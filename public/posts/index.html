@@ -1,6 +1,77 @@
-<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>HarryLoong's Blog</title>
-<link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel=stylesheet><style>:root{--primary:#2563eb;--bg:#f8fafc;--card-bg:#ffffff;--text:#1e293b;--text-light:#64748b;--border:#e2e8f0;--gradient:linear-gradient(135deg, #667eea 0%, #764ba2 100%)}*{margin:0;padding:0;box-sizing:border-box}body{font-family:inter,noto serif sc,-apple-system,sans-serif;line-height:1.8;background:var(--bg);color:var(--text)}.hero{background:var(--gradient);padding:4rem 2rem;text-align:center;position:relative;overflow:hidden}.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}.hero h1{color:#fff;font-size:2.5rem;position:relative;z-index:1}.hero .subtitle{color:rgba(255,255,255,.9);position:relative;z-index:1}.container{max-width:800px;margin:0 auto;padding:2rem}nav{background:var(--card-bg);border-bottom:1px solid var(--border);padding:1rem 0;position:sticky;top:0}nav .container{display:flex;justify-content:center;gap:2rem}nav a{color:var(--text-light);text-decoration:none;font-weight:500}nav a:hover{color:var(--primary)}.card{background:var(--card-bg);border-radius:16px;padding:2rem;margin-bottom:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,5%);border:1px solid var(--border);transition:transform .2s}.card:hover{transform:translateY(-2px)}.card h2{font-size:1.5rem;margin-bottom:.5rem}.card h2 a{color:var(--text);text-decoration:none}.card h2 a:hover{color:var(--primary)}.card p{color:var(--text-light)}.tag{display:inline-block;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:.3rem .8rem;border-radius:20px;font-size:.8rem}footer{text-align:center;padding:2rem;color:var(--text-light);border-top:1px solid var(--border);margin-top:3rem}</style></head><body><header class=hero><h1>HarryLoong's Blog</h1><p class=subtitle>技术分享与学习笔记</p></header><nav><div class=container><a href=/>🏠 首页</a>
-<a href=https://github.com/xzl01>🐙 GitHub</a></div></nav><main class=container><article class=card><h2><a href=/posts/linux-5g-modem/>Linux 下使用 5G Modem 上网指南</a></h2><p class=date>2026-03-02</p><p>详细介绍在 Linux 系统上配置 5G 蜂窝网络上网的完整步骤</p><div style=margin-top:1rem><span class=tag>Linux</span>
-<span class=tag>5G</span>
-<span class=tag>Modem</span>
-<span class=tag>教程</span></div></article><article class=card><h2><a href=/posts/welcome/>欢迎来到我的博客</a></h2><p class=date>2026-03-02</p><p></p></article></main><footer><p>&copy; 2026 HarryLoong. All rights reserved.</p></footer></body></html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HarryLoong&#39;s Blog</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #2563eb; --bg: #f8fafc; --card-bg: #ffffff; --text: #1e293b; --text-light: #64748b; --border: #e2e8f0; --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', 'Noto Serif SC', -apple-system, sans-serif; line-height: 1.8; background: var(--bg); color: var(--text); }
+        .hero { background: var(--gradient); padding: 4rem 2rem; text-align: center; position: relative; overflow: hidden; }
+        .hero::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
+        .hero h1 { color: white; font-size: 2.5rem; position: relative; z-index: 1; }
+        .hero .subtitle { color: rgba(255,255,255,0.9); position: relative; z-index: 1; }
+        .container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+        nav { background: var(--card-bg); border-bottom: 1px solid var(--border); padding: 1rem 0; position: sticky; top: 0; }
+        nav .container { display: flex; justify-content: center; gap: 2rem; }
+        nav a { color: var(--text-light); text-decoration: none; font-weight: 500; }
+        nav a:hover { color: var(--primary); }
+        .card { background: var(--card-bg); border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); transition: transform 0.2s; }
+        .card:hover { transform: translateY(-2px); }
+        .card h2 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .card h2 a { color: var(--text); text-decoration: none; }
+        .card h2 a:hover { color: var(--primary); }
+        .card p { color: var(--text-light); }
+        .tag { display: inline-block; background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; }
+        footer { text-align: center; padding: 2rem; color: var(--text-light); border-top: 1px solid var(--border); margin-top: 3rem; }
+    </style>
+</head>
+<body>
+    <header class="hero">
+        <h1>HarryLoong&#39;s Blog</h1>
+        <p class="subtitle">技术分享与学习笔记</p>
+    </header>
+    <nav>
+        <div class="container">
+            <a href="/">🏠 首页</a>
+            <a href="https://github.com/xzl01">🐙 GitHub</a>
+        </div>
+    </nav>
+    <main class="container">
+        
+        <article class="card">
+            <h2><a href="/posts/linux-5g-modem/">Linux 下使用 5G Modem 上网指南</a></h2>
+            <p class="date">2026-03-02</p>
+            <p>详细介绍在 Linux 系统上配置 5G 蜂窝网络上网的完整步骤</p>
+            
+            <div style="margin-top: 1rem;">
+                
+                <span class="tag">Linux</span>
+                
+                <span class="tag">5G</span>
+                
+                <span class="tag">Modem</span>
+                
+                <span class="tag">教程</span>
+                
+            </div>
+            
+        </article>
+        
+        <article class="card">
+            <h2><a href="/posts/welcome/">欢迎来到我的博客</a></h2>
+            <p class="date">2026-03-02</p>
+            <p></p>
+            
+        </article>
+        
+    </main>
+    <footer>
+        <p>&copy; 2026 HarryLoong. All rights reserved.</p>
+    </footer>
+</body>
+</html>
