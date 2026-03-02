@@ -1,97 +1,105 @@
----
-title: "Linux 下使用 5G Modem 上网指南"
-date: 2026-03-02
-description: "如何在 Linux 系统上配置 5G 蜂窝网络上网"
-tags: ["Linux", "5G", "Modem", "Network", "教程"]
----
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux 下使用 5G Modem 上网指南 - HarryLoong's Blog</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #2563eb; --bg: #f8fafc; --card-bg: #ffffff; --text: #1e293b; --text-light: #64748b; --border: #e2e8f0; --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', 'Noto Serif SC', -apple-system, sans-serif; line-height: 1.8; background: var(--bg); color: var(--text); }
+        .hero { background: var(--gradient); padding: 3rem 2rem; text-align: center; position: relative; }
+        .hero h1 { color: white; font-size: 1.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+        nav { background: var(--card-bg); border-bottom: 1px solid var(--border); padding: 1rem 0; position: sticky; top: 0; }
+        nav .container { display: flex; justify-content: center; gap: 2rem; }
+        nav a { color: var(--text-light); text-decoration: none; font-weight: 500; }
+        nav a:hover { color: var(--primary); }
+        .post { background: var(--card-bg); border-radius: 16px; padding: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .post h1 { font-size: 1.8rem; margin-bottom: 1rem; }
+        .post h2 { font-size: 1.4rem; margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); }
+        .post h3 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+        .post p { margin-bottom: 1rem; color: var(--text-light); }
+        .post ul, .post ol { margin: 1rem 0 1rem 1.5rem; color: var(--text-light); }
+        .post li { margin-bottom: 0.5rem; }
+        .post code { background: #f1f5f9; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: 'Monaco', monospace; font-size: 0.9rem; }
+        .post pre { background: #1e293b; color: #e2e8f0; padding: 1rem; border-radius: 8px; overflow-x: auto; margin: 1rem 0; }
+        .post pre code { background: none; padding: 0; color: inherit; }
+        .post blockquote { border-left: 4px solid var(--primary); padding-left: 1rem; margin: 1rem 0; color: var(--text-light); font-style: italic; }
+        .post a { color: var(--primary); }
+        .tag { display: inline-block; background: rgba(37,99,235,0.1); color: var(--primary); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; margin-right: 0.5rem; }
+        .date { color: var(--text-light); font-size: 0.9rem; }
+        footer { text-align: center; padding: 2rem; color: var(--text-light); border-top: 1px solid var(--border); margin-top: 3rem; }
+    </style>
+</head>
+<body>
+    <header class="hero">
+        <h1>Linux 下使用 5G Modem 上网指南</h1>
+    </header>
+    <nav>
+        <div class="container">
+            <a href="/">🏠 首页</a>
+            <a href="/posts/">📝 文章</a>
+            <a href="https://github.com/xzl01">🐙 GitHub</a>
+        </div>
+    </nav>
+    <main class="container">
+        <article class="post">
+            <p class="date">📅 2026-03-02</p>
+            <p><span class="tag">Linux</span><span class="tag">5G</span><span class="tag">Modem</span><span class="tag">教程</span></p>
+            
+            <blockquote>本教程将详细介绍在 Linux 系统中使用 ModemManager 连接 5G 网络的完整步骤。</blockquote>
 
-# Linux 下使用 5G Modem 上网指南
+            <h2 id="环境说明">环境说明</h2>
+            <ul>
+                <li><strong>操作系统</strong>: Deepin Linux / Debian / Ubuntu</li>
+                <li><strong>硬件</strong>: 5G WWAN 模块</li>
+                <li><strong>软件</strong>: ModemManager, NetworkManager</li>
+            </ul>
 
-> 本教程将详细介绍在 Linux 系统中使用 ModemManager 连接 5G 网络的完整步骤。
+            <h2 id="第一步安装-modemmanager">第一步：安装 ModemManager</h2>
+            <p>ModemManager 是一个由 freedesktop 托管的项目，旨在 Linux 设备上运行调制解调器以获得蜂窝无线网络连接能力。</p>
 
----
+            <h3 id="安装">安装</h3>
+            <pre><code>sudo apt install modemmanager</code></pre>
 
-## 环境说明
+            <h3 id="检查内核驱动">检查内核驱动</h3>
+            <p>确保内核模块已正确加载 WWAN 驱动：</p>
+            <pre><code>lspci -vvv</code></pre>
 
-- **操作系统**: Deepin Linux / Debian / Ubuntu
-- **硬件**: 5G WWAN 模块
-- **软件**: ModemManager, NetworkManager
+            <h2 id="第二步使用-mmcli-连接5g网络">第二步：使用 mmcli 连接 5G 网络</h2>
 
----
+            <h3 id="查看-wwan-卡信息">1. 查看 WWAN 卡信息</h3>
+            <pre><code>mmcli -L</code></pre>
+            <p>返回信息包含三个内容：</p>
+            <ul>
+                <li>DBus 地址</li>
+                <li>设备类型</li>
+                <li>设备 ID</li>
+            </ul>
+            <blockquote>💡 DBus 地址的最后一位为设备编号</blockquote>
 
-## 第一步：安装 ModemManager
+            <h3 id="查看设备详情">2. 查看设备详情</h3>
+            <pre><code>mmcli --modem=&lt;设备编号&gt;</code></pre>
 
-ModemManager 是一个由 freedesktop 托管的项目，旨在 Linux 设备上运行调制解调器以获得蜂窝无线网络连接能力。
+            <h3 id="解锁-sim-卡">3. 解锁 SIM 卡（如有 PIN 锁）</h3>
+            <pre><code>mmcli --modem=0 --sim=0 --pin=你的PIN码</code></pre>
 
-```bash
-# 安装 ModemManager
-sudo apt install modemmanager
-```
+            <h3 id="启动设备">4. 启动设备</h3>
+            <pre><code>mmcli --modem=&lt;设备编号&gt; --enable</code></pre>
 
-### 检查内核驱动
+            <h3 id="连接网络">5. 连接网络</h3>
+            <pre><code>mmcli -m &lt;设备编号&gt; --simple-connect='apn=你的APN,ip-type=ipv4v6'</code></pre>
+            <p><strong>示例</strong>（中国电信）：</p>
+            <pre><code>mmcli -m 4 --simple-connect='apn=ctnet,ip-type=ipv4v6'</code></pre>
 
-确保内核模块已正确加载 WWAN 驱动：
-
-```bash
-lspci -vvv
-```
-
----
-
-## 第二步：使用 mmcli 连接 5G 网络
-
-### 1. 查看 WWAN 卡信息
-
-```bash
-mmcli -L
-```
-
-返回信息包含三个内容：
-- DBus 地址
-- 设备类型
-- 设备 ID
-
-> 💡 DBus 地址的最后一位为设备编号
-
-### 2. 查看设备详情
-
-```bash
-mmcli --modem=<设备编号>
-```
-
-### 3. 解锁 SIM 卡（如有 PIN 锁）
-
-```bash
-mmcli --modem=0 --sim=0 --pin=你的PIN码
-```
-
-### 4. 启动设备
-
-```bash
-mmcli --modem=<设备编号> --enable
-```
-
-### 5. 连接网络
-
-```bash
-mmcli -m <设备编号> --simple-connect='apn=你的APN,ip-type=ipv4v6'
-```
-
-**示例**（中国电信）：
-```bash
-mmcli -m 4 --simple-connect='apn=ctnet,ip-type=ipv4v6'
-```
-
-### 6. 查看 Bearer 信息
-
-```bash
-mmcli -m <设备编号> -b <Bearer编号>
-```
-
-成功后会显示类似信息：
-
-```
-Status
+            <h3 id="查看-bearer-信息">6. 查看 Bearer 信息</h3>
+            <pre><code>mmcli -m &lt;设备编号&gt; -b &lt;Bearer编号&gt;</code></pre>
+            <p>成功后会显示类似信息：</p>
+            <pre><code>Status
   connected: yes
   interface: wwan0
 
@@ -100,63 +108,44 @@ IPv4 configuration
   address: 10.122.58.19
   prefix: 8
   gateway: 10.122.58.17
-  dns: 202.103.24.68, 202.103.44.150
-```
+  dns: 202.103.24.68, 202.103.44.150</code></pre>
 
----
+            <h2 id="第三步通过-networkmanager-管理连接">第三步：通过 NetworkManager 管理连接</h2>
+            <p>NetworkManager 对 ModemManager 有很好的支持。</p>
 
-## 第三步：通过 NetworkManager 管理连接
-
-NetworkManager 对 ModemManager 有很好的支持。
-
-### 1. 查看网络设备
-
-```bash
-nmcli device show
-```
-
-你会看到一个以 `wwan` 开头的设备：
-
-```
-GENERAL.DEVICE: wwan0mbim0
+            <h3 id="查看网络设备">1. 查看网络设备</h3>
+            <pre><code>nmcli device show</code></pre>
+            <p>你会看到一个以 <code>wwan</code> 开头的设备：</p>
+            <pre><code>GENERAL.DEVICE: wwan0mbim0
 GENERAL.TYPE: gsm
-GENERAL.STATE: 100（已连接）
-```
+GENERAL.STATE: 100（已连接）</code></pre>
 
-### 2. 激活连接
+            <h3 id="激活连接">2. 激活连接</h3>
+            <pre><code>nmcli d connect wwan0mbim0</code></pre>
 
-```bash
-nmcli d connect wwan0mbim0
-```
+            <h3 id="验证连接">3. 验证连接</h3>
+            <pre><code>ip a</code></pre>
+            <p>看到分配到的 IP 地址就说明成功了！</p>
 
-### 3. 验证连接
+            <h2 id="常见问题">常见问题</h2>
 
-```bash
-ip a
-```
+            <h3 id="q1">Q: mmcli 命令找不到？</h3>
+            <p>确保已安装 <code>modemmanager</code> 和 <code>modemmanager-gui</code> 包</p>
 
-看到分配到的 IP 地址就说明成功了！
+            <h3 id="q2">Q: 一直显示 "connecting"？</h3>
+            <p>检查 SIM 卡是否正确插入，APN 是否正确</p>
 
----
+            <h3 id="q3">Q: DNS 无法解析？</h3>
+            <p>手动设置 DNS：</p>
+            <pre><code>nmcli dev modify wwan0 ipv4.dns "8.8.8.8 8.8.4.4"</code></pre>
 
-## 常见问题
-
-### Q: mmcli 命令找不到？
-A: 确保已安装 `modemmanager` 和 `modemmanager-gui` 包
-
-### Q: 一直显示 "connecting"？
-A: 检查 SIM 卡是否正确插入，APN 是否正确
-
-### Q: DNS 无法解析？
-A: 手动设置 DNS：
-```bash
-nmcli dev modify wwan0 ipv4.dns "8.8.8.8 8.8.4.4"
-```
-
----
-
-## 总结
-
-通过以上步骤，你就可以在 Linux 系统上使用 5G 蜂窝网络上网了。ModemManager 提供了便捷的命令行工具，让 5G 上网变得简单可控。
-
-> 📡 享受高速的 5G 网络吧！
+            <h2 id="总结">总结</h2>
+            <p>通过以上步骤，你就可以在 Linux 系统上使用 5G 蜂窝网络上网了。ModemManager 提供了便捷的命令行工具，让 5G 上网变得简单可控。</p>
+            <blockquote>📡 享受高速的 5G 网络吧！</blockquote>
+        </article>
+    </main>
+    <footer>
+        <p>&copy; 2026 HarryLoong. All rights reserved.</p>
+    </footer>
+</body>
+</html>
