@@ -6,10 +6,9 @@
     <title>{{ .Title }} - {{ .Site.Title }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script>hljs.highlightAll();</script>
     <style>
         :root { --primary: #2563eb; --bg: #f8fafc; --card-bg: #ffffff; --text: #1e293b; --text-light: #64748b; --border: #e2e8f0; --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -28,10 +27,17 @@
         .post p { margin-bottom: 1rem; color: var(--text-light); }
         .post ul, .post ol { margin: 1rem 0 1rem 1.5rem; color: var(--text-light); }
         .post li { margin-bottom: 0.5rem; }
-        .post code { background: #f1f5f9; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: 'Monaco', monospace; font-size: 0.9rem; }
-        .post pre { background: #1e293b; color: #e2e8f0; padding: 1rem; border-radius: 8px; overflow-x: auto; margin: 1rem 0; }
-        .post pre { background: transparent; padding: 0; margin: 1rem 0; }
-        .post pre code { background: #0d1117; color: #c9d1d9; padding: 1rem; border-radius: 8px; overflow-x: auto; display: block; font-family: 'Fira Code', 'Monaco', monospace; font-size: 0.9rem; line-height: 1.5; }
+        .post code:not(pre code) { background: #f1f5f9; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .post pre { background: #0d1117 !important; border-radius: 8px; margin: 1rem 0; overflow: hidden; }
+        .post pre code { 
+            display: block; 
+            padding: 1rem; 
+            overflow-x: auto; 
+            font-family: 'Fira Code', 'Monaco', monospace; 
+            font-size: 0.85rem; 
+            line-height: 1.6;
+            background: transparent !important;
+        }
         .post blockquote { border-left: 4px solid var(--primary); padding-left: 1rem; margin: 1rem 0; color: var(--text-light); font-style: italic; }
         .post a { color: var(--primary); }
         .tag { display: inline-block; background: rgba(37,99,235,0.1); color: var(--primary); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; margin-right: 0.5rem; }
@@ -41,19 +47,31 @@
 </head>
 <body>
     <header class="hero">
-        <h1>{{ .Site.Title }}</h1>
+        <h1>{{ .Title }}</h1>
     </header>
     <nav>
         <div class="container">
             <a href="/">🏠 首页</a>
+            <a href="/blog/">📝 文章</a>
             <a href="https://github.com/xzl01">🐙 GitHub</a>
         </div>
     </nav>
     <main class="container">
-        {{ .Content }}
+        <article class="post">
+            <p class="date">{{ .Date.Format "2006-01-02" }}</p>
+            {{ with .Params.tags }}
+            <div style="margin: 1rem 0;">
+                {{ range . }}
+                <span class="tag">{{ . }}</span>
+                {{ end }}
+            </div>
+            {{ end }}
+            {{ .Content }}
+        </article>
     </main>
     <footer>
         <p>&copy; 2026 HarryLoong. All rights reserved.</p>
     </footer>
+    <script>hljs.highlightAll();</script>
 </body>
 </html>

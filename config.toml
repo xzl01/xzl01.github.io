@@ -7,9 +7,8 @@ title = "HarryLoong's Blog"
   page = ["HTML"]
 
 [markup]
-  [markup.goldmark]
-    [markup.goldmark.renderer]
-      unsafe = true
   [markup.highlight]
     noClasses = false
     style = "github-dark"
+  [markup.goldmark.renderer]
+    unsafe = true
