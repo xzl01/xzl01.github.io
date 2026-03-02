@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>教程 on HarryLoong's Blog</title><link>https://xzl01.github.io/tags/%E6%95%99%E7%A8%8B/</link><description>Recent content in 教程 on HarryLoong's Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Mon, 02 Mar 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://xzl01.github.io/tags/%E6%95%99%E7%A8%8B/index.xml" rel="self" type="application/rss+xml"/><item><title>Linux 下使用 5G Modem 上网指南</title><link>https://xzl01.github.io/posts/linux-5g-modem/</link><pubDate>Mon, 02 Mar 2026 00:00:00 +0000</pubDate><guid>https://xzl01.github.io/posts/linux-5g-modem/</guid><description>简介 本教程将详细介绍在 Linux 系统中使用 ModemManager 连接 5G 网络的完整步骤。
+环境说明 操作系统: Deepin Linux / Debian / Ubuntu 硬件: 5G WWAN 模块 软件: ModemManager, NetworkManager 第一步：安装 ModemManager ModemManager 是一个由 freedesktop 托管的项目，旨在 Linux 设备上运行调制解调器以获得蜂窝无线网络连接能力。
+# 安装 ModemManager sudo apt install modemmanager 检查内核驱动 确保内核模块已正确加载 WWAN 驱动：
+lspci -vvv 第二步：使用 mmcli 连接 5G 网络 1. 查看 WWAN 卡信息 mmcli -L 返回信息包含三个内容：
+DBus 地址 设备类型 设备 ID 💡 DBus 地址的最后一位为设备编号
+2. 查看设备详情 mmcli --modem=&amp;lt;设备编号&amp;gt; 3. 解锁 SIM 卡（如有 PIN 锁） mmcli --modem=0 --sim=0 --pin=你的PIN码 4.</description></item></channel></rss>
