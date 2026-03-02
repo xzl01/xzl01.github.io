@@ -85,7 +85,7 @@ mmcli -m <设备编号> -b <Bearer编号>
 
 成功后会显示类似信息：
 
-```
+```text
 Status
   connected: yes
   interface: wwan0
@@ -110,7 +110,7 @@ nmcli device show
 
 你会看到一个以 `wwan` 开头的设备：
 
-```
+```text
 GENERAL.DEVICE: wwan0mbim0
 GENERAL.TYPE: gsm
 GENERAL.STATE: 100（已连接）
