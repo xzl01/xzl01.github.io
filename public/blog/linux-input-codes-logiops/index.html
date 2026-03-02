@@ -1,0 +1,97 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Linux 输入设备键码与 Logitech MX Master 配置指南 - HarryLoong's Blog</title>
+<link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap" rel=stylesheet><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js></script><style>:root{--primary:#2563eb;--bg:#f8fafc;--card-bg:#ffffff;--text:#1e293b;--text-light:#64748b;--border:#e2e8f0;--gradient:linear-gradient(135deg, #667eea 0%, #764ba2 100%)}*{margin:0;padding:0;box-sizing:border-box}body{font-family:inter,noto serif sc,-apple-system,sans-serif;line-height:1.8;background:var(--bg);color:var(--text)}.hero{background:var(--gradient);padding:3rem 2rem;text-align:center}.hero h1{color:#fff;font-size:1.8rem}.container{max-width:800px;margin:0 auto;padding:2rem}nav{background:var(--card-bg);border-bottom:1px solid var(--border);padding:1rem 0;position:sticky;top:0}nav .container{display:flex;justify-content:center;gap:2rem}nav a{color:var(--text-light);text-decoration:none;font-weight:500}nav a:hover{color:var(--primary)}.post{background:var(--card-bg);border-radius:16px;padding:2rem;box-shadow:0 1px 3px rgba(0,0,0,5%);border:1px solid var(--border)}.post h1{font-size:1.8rem;margin-bottom:1rem}.post h2{font-size:1.4rem;margin:2rem 0 1rem;padding-bottom:.5rem;border-bottom:2px solid var(--border)}.post h3{font-size:1.2rem;margin:1.5rem 0 .5rem}.post p{margin-bottom:1rem;color:var(--text-light)}.post ul,.post ol{margin:1rem 0 1rem 1.5rem;color:var(--text-light)}.post li{margin-bottom:.5rem}.post code:not(pre code){background:#f1f5f9;padding:.2rem .4rem;border-radius:4px;font-family:fira code,monospace;font-size:.9rem}.post pre{background:#0d1117!important;border-radius:8px;margin:1rem 0;overflow:hidden}.post pre code{display:block;padding:1rem;overflow-x:auto;font-family:fira code,monaco,monospace;font-size:.85rem;line-height:1.6;background:0 0!important}.post blockquote{border-left:4px solid var(--primary);padding-left:1rem;margin:1rem 0;color:var(--text-light);font-style:italic}.post a{color:var(--primary)}.tag{display:inline-block;background:rgba(37,99,235,.1);color:var(--primary);padding:.25rem .75rem;border-radius:20px;font-size:.85rem;margin-right:.5rem}.date{color:var(--text-light);font-size:.9rem}footer{text-align:center;padding:2rem;color:var(--text-light);border-top:1px solid var(--border);margin-top:3rem}</style></head><body><header class=hero><h1>Linux 输入设备键码与 Logitech MX Master 配置指南</h1></header><nav><div class=container><a href=/>🏠 首页</a>
+<a href=/blog/>📝 文章</a>
+<a href=https://github.com/xzl01>🐙 GitHub</a></div></nav><main class=container><article class=post><p class=date>2026-03-02</p><div style="margin:1rem 0"><span class=tag>Linux</span>
+<span class=tag>Logitech</span>
+<span class=tag>键码</span>
+<span class=tag>配置</span>
+<span class=tag>鼠标</span></div><h2 id=简介>简介</h2><p>本文档包含 Linux 输入设备键码定义以及 Logitech MX Master 2S 鼠标的 logiops 配置教程。</p><hr><h2 id=第一部分linux-输入事件码>第一部分：Linux 输入事件码</h2><h3 id=键盘键码-key_>键盘键码 (KEY_*)</h3><table><thead><tr><th>键码</th><th>定义</th><th>说明</th></tr></thead><tbody><tr><td><code>0x01</code></td><td>KEY_ESC</td><td>ESC 键</td></tr><tr><td><code>0x02-0x0C</code></td><td>KEY_1 - KEY_0</td><td>数字键</td></tr><tr><td><code>0x10</code></td><td>KEY_Q</td><td>Q 键</td></tr><tr><td>&mldr;</td><td>&mldr;</td><td>更多请查看源码</td></tr></tbody></table><h3 id=鼠标触控按钮-btn_>鼠标/触控按钮 (BTN_*)</h3><table><thead><tr><th>键码</th><th>定义</th><th>说明</th></tr></thead><tbody><tr><td><code>0x110</code></td><td>BTN_LEFT</td><td>鼠标左键</td></tr><tr><td><code>0x111</code></td><td>BTN_RIGHT</td><td>鼠标右键</td></tr><tr><td><code>0x112</code></td><td>BTN_MIDDLE</td><td>鼠标中键</td></tr><tr><td><code>0x113</code></td><td>BTN_SIDE</td><td>侧边按钮</td></tr><tr><td><code>0x114</code></td><td>BTN_EXTRA</td><td>额外按钮</td></tr><tr><td><code>0x115</code></td><td>BTN_FORWARD</td><td>前进按钮</td></tr><tr><td><code>0x116</code></td><td>BTN_BACK</td><td>后退按钮</td></tr></tbody></table><h3 id=绝对坐标轴-abs_>绝对坐标轴 (ABS_*)</h3><table><thead><tr><th>键码</th><th>定义</th><th>说明</th></tr></thead><tbody><tr><td><code>0x00</code></td><td>ABS_X</td><td>X 坐标</td></tr><tr><td><code>0x01</code></td><td>ABS_Y</td><td>Y 坐标</td></tr><tr><td><code>0x18</code></td><td>ABS_PRESSURE</td><td>压力</td></tr><tr><td><code>0x35</code></td><td>ABS_MT_POSITION_X</td><td>多点触控 X</td></tr><tr><td><code>0x36</code></td><td>ABS_MT_POSITION_Y</td><td>多点触控 Y</td></tr></tbody></table><h3 id=系统控制键-key_-系统功能>系统控制键 (KEY_* 系统功能)</h3><table><thead><tr><th>键码</th><th>定义</th><th>功能</th></tr></thead><tbody><tr><td><code>0x100</code></td><td>KEY_POWER</td><td>电源</td></tr><tr><td><code>0x6E</code></td><td>KEY_DISPLAY_TOOGLE</td><td>显示开关</td></tr><tr><td><code>0x6F</code></td><td>KEY_SLEEP</td><td>睡眠</td></tr><tr><td><code>0xE2</code></td><td>KEY_MUTE</td><td>静音</td></tr><tr><td><code>0xE5</code></td><td>KEY_PLAYPAUSE</td><td>播放/暂停</td></tr><tr><td><code>0xE6</code></td><td>KEY_NEXTSONG</td><td>下一曲</td></tr><tr><td><code>0xE7</code></td><td>KEY_VOLUMEUP</td><td>音量+</td></tr><tr><td><code>0xE8</code></td><td>KEY_VOLUMEDOWN</td><td>音量-</td></tr></tbody></table><blockquote><p>📖 完整键码列表请参考：<a href=https://github.com/torvalds/linux/blob/master/include/uapi/linux/input-event-codes.h>linux/input-event-codes.h</a></p></blockquote><hr><h2 id=第二部分logitech-mx-master-配置>第二部分：Logitech MX Master 配置</h2><h3 id=安装-logiops>安装 logiops</h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo apt install logiops
+</span></span><span class=line><span class=cl><span class=c1># 或从源码编译</span>
+</span></span><span class=line><span class=cl>git clone https://github.com/PixlOne/logiops.git
+</span></span><span class=line><span class=cl><span class=nb>cd</span> logiops
+</span></span><span class=line><span class=cl>cmake .
+</span></span><span class=line><span class=cl>make
+</span></span><span class=line><span class=cl>sudo make install
+</span></span></code></pre></div><h3 id=配置文件位置>配置文件位置</h3><ul><li>默认配置：<code>/etc/logid.cfg</code></li><li>自定义配置：<code>~/.config/logid.cfg</code> 或使用 <code>-c</code> 参数</li></ul><h3 id=配置示例>配置示例</h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-json data-lang=json><span class=line><span class=cl><span class=err>devices:</span> <span class=err>(</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=err>name:</span> <span class=nt>&#34;Wireless Mouse MX Master 2S&#34;</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=c1>// DPI 设置
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=err>dpi</span><span class=p>:</span> <span class=mi>2000</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=c1>// SmartShift 滚轮模式
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=err>smartshift</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=err>on:</span> <span class=err>true;</span>
+</span></span><span class=line><span class=cl>            <span class=err>threshold:</span> <span class=err>30;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=c1>// HiRes 滚轮设置
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=err>hiresscroll</span><span class=p>:</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=err>hires:</span> <span class=err>true;</span>
+</span></span><span class=line><span class=cl>            <span class=err>invert:</span> <span class=err>false;</span>
+</span></span><span class=line><span class=cl>            <span class=err>target:</span> <span class=err>false;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>        
+</span></span><span class=line><span class=cl>        <span class=c1>// 按钮映射
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=err>buttons</span><span class=p>:</span> <span class=err>(</span>
+</span></span><span class=line><span class=cl>            <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=c1>// 手势按钮 (cid: 0xc3)
+</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=err>cid:</span> <span class=err>0xc3;</span>
+</span></span><span class=line><span class=cl>                <span class=err>action</span> <span class=err>=</span> <span class=err>{</span>
+</span></span><span class=line><span class=cl>                    <span class=err>type:</span> <span class=nt>&#34;Gestures&#34;</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                    <span class=err>gestures</span><span class=p>:</span> <span class=err>(</span>
+</span></span><span class=line><span class=cl>                        <span class=p>{</span>
+</span></span><span class=line><span class=cl>                            <span class=err>direction:</span> <span class=nt>&#34;Up&#34;</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                            <span class=err>mode</span><span class=p>:</span> <span class=s2>&#34;OnRelease&#34;</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                            <span class=err>action</span> <span class=err>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                                <span class=err>type:</span> <span class=nt>&#34;Keypress&#34;</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                                <span class=err>keys</span><span class=p>:</span> <span class=p>[</span><span class=s2>&#34;KEY_LEFTMETA&#34;</span><span class=p>,</span> <span class=s2>&#34;KEY_F&#34;</span><span class=p>]</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                            <span class=p>}</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                        <span class=p>},</span>
+</span></span><span class=line><span class=cl>                        <span class=err>{</span>
+</span></span><span class=line><span class=cl>                            <span class=err>direction:</span> <span class=nt>&#34;Down&#34;</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                            <span class=err>mode</span><span class=p>:</span> <span class=s2>&#34;OnRelease&#34;</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                            <span class=err>action</span> <span class=err>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                                <span class=err>type:</span> <span class=nt>&#34;Keypress&#34;</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                                <span class=err>keys</span><span class=p>:</span> <span class=p>[</span><span class=s2>&#34;KEY_LEFTMETA&#34;</span><span class=p>,</span> <span class=s2>&#34;KEY_B&#34;</span><span class=p>]</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                            <span class=p>}</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                        <span class=p>},</span>
+</span></span><span class=line><span class=cl>                        <span class=err>{</span>
+</span></span><span class=line><span class=cl>                            <span class=err>direction:</span> <span class=nt>&#34;Left&#34;</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                            <span class=err>mode</span><span class=p>:</span> <span class=s2>&#34;OnRelease&#34;</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                            <span class=err>action</span> <span class=err>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                                <span class=err>type:</span> <span class=nt>&#34;Keypress&#34;</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                                <span class=err>keys</span><span class=p>:</span> <span class=p>[</span><span class=s2>&#34;KEY_LEFTMETA&#34;</span><span class=p>,</span> <span class=s2>&#34;KEY_LEFTSHIFT&#34;</span><span class=p>,</span> <span class=s2>&#34;KEY_TAB&#34;</span><span class=p>]</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                            <span class=p>}</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                        <span class=p>}</span><span class=err>,</span>
+</span></span><span class=line><span class=cl>                        <span class=p>{</span>
+</span></span><span class=line><span class=cl>                            <span class=err>direction:</span> <span class=nt>&#34;Right&#34;</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                            <span class=err>mode</span><span class=p>:</span> <span class=s2>&#34;OnRelease&#34;</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                            <span class=err>action</span> <span class=err>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                                <span class=err>type:</span> <span class=nt>&#34;Keypress&#34;</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                                <span class=err>keys</span><span class=p>:</span> <span class=p>[</span><span class=s2>&#34;KEY_LEFTMETA&#34;</span><span class=p>,</span> <span class=s2>&#34;KEY_TAB&#34;</span><span class=p>]</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                            <span class=p>}</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                        <span class=p>}</span><span class=err>,</span>
+</span></span><span class=line><span class=cl>                        <span class=p>{</span>
+</span></span><span class=line><span class=cl>                            <span class=err>direction:</span> <span class=nt>&#34;None&#34;</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                            <span class=err>mode</span><span class=p>:</span> <span class=s2>&#34;OnRelease&#34;</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                            <span class=err>action</span> <span class=err>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>                                <span class=err>type:</span> <span class=nt>&#34;Keypress&#34;</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                                <span class=err>keys</span><span class=p>:</span> <span class=p>[</span><span class=s2>&#34;KEY_LEFTMETA&#34;</span><span class=p>,</span> <span class=s2>&#34;KEY_LEFTSHIFT&#34;</span><span class=p>,</span> <span class=s2>&#34;KEY_SPACE&#34;</span><span class=p>]</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                            <span class=p>}</span><span class=err>;</span>
+</span></span><span class=line><span class=cl>                        <span class=p>}</span>
+</span></span><span class=line><span class=cl>                    <span class=err>);</span>
+</span></span><span class=line><span class=cl>                <span class=err>};</span>
+</span></span><span class=line><span class=cl>            <span class=err>}</span>
+</span></span><span class=line><span class=cl>        <span class=err>);</span>
+</span></span><span class=line><span class=cl>    <span class=err>}</span>
+</span></span><span class=line><span class=cl><span class=err>);</span>
+</span></span></code></pre></div><h3 id=常用-cid-值-mx-master-系列>常用 cid 值 (MX Master 系列)</h3><table><thead><tr><th>按钮</th><th>cid 值</th></tr></thead><tbody><tr><td>滚轮按下</td><td>0xc4</td></tr><tr><td>手势按钮</td><td>0xc3</td></tr><tr><td>中键</td><td>0xc0</td></tr><tr><td>前进</td><td>0x53</td></tr><tr><td>后退</td><td>0x56</td></tr></tbody></table><h3 id=调试命令>调试命令</h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 查看设备列表</span>
+</span></span><span class=line><span class=cl>xinpt --list
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 测试按钮事件</span>
+</span></span><span class=line><span class=cl>xinput test-xi2 --root &lt;设备ID&gt;
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 启动 logiops (调试模式)</span>
+</span></span><span class=line><span class=cl>sudo logid -d
+</span></span></code></pre></div><hr><h2 id=参考资料>参考资料</h2><ul><li><a href=https://github.com/torvalds/linux/blob/master/include/uapi/linux/input-event-codes.h>linux/input-event-codes.h</a></li><li><a href=https://github.com/PixlOne/logiops/wiki>logiops Wiki</a></li><li><a href=https://www.logitech.com.cn/zh-cn/products/masters/mx-master-2s.html>Logitech MX Master 2S 产品页面</a></li></ul></article></main><footer><p>&copy; 2026 HarryLoong. All rights reserved.</p></footer><script>hljs.highlightAll()</script></body></html>
