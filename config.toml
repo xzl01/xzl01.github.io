@@ -1,3 +1,13 @@
-baseURL = "https://xzl01.github.io/"
-languageCode = "zh-cn"
+baseURL = 'https://xzl01.github.io/'
+languageCode = 'zh-cn'
 title = "HarryLoong's Blog"
+theme = ''
+
+[outputs]
+  home = ["HTML"]
+  page = ["HTML"]
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true

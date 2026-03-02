@@ -1,8 +1,55 @@
-{{ define "main" }}
-<article>
-    <h2>{{ .Title }}</h2>
-    <p class="date">{{ .Date.Format "2006-01-02" }}</p>
-    <hr>
-    {{ .Content }}
-</article>
-{{ end }}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Title }} - {{ .Site.Title }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #2563eb; --bg: #f8fafc; --card-bg: #ffffff; --text: #1e293b; --text-light: #64748b; --border: #e2e8f0; --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', 'Noto Serif SC', -apple-system, sans-serif; line-height: 1.8; background: var(--bg); color: var(--text); }
+        .hero { background: var(--gradient); padding: 3rem 2rem; text-align: center; }
+        .hero h1 { color: white; font-size: 1.8rem; }
+        .container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+        nav { background: var(--card-bg); border-bottom: 1px solid var(--border); padding: 1rem 0; position: sticky; top: 0; }
+        nav .container { display: flex; justify-content: center; gap: 2rem; }
+        nav a { color: var(--text-light); text-decoration: none; font-weight: 500; }
+        nav a:hover { color: var(--primary); }
+        .post { background: var(--card-bg); border-radius: 16px; padding: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .post h1 { font-size: 1.8rem; margin-bottom: 1rem; }
+        .post h2 { font-size: 1.4rem; margin: 2rem 0 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--border); }
+        .post h3 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+        .post p { margin-bottom: 1rem; color: var(--text-light); }
+        .post ul, .post ol { margin: 1rem 0 1rem 1.5rem; color: var(--text-light); }
+        .post li { margin-bottom: 0.5rem; }
+        .post code { background: #f1f5f9; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: 'Monaco', monospace; font-size: 0.9rem; }
+        .post pre { background: #1e293b; color: #e2e8f0; padding: 1rem; border-radius: 8px; overflow-x: auto; margin: 1rem 0; }
+        .post pre code { background: none; padding: 0; color: inherit; }
+        .post blockquote { border-left: 4px solid var(--primary); padding-left: 1rem; margin: 1rem 0; color: var(--text-light); font-style: italic; }
+        .post a { color: var(--primary); }
+        .tag { display: inline-block; background: rgba(37,99,235,0.1); color: var(--primary); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; margin-right: 0.5rem; }
+        .date { color: var(--text-light); font-size: 0.9rem; }
+        footer { text-align: center; padding: 2rem; color: var(--text-light); border-top: 1px solid var(--border); margin-top: 3rem; }
+    </style>
+</head>
+<body>
+    <header class="hero">
+        <h1>{{ .Site.Title }}</h1>
+    </header>
+    <nav>
+        <div class="container">
+            <a href="/">🏠 首页</a>
+            <a href="https://github.com/xzl01">🐙 GitHub</a>
+        </div>
+    </nav>
+    <main class="container">
+        {{ .Content }}
+    </main>
+    <footer>
+        <p>&copy; 2026 HarryLoong. All rights reserved.</p>
+    </footer>
+</body>
+</html>
