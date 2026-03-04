@@ -1,0 +1,63 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>64位主机进入ARM/32位rootfs的chroot配置指南 - HarryLoong's Blog</title>
+<link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Inter:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap" rel=stylesheet><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js></script><style>:root{--primary:#2563eb;--bg:#f8fafc;--card-bg:#ffffff;--text:#1e293b;--text-light:#64748b;--border:#e2e8f0;--gradient:linear-gradient(135deg, #667eea 0%, #764ba2 100%)}*{margin:0;padding:0;box-sizing:border-box}body{font-family:inter,noto serif sc,-apple-system,sans-serif;line-height:1.8;background:var(--bg);color:var(--text)}.hero{background:var(--gradient);padding:3rem 2rem;text-align:center}.hero h1{color:#fff;font-size:1.8rem}.container{max-width:800px;margin:0 auto;padding:2rem}nav{background:var(--card-bg);border-bottom:1px solid var(--border);padding:1rem 0;position:sticky;top:0}nav .container{display:flex;justify-content:center;gap:2rem}nav a{color:var(--text-light);text-decoration:none;font-weight:500}nav a:hover{color:var(--primary)}.post{background:var(--card-bg);border-radius:16px;padding:2rem;box-shadow:0 1px 3px rgba(0,0,0,5%);border:1px solid var(--border)}.post h1{font-size:1.8rem;margin-bottom:1rem}.post h2{font-size:1.4rem;margin:2rem 0 1rem;padding-bottom:.5rem;border-bottom:2px solid var(--border)}.post h3{font-size:1.2rem;margin:1.5rem 0 .5rem}.post p{margin-bottom:1rem;color:var(--text-light)}.post ul,.post ol{margin:1rem 0 1rem 1.5rem;color:var(--text-light)}.post li{margin-bottom:.5rem}.post code:not(pre code){background:#f1f5f9;padding:.2rem .4rem;border-radius:4px;font-family:fira code,monospace;font-size:.9rem}.post pre{background:#0d1117!important;border-radius:8px;margin:1rem 0;overflow:hidden}.post pre code{display:block;padding:1rem;overflow-x:auto;font-family:fira code,monaco,monospace;font-size:.85rem;line-height:1.6;background:0 0!important}.post blockquote{border-left:4px solid var(--primary);padding-left:1rem;margin:1rem 0;color:var(--text-light);font-style:italic}.post a{color:var(--primary)}.tag{display:inline-block;background:rgba(37,99,235,.1);color:var(--primary);padding:.25rem .75rem;border-radius:20px;font-size:.85rem;margin-right:.5rem}.date{color:var(--text-light);font-size:.9rem}footer{text-align:center;padding:2rem;color:var(--text-light);border-top:1px solid var(--border);margin-top:3rem}</style></head><body><header class=hero><h1>64位主机进入ARM/32位rootfs的chroot配置指南</h1></header><nav><div class=container><a href=/>🏠 首页</a>
+<a href=/blog/>📝 文章</a>
+<a href=https://github.com/xzl01>🐙 GitHub</a></div></nav><main class=container><article class=post><p class=date>2026-03-04</p><div style="margin:1rem 0"><span class=tag>Linux</span>
+<span class=tag>chroot</span>
+<span class=tag>ARM</span>
+<span class=tag>QEMU</span>
+<span class=tag>交叉编译</span></div><h1 id=64位主机进入arm32位rootfs的chroot配置指南>64位主机进入ARM/32位rootfs的chroot配置指南</h1><p>在 64 位主机上使用 chroot 进入一个为不同架构（如 ARM 或 32 位 i386）准备的根文件系统（rootfs）时，为了确保环境能正常工作，必须正确挂载一系列虚拟文件系统。</p><h2 id=1-挂载核心虚拟文件系统>1. 挂载核心虚拟文件系统</h2><p>在 chroot 之前，必须将宿主机的几个关键虚拟文件系统绑定挂载到目标 rootfs 的对应目录下。这是为了让 chroot 环境内的进程能够访问设备、进程信息和系统信息等核心资源。</p><h3 id=proc---进程信息文件系统>/proc - 进程信息文件系统</h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo mount -t proc /proc /path/to/rootfs/proc
+</span></span><span class=line><span class=cl><span class=c1># 或使用 --bind 选项</span>
+</span></span><span class=line><span class=cl>sudo mount --bind /proc /path/to/rootfs/proc
+</span></span></code></pre></div><h3 id=sys---系统内核信息>/sys - 系统内核信息</h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo mount -t sysfs /sys /path/to/rootfs/sys
+</span></span><span class=line><span class=cl><span class=c1># 或</span>
+</span></span><span class=line><span class=cl>sudo mount --bind /sys /path/to/rootfs/sys
+</span></span></code></pre></div><h3 id=dev---设备文件系统>/dev - 设备文件系统</h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo mount --bind /dev /path/to/rootfs/dev
+</span></span></code></pre></div><h3 id=devpts---伪终端支持>/dev/pts - 伪终端支持</h3><p>这是 <code>/dev</code> 下的一个特殊目录，用于伪终端支持，对于运行 bash 等 Shell 是必要的：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo mount --bind /dev/pts /path/to/rootfs/dev/pts
+</span></span></code></pre></div><h2 id=2-其他可能需要挂载的目录>2. 其他可能需要挂载的目录</h2><p>根据具体使用场景，可能还需要挂载以下目录：</p><h3 id=tmp---临时文件系统>/tmp - 临时文件系统</h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo mount --bind /tmp /path/to/rootfs/tmp
+</span></span></code></pre></div><h3 id=run---运行时目录>/run - 运行时目录</h3><p>某些服务（如 Docker 守护进程）会用到：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo mount --bind /run /path/to/rootfs/run
+</span></span></code></pre></div><h2 id=3-跨架构-chroot-的特殊准备>3. 跨架构 chroot 的特殊准备</h2><p>如果你的 rootfs 是为 ARM 或 i386 等与宿主机不同的 CPU 架构准备的，仅挂载文件系统是不够的。你还需要配置跨架构二进制执行支持，否则 chroot 后无法运行目标架构的程序。</p><h3 id=安装必要工具>安装必要工具</h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo apt update
+</span></span><span class=line><span class=cl>sudo apt install qemu-user-static binfmt-support
+</span></span></code></pre></div><h3 id=复制-qemu-静态二进制文件>复制 QEMU 静态二进制文件</h3><p>将对应的 QEMU 静态二进制文件复制到 rootfs 的 <code>/usr/bin</code> 目录下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 对于 ARM (armhf/armel)</span>
+</span></span><span class=line><span class=cl>sudo cp /usr/bin/qemu-arm-static /path/to/rootfs/usr/bin/
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 对于 32位 x86 (i386)</span>
+</span></span><span class=line><span class=cl>sudo cp /usr/bin/qemu-i386-static /path/to/rootfs/usr/bin/
+</span></span></code></pre></div><p>这个步骤使得宿主机内核能够识别并调用 QEMU 来执行目标架构的二进制文件。</p><h2 id=4-进入-chroot-环境>4. 进入 chroot 环境</h2><p>完成上述挂载和准备后，即可使用 chroot 命令进入目标根文件系统：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo chroot /path/to/rootfs /bin/bash
+</span></span></code></pre></div><h2 id=5-退出与卸载>5. 退出与卸载</h2><p>完成在 chroot 环境中的操作后，需要退出并按顺序卸载之前挂载的文件系统，以避免出现"设备忙"的错误。</p><h3 id=退出-chroot>退出 chroot</h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nb>exit</span>
+</span></span></code></pre></div><h3 id=卸载挂载点>卸载挂载点</h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>sudo umount /path/to/rootfs/dev/pts
+</span></span><span class=line><span class=cl>sudo umount /path/to/rootfs/dev
+</span></span><span class=line><span class=cl>sudo umount /path/to/rootfs/proc
+</span></span><span class=line><span class=cl>sudo umount /path/to/rootfs/sys
+</span></span><span class=line><span class=cl>sudo umount /path/to/rootfs/tmp  <span class=c1># 如果挂载了</span>
+</span></span><span class=line><span class=cl>sudo umount /path/to/rootfs/run  <span class=c1># 如果挂载了</span>
+</span></span></code></pre></div><blockquote><p>⚠️ 卸载顺序通常与挂载时相反</p></blockquote><h2 id=6-自动化脚本>6. 自动化脚本</h2><p>为了方便，可以将挂载和卸载步骤写成脚本：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=cp>#!/bin/bash
+</span></span></span><span class=line><span class=cl><span class=cp></span><span class=c1># ch-mount.sh</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>function</span> mnt<span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=nb>echo</span> <span class=s2>&#34;MOUNTING&#34;</span>
+</span></span><span class=line><span class=cl>    sudo mount -t proc /proc <span class=si>${</span><span class=nv>2</span><span class=si>}</span>proc
+</span></span><span class=line><span class=cl>    sudo mount -t sysfs /sys <span class=si>${</span><span class=nv>2</span><span class=si>}</span>sys
+</span></span><span class=line><span class=cl>    sudo mount -o <span class=nb>bind</span> /dev <span class=si>${</span><span class=nv>2</span><span class=si>}</span>dev
+</span></span><span class=line><span class=cl>    sudo mount -o <span class=nb>bind</span> /dev/pts <span class=si>${</span><span class=nv>2</span><span class=si>}</span>dev/pts
+</span></span><span class=line><span class=cl>    sudo chroot <span class=si>${</span><span class=nv>2</span><span class=si>}</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>function</span> umnt<span class=o>()</span> <span class=o>{</span>
+</span></span><span class=line><span class=cl>    <span class=nb>echo</span> <span class=s2>&#34;UNMOUNTING&#34;</span>
+</span></span><span class=line><span class=cl>    sudo umount <span class=si>${</span><span class=nv>2</span><span class=si>}</span>proc
+</span></span><span class=line><span class=cl>    sudo umount <span class=si>${</span><span class=nv>2</span><span class=si>}</span>sys
+</span></span><span class=line><span class=cl>    sudo umount <span class=si>${</span><span class=nv>2</span><span class=si>}</span>dev/pts
+</span></span><span class=line><span class=cl>    sudo umount <span class=si>${</span><span class=nv>2</span><span class=si>}</span>dev
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=o>[</span> <span class=s2>&#34;</span><span class=nv>$1</span><span class=s2>&#34;</span> <span class=o>==</span> <span class=s2>&#34;-m&#34;</span> <span class=o>]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>    mnt <span class=nv>$1</span> <span class=nv>$2</span>
+</span></span><span class=line><span class=cl><span class=k>elif</span> <span class=o>[</span> <span class=s2>&#34;</span><span class=nv>$1</span><span class=s2>&#34;</span> <span class=o>==</span> <span class=s2>&#34;-u&#34;</span> <span class=o>]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>    umnt <span class=nv>$1</span> <span class=nv>$2</span>
+</span></span><span class=line><span class=cl><span class=k>fi</span>
+</span></span></code></pre></div><h3 id=使用方法>使用方法</h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 挂载并进入 chroot</span>
+</span></span><span class=line><span class=cl>sudo bash ch-mount.sh -m /path/to/rootfs/
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 卸载</span>
+</span></span><span class=line><span class=cl>sudo bash ch-mount.sh -u /path/to/rootfs/
+</span></span></code></pre></div><h2 id=总结>总结</h2><table><thead><tr><th>步骤</th><th>命令</th></tr></thead><tbody><tr><td>挂载文件系统</td><td>mount &ndash;bind /proc, /sys, /dev, /dev/pts</td></tr><tr><td>配置 QEMU</td><td>qemu-user-static</td></tr><tr><td>进入 chroot</td><td>chroot /path/to/rootfs /bin/bash</td></tr><tr><td>退出</td><td>exit</td></tr><tr><td>卸载</td><td>umount (顺序与挂载相反)</td></tr></tbody></table><p>通过正确配置这些虚拟文件系统和 QEMU 模拟器，就可以在 64 位 x86 主机上无缝运行 ARM 或 32 位 rootfs 中的程序了。</p></article></main><footer><p>&copy; 2026 HarryLoong. All rights reserved.</p></footer><script>hljs.highlightAll()</script></body></html>
