@@ -26,8 +26,10 @@ This file helps AI agents understand how to maintain this Hugo blog.
 
 | File | Title | Date |
 |------|-------|------|
-| `linux-5g-modem.md` | Linux 5G Modem 配置 | - |
-| `logitech-linux-config-guide.md` | Linux 下罗技键鼠配置指南 | 2026-03-02 |
+| `welcome.md` | 欢迎来到我的博客 | 2026-03-02 |
+| `linux-5g-modem.md` | Linux 下使用 5G Modem 上网指南 | 2026-03-02 |
+| `logitech-linux-config-guide.md` | Linux 下罗技键鼠配置指南 - logiops 使用教程 | 2026-03-02 |
+| `chroot-cross-architecture.md` | 64位主机进入ARM/32位rootfs的chroot配置指南 | 2026-03-04 |
 
 ## How to Add a New Post
 
@@ -227,3 +229,16 @@ When maintaining this blog:
 
 - Blog Owner: HarryLoong
 - GitHub: https://github.com/xzl01/xzl01.github.io
+
+## Import Records
+
+- Import records are stored in `.github/import-records/`.
+- Latest record: `.github/import-records/2026-03-04-w-ktny-import.md`
+
+## Import Cleanup Automation
+
+- After importing markdown files into `content/blog/`, run:
+  - `scripts/clean_imported_markdown.py content/blog/<file1>.md content/blog/<file2>.md ...`
+- This step normalizes heading hierarchy, fixes malformed code fences, removes empty table rows, and trims noisy formatting.
+- Treat this as mandatory before `hugo --minify` verification.
+- After cleanup, always run a full build (`hugo --minify`) and restart `hugo server` to avoid stale hot-reload cache issues.

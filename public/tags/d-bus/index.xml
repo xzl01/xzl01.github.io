@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>D-Bus on HarryLoong's Blog</title><link>https://xzl01.github.io/tags/d-bus/</link><description>Recent content in D-Bus on HarryLoong's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Wed, 04 Mar 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://xzl01.github.io/tags/d-bus/index.xml" rel="self" type="application/rss+xml"/><item><title>AccountsService 接口说明</title><link>https://xzl01.github.io/blog/linux-accountsservice-guide/</link><pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate><guid>https://xzl01.github.io/blog/linux-accountsservice-guide/</guid><description>&lt;h2 id="cacheuser-"&gt;CacheUser ()&lt;/h2&gt;
+&lt;p&gt;CacheUser (in &amp;rsquo;s&amp;rsquo; name, out &amp;lsquo;o&amp;rsquo; user)
+缓存一个用户帐户，以便它显示在ListCachedUsers() 输出中。用户名可以是远程用户，但是系统必须能够查找用户名并解析用户信息。&lt;/p&gt;
+&lt;p&gt;传入参数*&lt;code&gt;name&lt;/code&gt;*:用户的用户名&lt;/p&gt;
+&lt;p&gt;返回参数*&lt;code&gt;user&lt;/code&gt;*:用户对象的路径&lt;/p&gt;
+&lt;h3 id="错误"&gt;错误&lt;/h3&gt;
+&lt;p&gt;&lt;em&gt;&lt;code&gt;org.freedesktop.Accounts.Error.PermissionDenied&lt;/code&gt;&lt;/em&gt;:&lt;/p&gt;
+&lt;p&gt;如果调用者缺乏适当的PolicyKit授权&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;&lt;code&gt;org.freedesktop.Accounts.Error.UserDoesNotExist&lt;/code&gt;&lt;/em&gt;:
+如果用户名无法解析(含有非法字符）&lt;/p&gt;
+&lt;h3 id="权限"&gt;权限&lt;/h3&gt;
+&lt;p&gt;调用者需要有 &lt;code&gt;org.freedesktop.accounts.user-administration&lt;/code&gt; PolicyKit 权限.&lt;/p&gt;
+&lt;h2 id="createuser-"&gt;CreateUser ()&lt;/h2&gt;
+&lt;p&gt;CreateUser (in &amp;rsquo;s&amp;rsquo; name,&lt;/p&gt;
+&lt;p&gt;in &amp;rsquo;s&amp;rsquo; fullname,&lt;/p&gt;
+&lt;p&gt;out &amp;lsquo;o&amp;rsquo; user,&lt;/p&gt;
+&lt;p&gt;in &amp;lsquo;i&amp;rsquo; accountType)&lt;/p&gt;
+&lt;p&gt;创建一个新的用户账户
+accountType参数可以采用以下值:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;0:&lt;/strong&gt; 普通用户&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;1:&lt;/strong&gt; 管理员&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;&lt;code&gt;name&lt;/code&gt;&lt;/em&gt;:&lt;/p&gt;
+&lt;p&gt;新用户的用户名&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;&lt;code&gt;fullname&lt;/code&gt;&lt;/em&gt;:&lt;/p&gt;
+&lt;p&gt;新用户的真实姓名（全名）&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;&lt;code&gt;user&lt;/code&gt;&lt;/em&gt;:&lt;/p&gt;
+&lt;p&gt;新用户的对象路径&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;&lt;code&gt;accountType&lt;/code&gt;&lt;/em&gt;:&lt;/p&gt;
+&lt;p&gt;用户类型&lt;/p&gt;
+&lt;h3 id="errors"&gt;Errors&lt;/h3&gt;
+&lt;p&gt;&lt;em&gt;&lt;code&gt;org.freedesktop.Accounts.Error.PermissionDenied&lt;/code&gt;&lt;/em&gt;:&lt;/p&gt;
+&lt;p&gt;如果调用者缺乏适当的PolicyKit授权&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;&lt;code&gt;org.freedesktop.Accounts.Error.Failed&lt;/code&gt;&lt;/em&gt;:&lt;/p&gt;
+&lt;p&gt;如果操作失败&lt;/p&gt;
+&lt;h3 id="permissions"&gt;Permissions&lt;/h3&gt;
+&lt;p&gt;The caller needs the org.freedesktop.accounts.user-administration PolicyKit authorization.&lt;/p&gt;
+&lt;h2 id="deleteuser-"&gt;DeleteUser ()&lt;/h2&gt;
+&lt;p&gt;DeleteUser (in &amp;lsquo;x&amp;rsquo; id,&lt;/p&gt;</description></item><item><title>systemd-logind D-Bus 接口详解</title><link>https://xzl01.github.io/blog/systemd-logind-dbus-interface/</link><pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate><guid>https://xzl01.github.io/blog/systemd-logind-dbus-interface/</guid><description>&lt;h2 id="name"&gt;name&lt;/h2&gt;
+&lt;p&gt;org.freedesktop.login1 — systemd-logind 的 D-Bus 接口&lt;/p&gt;
+&lt;h2 id="简介"&gt;简介&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://www.freedesktop.org/software/systemd/man/systemd-logind.service.html#" title="systemd-logind.service (8)"&gt;systemd-logind.service (8)&lt;/a&gt; 是一个跟踪用户登录和seat的系统服务。&lt;/p&gt;
+&lt;p&gt;守护进程提供 C 库接口和 D-Bus 接口。库界面可用于内省和观察用户登录和seat&lt;sup id="fnref:1"&gt;&lt;a href="#fn:1" class="footnote-ref" role="doc-noteref"&gt;1&lt;/a&gt;&lt;/sup&gt;的状态。总线接口提供相同的功能，但也可用于更改系统状态。更多信息请查看&lt;a href="https://www.freedesktop.org/software/systemd/man/sd-login.html#" title="sd-login (3)"&gt;sd-login (3)&lt;/a&gt;。&lt;/p&gt;
+&lt;h2 id="管理器对象"&gt;管理器对象&lt;/h2&gt;
+&lt;p&gt;该服务在总线上的 Manager 对象上公开以下接口：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-text" data-lang="text"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;node /org/freedesktop/login1 {
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; interface org.freedesktop.login1.Manager {
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; methods:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; GetSession(in s session_id,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; out o object_path);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; GetSessionByPID(in u pid,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; out o object_path);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; GetUser(in u uid,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; out o object_path);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; GetUserByPID(in u pid,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; out o object_path);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; GetSeat(in s seat_id,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; out o object_path);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ListSessions(out a(susso) sessions);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ListUsers(out a(uso) users);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ListSeats(out a(so) seats);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ListInhibitors(out a(ssssuu) inhibitors);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.systemd1.Privileged(&amp;#34;true&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; CreateSession(in u uid,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in u pid,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in s service,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in s type,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in s class,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in s desktop,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in s seat_id,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in u vtnr,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in s tty,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in s display,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in b remote,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in s remote_user,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in s remote_host,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in a(sv) properties,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; out s session_id,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; out o object_path,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; out s runtime_path,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; out h fifo_fd,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; out u uid,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; out s seat_id,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; out u vtnr,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; out b existing);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.systemd1.Privileged(&amp;#34;true&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ReleaseSession(in s session_id);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ActivateSession(in s session_id);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ActivateSessionOnSeat(in s session_id,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in s seat_id);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; LockSession(in s session_id);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; UnlockSession(in s session_id);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; LockSessions();
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; UnlockSessions();
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; KillSession(in s session_id,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in s who,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in i signal_number);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; KillUser(in u uid,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in i signal_number);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; TerminateSession(in s session_id);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; TerminateUser(in u uid);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; TerminateSeat(in s seat_id);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; SetUserLinger(in u uid,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in b enable,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in b interactive);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; AttachDevice(in s seat_id,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in s sysfs_path,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in b interactive);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; FlushDevices(in b interactive);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; PowerOff(in b interactive);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; PowerOffWithFlags(in t flags);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Reboot(in b interactive);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; RebootWithFlags(in t flags);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Halt(in b interactive);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; HaltWithFlags(in t flags);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Suspend(in b interactive);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; SuspendWithFlags(in t flags);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Hibernate(in b interactive);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; HibernateWithFlags(in t flags);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; HybridSleep(in b interactive);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; HybridSleepWithFlags(in t flags);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; SuspendThenHibernate(in b interactive);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; SuspendThenHibernateWithFlags(in t flags);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; CanPowerOff(out s result);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; CanReboot(out s result);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; CanHalt(out s result);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; CanSuspend(out s result);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; CanHibernate(out s result);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; CanHybridSleep(out s result);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; CanSuspendThenHibernate(out s result);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ScheduleShutdown(in s type,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in t usec);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; CancelScheduledShutdown(out b cancelled);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Inhibit(in s what,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in s who,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in s why,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in s mode,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; out h pipe_fd);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; CanRebootParameter(out s result);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; SetRebootParameter(in s parameter);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; CanRebootToFirmwareSetup(out s result);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; SetRebootToFirmwareSetup(in b enable);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; CanRebootToBootLoaderMenu(out s result);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; SetRebootToBootLoaderMenu(in t timeout);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; CanRebootToBootLoaderEntry(out s result);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; SetRebootToBootLoaderEntry(in s boot_loader_entry);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; SetWallMessage(in s wall_message,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; in b enable);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; signals:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; SessionNew(s session_id,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; o object_path);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; SessionRemoved(s session_id,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; o object_path);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; UserNew(u uid,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; o object_path);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; UserRemoved(u uid,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; o object_path);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; SeatNew(s seat_id,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; o object_path);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; SeatRemoved(s seat_id,
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; o object_path);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; PrepareForShutdown(b start);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; PrepareForSleep(b start);
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; properties:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;false&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.systemd1.Privileged(&amp;#34;true&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readwrite b EnableWallMessages = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;false&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.systemd1.Privileged(&amp;#34;true&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readwrite s WallMessage = &amp;#39;...&amp;#39;;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly u NAutoVTs = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly as KillOnlyUsers = [&amp;#39;...&amp;#39;, ...];
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly as KillExcludeUsers = [&amp;#39;...&amp;#39;, ...];
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly b KillUserProcesses = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;false&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly s RebootParameter = &amp;#39;...&amp;#39;;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;false&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly b RebootToFirmwareSetup = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;false&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly t RebootToBootLoaderMenu = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;false&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly s RebootToBootLoaderEntry = &amp;#39;...&amp;#39;;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly as BootLoaderEntries = [&amp;#39;...&amp;#39;, ...];
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly b IdleHint = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly t IdleSinceHint = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly t IdleSinceHintMonotonic = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly s BlockInhibited = &amp;#39;...&amp;#39;;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly s DelayInhibited = &amp;#39;...&amp;#39;;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly t InhibitDelayMaxUSec = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly t UserStopDelayUSec = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly s HandlePowerKey = &amp;#39;...&amp;#39;;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly s HandlePowerKeyLongPress = &amp;#39;...&amp;#39;;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly s HandleRebootKey = &amp;#39;...&amp;#39;;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly s HandleRebootKeyLongPress = &amp;#39;...&amp;#39;;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly s HandleSuspendKey = &amp;#39;...&amp;#39;;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly s HandleSuspendKeyLongPress = &amp;#39;...&amp;#39;;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly s HandleHibernateKey = &amp;#39;...&amp;#39;;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly s HandleHibernateKeyLongPress = &amp;#39;...&amp;#39;;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly s HandleLidSwitch = &amp;#39;...&amp;#39;;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly s HandleLidSwitchExternalPower = &amp;#39;...&amp;#39;;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly s HandleLidSwitchDocked = &amp;#39;...&amp;#39;;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly t HoldoffTimeoutUSec = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly s IdleAction = &amp;#39;...&amp;#39;;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly t IdleActionUSec = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;false&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly b PreparingForShutdown = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;false&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly b PreparingForSleep = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;false&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly (st) ScheduledShutdown = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;false&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly b Docked = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;false&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly b LidClosed = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;false&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly b OnExternalPower = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly b RemoveIPC = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly t RuntimeDirectorySize = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly t RuntimeDirectoryInodesMax = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly t InhibitorsMax = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;false&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly t NCurrentInhibitors = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;const&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly t SessionsMax = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; @org.freedesktop.DBus.Property.EmitsChangedSignal(&amp;#34;false&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; readonly t NCurrentSessions = ...;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; };
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; interface org.freedesktop.DBus.Peer { ... };
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; interface org.freedesktop.DBus.Introspectable { ... };
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; interface org.freedesktop.DBus.Properties { ... };
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;};
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="方法"&gt;方法&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;GetSession()&lt;/code&gt;可用于获取具有指定 ID 的会话的会话对象路径。同样，&lt;code&gt;GetUser()&lt;/code&gt; &lt;code&gt;GetSeat()&lt;/code&gt;分别获取用户和Seat对象。&lt;code&gt;GetSessionByPID()&lt;/code&gt;并 &lt;code&gt;GetUserByPID()&lt;/code&gt;获取指定 PID 所属的会话/用户对象（如果有）。&lt;/p&gt;</description></item><item><title>UPower 接口与 Linux 电源管理</title><link>https://xzl01.github.io/blog/linux-upower-guide/</link><pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate><guid>https://xzl01.github.io/blog/linux-upower-guide/</guid><description>&lt;p&gt;GNU 自由文档许可证1.1 版&lt;/p&gt;
+&lt;p&gt;UPower 是枚举电源设备、监听设备事件以及查询历史和统计数据的抽象。&lt;code&gt;org.freedesktop.UPower&lt;/code&gt;系统上的任何应用程序或服务都可以通过系统消息总线 访问该 服务。&lt;/p&gt;
+&lt;p&gt;UPower &lt;a href="http://lists.freedesktop.org/archives/devkit-devel/2009-December/000567.html" title="曾经被称为 DeviceKit-power"&gt;曾经被称为 DeviceKit-power&lt;/a&gt;。UPower 旨在使大量 HAL 冗余，因为 HAL 已正式 &lt;a href="http://lists.freedesktop.org/archives/hal/2008-May/011560.html" title="弃用"&gt;弃用&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;UPower 还可用于控制 计算机上 &lt;a href="http://blogs.gnome.org/hughsie/2008/11/06/devicekit-power-latency-control/" title="不同操作的延迟"&gt;不同操作的延迟&lt;/a&gt;，从而节省大量电量。目前还没有太多使用这个界面，但这是一个经典的鸡和蛋场景，我认为鼓励鸡蛋下鸡很重要。请将任何问题报告给 &lt;a href="https://bugs.freedesktop.org/enter_bug.cgi?product=upower" title="Freedesktop"&gt;Freedesktop&lt;/a&gt; bugzilla 或发送邮件到 &lt;a href="http://lists.freedesktop.org/mailman/listinfo/devkit-devel" title="DeviceKit"&gt;DeviceKit&lt;/a&gt; 邮件列表进行讨论。&lt;/p&gt;
+&lt;h2 id="orgfreedesktopupower"&gt;org.freedesktop.UPower&lt;/h2&gt;
+&lt;p&gt;org.freedesktop.UPower — UPower 接口&lt;/p&gt;
+&lt;h2 id="方法"&gt;方法&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;EnumerateDevices（out 'ao' devices）&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;GetDisplayDevice（out'o'device）&lt;/code&gt; &lt;/p&gt;
+&lt;p&gt;&lt;code&gt;GetCriticalAction (out 's' action)&lt;/code&gt;&lt;/p&gt;
+&lt;h2 id="信号"&gt;信号&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;DeviceAdded ('o' device)&lt;/code&gt; &lt;/p&gt;
+&lt;p&gt;&lt;code&gt;DeviceRemoved ('o' device)&lt;/code&gt;&lt;/p&gt;
+&lt;h2 id="实现的接口"&gt;实现的接口&lt;/h2&gt;
+&lt;p&gt;实现 &lt;code&gt;org.freedesktop.UPower&lt;/code&gt; 的对象也实现了 &lt;code&gt;org.freedesktop.DBus.Introspectable&lt;/code&gt;、&lt;code&gt;org.freedesktop.DBus.Properties&lt;/code&gt;&lt;/p&gt;
+&lt;h2 id="属性"&gt;属性&lt;/h2&gt;
+&lt;p&gt;&amp;lsquo;DaemonVersion&amp;rsquo; 读为 &amp;rsquo;s&amp;rsquo; &lt;/p&gt;
+&lt;p&gt;&amp;lsquo;OnBattery&amp;rsquo; 读为 &amp;lsquo;b&amp;rsquo; &lt;/p&gt;
+&lt;p&gt;&amp;lsquo;LidIsClosed&amp;rsquo; 读为 &amp;lsquo;b&amp;rsquo; &lt;/p&gt;
+&lt;p&gt;“LidIsPresent”读作“b”&lt;/p&gt;
+&lt;h2 id="描述"&gt;描述&lt;/h2&gt;
+&lt;p&gt;UPower服务是通过系统消息总线提供的。要访问该服务，请使用D-Bus系统总线服务上的&lt;code&gt;/org/freedesktop/UPower&lt;/code&gt;对象上的&lt;code&gt;org.freedesktop.UPower&lt;/code&gt;接口，其名称为&lt;code&gt;org.freedesktop.UPower&lt;/code&gt;。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;dbus-send --print-reply &lt;span class="se"&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; --system &lt;span class="se"&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; --dest&lt;span class="o"&gt;=&lt;/span&gt;org.freedesktop.UPower &lt;span class="se"&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; /org/freedesktop/UPower &lt;span class="se"&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; org.freedesktop.UPower.EnumerateDevices
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;method &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nv"&gt;sender&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;:1.386 -&amp;gt; &lt;span class="nv"&gt;dest&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;:1.451 &lt;span class="nv"&gt;reply_serial&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; array &lt;span class="o"&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; object path &lt;span class="s2"&gt;&amp;#34;/org/freedesktop/UPower/devices/line_power_AC&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; object path &lt;span class="s2"&gt;&amp;#34;/org/freedesktop/UPower/devices/battery_BAT0&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="o"&gt;]&lt;/span&gt;$ dbus-send --print-reply &lt;span class="se"&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; --system &lt;span class="se"&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; --dest&lt;span class="o"&gt;=&lt;/span&gt;org.freedesktop.UPower &lt;span class="se"&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; /org/freedesktop/UPower &lt;span class="se"&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; org.freedesktop.UPower.EnumerateDevices
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;method &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nv"&gt;sender&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;:1.386 -&amp;gt; &lt;span class="nv"&gt;dest&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;:1.451 &lt;span class="nv"&gt;reply_serial&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; array &lt;span class="o"&gt;[&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; object path &lt;span class="s2"&gt;&amp;#34;/org/freedesktop/UPower/devices/line_power_AC&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; object path &lt;span class="s2"&gt;&amp;#34;/org/freedesktop/UPower/devices/battery_BAT0&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &lt;span class="o"&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="细节"&gt;细节&lt;/h2&gt;
+&lt;h3 id="enumeratedevices-"&gt;EnumerateDevices ()&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;EnumerateDevices(out 'ao' device)&lt;/code&gt;&lt;/p&gt;</description></item></channel></rss>

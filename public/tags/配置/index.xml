@@ -1,2 +1,46 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>配置 on HarryLoong's Blog</title><link>https://xzl01.github.io/tags/%E9%85%8D%E7%BD%AE/</link><description>Recent content in 配置 on HarryLoong's Blog</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Mon, 02 Mar 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://xzl01.github.io/tags/%E9%85%8D%E7%BD%AE/index.xml" rel="self" type="application/rss+xml"/><item><title>Linux 输入设备键码与 Logitech MX Master 配置指南</title><link>https://xzl01.github.io/blog/linux-input-codes-logiops/</link><pubDate>Mon, 02 Mar 2026 00:00:00 +0000</pubDate><guid>https://xzl01.github.io/blog/linux-input-codes-logiops/</guid><description>简介 本文档包含 Linux 输入设备键码定义以及 Logitech MX Master 2S 鼠标的 logiops 配置教程。
-第一部分：Linux 输入事件码 键盘键码 (KEY_*) 键码 定义 说明 0x01 KEY_ESC ESC 键 0x02-0x0C KEY_1 - KEY_0 数字键 0x10 KEY_Q Q 键 &amp;hellip; &amp;hellip; 更多请查看源码 鼠标/触控按钮 (BTN_*) 键码 定义 说明 0x110 BTN_LEFT 鼠标左键 0x111 BTN_RIGHT 鼠标右键 0x112 BTN_MIDDLE 鼠标中键 0x113 BTN_SIDE 侧边按钮 0x114 BTN_EXTRA 额外按钮 0x115 BTN_FORWARD 前进按钮 0x116 BTN_BACK 后退按钮 绝对坐标轴 (ABS_*) 键码 定义 说明 0x00 ABS_X X 坐标 0x01 ABS_Y Y 坐标 0x18 ABS_PRESSURE 压力 0x35 ABS_MT_POSITION_X 多点触控 X 0x36 ABS_MT_POSITION_Y 多点触控 Y 系统控制键 (KEY_* 系统功能) 键码 定义 功能 0x100 KEY_POWER 电源 0x6E KEY_DISPLAY_TOOGLE 显示开关 0x6F KEY_SLEEP 睡眠 0xE2 KEY_MUTE 静音 0xE5 KEY_PLAYPAUSE 播放/暂停 0xE6 KEY_NEXTSONG 下一曲 0xE7 KEY_VOLUMEUP 音量+ 0xE8 KEY_VOLUMEDOWN 音量- 📖 完整键码列表请参考：linux/input-event-codes.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>配置 on HarryLoong's Blog</title><link>https://xzl01.github.io/tags/%E9%85%8D%E7%BD%AE/</link><description>Recent content in 配置 on HarryLoong's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Wed, 04 Mar 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://xzl01.github.io/tags/%E9%85%8D%E7%BD%AE/index.xml" rel="self" type="application/rss+xml"/><item><title>systemd-logind 配置文件指南</title><link>https://xzl01.github.io/blog/systemd-logind-config-guide/</link><pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate><guid>https://xzl01.github.io/blog/systemd-logind-config-guide/</guid><description>&lt;h2 id="名称"&gt;名称&lt;/h2&gt;
+&lt;p&gt;logind.conf, logind.conf.d — Login manager configuration files&lt;/p&gt;
+&lt;h2 id="简介"&gt;简介&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;etc/systemd/logind.conf&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;/etc/systemd/logind.conf.d/*.conf&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;/run/systemd/logind.conf.d/*.conf&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;/usr/lib/systemd/logind.conf.d/*.conf&lt;/code&gt;&lt;/p&gt;
+&lt;h2 id="描述"&gt;描述&lt;/h2&gt;
+&lt;p&gt;这些文件配置了 systemd 登录管理器 systemd-logind.service(8) 的各种参数。语法的一般描述见 systemd.syntax(7)。&lt;/p&gt;
+&lt;h2 id="配置目录和优先级"&gt;配置目录和优先级&lt;/h2&gt;
+&lt;p&gt;默认配置是在编译过程中设置的，所以只有在需要更改这些默认值时才需要配置。最初，&lt;code&gt;/etc/systemd/&lt;/code&gt;中的主配置文件包含已注释的条目，显示为默认值，这些默认值作为管理员的配置指南。可以通过编辑该文件或创建drop-ins来进行本地重写，如下所述。建议使用drop-ins进行本地配置，而不是修改主配置文件（drop-ins指的是对下面的conf文件进行删除和插入，而不去影响主要的文件）。&lt;/p&gt;
+&lt;p&gt;除了 &amp;ldquo;mian &amp;ldquo;配置文件外，还可从&lt;code&gt;/usr/lib/systemd/*.conf.d/&lt;/code&gt;&lt;em&gt;、&lt;/em&gt;&lt;code&gt;/usr/local/lib/systemd/*.conf.d/&lt;/code&gt;和&lt;code&gt;/etc/systemd/*.conf.d/&lt;/code&gt;读取插入式配置片段。这些结尾为d的文件夹具有更高的优先权，并凌驾于主配置文件之上。&lt;em&gt;在&lt;/em&gt;&lt;code&gt;*.conf.d/&lt;/code&gt;配置子目录中的文件，无论在哪个子目录中，都会按文件名以词法顺序排序。当多个文件指定相同的选项时，对于只接受一个值的选项，&lt;strong&gt;最后排序的文件中的条目优先&lt;/strong&gt;，而对于接受一个值列表的选项，条目按照文件排序进行添加。&lt;/p&gt;
+&lt;p&gt;当软件包需要用户定制配置时，它们可以在&lt;code&gt;/usr/&lt;/code&gt;下安装drop-ins。&lt;code&gt;/etc/&lt;/code&gt;中的文件是为本地管理员（root用户）保留的，他可以使用这个逻辑来覆盖供应商软件包所安装的配置文件。Drop-ins必须用来覆盖软件包的drop-ins，因为主配置文件的优先级较低。建议在这些子目录中的所有文件名前加一个两位数的数字和一个破折号前缀，以简化文件的排序。&lt;/p&gt;
+&lt;p&gt;要禁用供应商提供的配置文件，推荐的方法是在/etc/的配置目录中放置一个指向/dev/null的符号链接，其文件名与供应商的配置文件相同。&lt;/p&gt;
+&lt;h2 id="选项"&gt;选项&lt;/h2&gt;
+&lt;p&gt;所有的选项都是在[Login]部分配置的。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;NAutoVTs=&lt;/code&gt; 取一个正整数。配置默认分配多少个虚拟终端（VT），当切换到之前未使用的虚拟终端时，&amp;ldquo;autovt &amp;ldquo;服务会自动生成。这些服务是由模板单元autovt@.service为各自的VT TTY名称实例化的，例如，autovt@tty4.service。默认情况下，autovt@.service被链接到getty@.service。换句话说，当用户切换到未使用的虚拟终端时，登录提示会动态地启动。因此，这个参数控制了VT上有多少个登录 &amp;ldquo;gettys &amp;ldquo;可用。如果一个VT已经被其他子系统使用（例如，图形登录），这种激活将不会被尝试。请注意，在&lt;code&gt;ReserveVT=&lt;/code&gt;中配置的VT总是受到这种激活的影响，即使它不是用NAutoVTs=指令配置的VT之一。默认为6。当设置为0时，&amp;ldquo;autovt &amp;ldquo;服务的自动生成被禁用。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;ReserveVT=&lt;/code&gt; 取一个正整数。指定一个虚拟终端，该终端应无条件地保留给autovt@.server激活（见上文）。用这个选项选择的VT将被无条件地标记为繁忙，因此没有其他子系统会分配它。这个功能很有用，可以确保无论其他子系统分配了多少个VT，总有一个登录 &amp;ldquo;getty&amp;quot;可用。默认为6（换句话说，Alt-F6上永远有一个 &amp;ldquo;getty &amp;ldquo;可用，getty详情见：&lt;a href="https://wiki.archlinux.org/title/Getty_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)" title="Archwiki"&gt;Archwiki&lt;/a&gt;。） 当设置为0时，VT保留被禁用。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;KillUserProcesses=&lt;/code&gt;接受一个布尔参数。配置当用户注销时是否应该杀死该用户的进程。如果为真，与会话对应的作用域单元和该作用域内的所有进程将被终止。如果为 &amp;ldquo;false&amp;rdquo;，则该作用域被 &amp;ldquo;抛弃&amp;rdquo;，参见systemd.scope(5)，进程不被杀死。默认为 &amp;ldquo;true&amp;rdquo;，但可参考下面的KillOnlyUsers=和KillExcludeUsers=选项。&lt;/p&gt;
+&lt;p&gt;除了会话进程外，用户进程还可以在用户管理单元user@.service下运行。根据linger的设置，这可能允许用户运行独立于其登录会话的进程。参见loginctl(1)中关于enable-linger的描述。&lt;/p&gt;
+&lt;p&gt;注意，设置&lt;code&gt;KillUserProcesses=yes&lt;/code&gt;会破坏screen(1)和tmux(1)等工具，除非它们被移出会话范围。见systemd-run(1)中的例子。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;KillOnlyUsers=&lt;/code&gt;,&lt;code&gt;KillExcludeUsers=&lt;/code&gt;这些设置采用空格分隔的用户名列表，覆盖 &lt;code&gt;KillUserProcesses=&lt;/code&gt; 设置。一个用户名可以被添加到&lt;code&gt;KillExcludeUsers=&lt;/code&gt;中，以排除该用户会话作用域中的进程被杀，即使&lt;code&gt;KillUserProcesses=yes&lt;/code&gt;被设置。如果KillExcludeUsers=没有被设置，&amp;ldquo;root &amp;ldquo;用户被默认排除在外。&lt;code&gt;KillExcludeUsers=&lt;/code&gt;可以被设置为一个空值来覆盖这个默认值。如果一个用户没有被排除，接下来会检查&lt;code&gt;KillOnlyUsers=&lt;/code&gt;。如果指定了这个设置，只有这些用户的会话作用域中的进程将被杀死。否则，用户将受到&lt;code&gt;KillUserProcesses=yes&lt;/code&gt;设置的影响。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;IdleAction=&lt;/code&gt;配置系统空闲时采取的行动。从 &amp;ldquo;ignore&amp;rdquo;、&amp;ldquo;poweroff&amp;rdquo;、&amp;ldquo;reboot&amp;rdquo;、&amp;ldquo;halt&amp;rdquo;、&amp;ldquo;kexec&amp;rdquo;（见&lt;a href="https://wiki.archlinux.org/title/Kexec" title="Archwiki"&gt;Archwiki&lt;/a&gt;）、&amp;ldquo;suspend&amp;rdquo;、&amp;ldquo;hibernate&amp;rdquo;、&amp;ldquo;hybrid-sleep&amp;rdquo;、&amp;ldquo;suspend-then-hibernate&amp;quot;和 &amp;ldquo;lock&amp;quot;中选择一项。默认为 &amp;ldquo;ignore&amp;rdquo;。&lt;/p&gt;
+&lt;p&gt;注意，这需要用户会话正确地向系统报告空闲状态。系统将在所有会话报告他们是空闲的，没有空闲抑制锁处于活动状态，随后，&lt;code&gt;IdleActionSec=&lt;/code&gt;（见下文）配置的时间已过后执行该动作。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;IdleActionSec=&lt;/code&gt;配置系统空闲后采取&lt;code&gt;IdleAction=&lt;/code&gt;（见上文）中配置的动作的延迟&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;InhibitDelayMaxSec=&lt;/code&gt;指定由于 &amp;ldquo;delay &amp;ldquo;类型的抑制器锁处于活动状态而延迟系统关闭或睡眠请求的最大时间，然后该抑制器被忽略，操作仍然执行。默认值为5。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;UserStopDelaySec=&lt;/code&gt;指定在用户完全注销后为其保留用户记录和每个用户服务user@.service的时间。如果设置为0，当用户的最后一个会话结束后，每个用户的服务会立即终止。如果这个选项被配置为非零，快速注销/登录周期就会加快，因为用户的服务管理器不会被不断重启。如果设置为 &amp;ldquo;无穷大&amp;rdquo;，用户的每个用户服务在第一次登录后就不会再终止，而是继续运行直到系统关闭。默认值为10s。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;HandlePowerKey=&lt;/code&gt;, &lt;code&gt;HandlePowerKeyLongPress=&lt;/code&gt;,&lt;code&gt;HandleRebootKey=&lt;/code&gt;, &lt;code&gt;HandleRebootKeyLongPress=&lt;/code&gt;,&lt;code&gt;HandleSuspendKey=&lt;/code&gt;, &lt;code&gt;HandleSuspendKeyLongPress=&lt;/code&gt;,&lt;code&gt;HandleHibernateKey=&lt;/code&gt;, &lt;code&gt;HandleHibernateKeyLongPress=&lt;/code&gt;,&lt;code&gt;HandleLidSwitch=&lt;/code&gt;, &lt;code&gt;HandleLidSwitchExternalPower=&lt;/code&gt;,&lt;code&gt;HandleLidSwitchDocked=&lt;/code&gt; 控制logind如何处理系统电源、重启和睡眠键，以及触发系统断电、重启或暂停等动作的盖子开关。可以是 &amp;ldquo;忽略&amp;rdquo;、&amp;ldquo;关机&amp;rdquo;、&amp;ldquo;重启&amp;rdquo;、&amp;ldquo;停止&amp;rdquo;、&amp;ldquo;kexec&amp;rdquo;、&amp;ldquo;暂停&amp;rdquo;、&amp;ldquo;休眠&amp;rdquo;、&amp;ldquo;混合睡眠&amp;rdquo;、&amp;ldquo;暂停-休眠&amp;rdquo;、&amp;ldquo;锁定&amp;rdquo;、&amp;ldquo;工厂复位 &amp;ldquo;中的一个。如果是 &amp;ldquo;忽略&amp;rdquo;，systemd-logind就不会处理这些键。如果是 &amp;ldquo;锁定&amp;rdquo;，所有正在运行的会话将被锁屏；否则，将在相应的事件中采取指定的行动。只有带有 &amp;ldquo;power-switch &amp;ldquo;udev标签的输入设备才会被观察到按键/盖板切换事件。&lt;/p&gt;</description></item></channel></rss>

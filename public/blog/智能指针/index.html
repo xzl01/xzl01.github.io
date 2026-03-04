@@ -1,0 +1,133 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>智能指针 - HarryLoong's Blog</title><meta name=description content="&amp;#x20;堆栈与RAII中提到了一种能防止在使用父类指针指向子类时出现的内存泄漏的类`shape_wrapper` 这其实就是智能指针的雏形。 使用智能指针可以简化和完善资源管理。 这个类只适用于shape类 所以缺了..."><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet href=/css/site.css><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css></head><body><div class="bg-shape bg-shape-a" aria-hidden=true></div><div class="bg-shape bg-shape-b" aria-hidden=true></div><header class=hero><div class="container hero-inner reveal"><p class=eyebrow>ARTICLE</p><h1>智能指针</h1><p class=subtitle>&amp;#x20;堆栈与RAII中提到了一种能防止在使用父类指针指向子类时出现的内存泄漏的类`shape_wrapper` 这其实就是智能指针的雏形。 使用智能指针可以简化和完善资源管理。 这个类只适用于shape类 所以缺了...</p></div></header><nav class=top-nav><div class="container nav-inner"><a href=/>首页</a>
+<a href=/blog/>文章</a>
+<a href=https://github.com/xzl01 target=_blank rel="noopener noreferrer">GitHub</a></div></nav><main class="container main-wrap"><article class="single-post reveal"><div class=post-meta><span>2026-03-04</span>
+<span>·</span>
+<span>3 个标签</span></div><div class="tag-list post-tags"><span class=tag>Linux</span>
+<span class=tag>系统编程</span>
+<span class=tag>C++</span></div><div class=post-content><h1 id=智能指针>智能指针</h1><p><a href=%E5%A0%86%E6%A0%88%E4%B8%8ERAII_vQT4cTpffqvNy5T8VT5vWR.md title=堆栈与RAII>堆栈与RAII</a>中提到了一种能防止在使用父类指针指向子类时出现的内存泄漏的类<code>shape_wrapper</code> 这其实就是智能指针的雏形。</p><p>使用智能指针可以简化和完善资源管理。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=k>class</span> <span class=nc>shape_wrapper</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl><span class=k>public</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>  <span class=k>explicit</span> <span class=n>shape_wrapper</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>shape</span><span class=o>*</span> <span class=n>ptr</span> <span class=o>=</span> <span class=k>nullptr</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=o>:</span> <span class=n>ptr_</span><span class=p>(</span><span class=n>ptr</span><span class=p>)</span> <span class=p>{}</span>
+</span></span><span class=line><span class=cl>  <span class=o>~</span><span class=n>shape_wrapper</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>delete</span> <span class=n>ptr_</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=n>shape</span><span class=o>*</span> <span class=nf>get</span><span class=p>()</span> <span class=k>const</span> <span class=p>{</span> <span class=k>return</span> <span class=n>ptr_</span><span class=p>;</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=k>private</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>  <span class=n>shape</span><span class=o>*</span> <span class=n>ptr_</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></div><p>这个类只适用于shape类 所以缺了点东西</p><ol><li>这个类只适用于 shape 类</li><li>该类对象的行为不够像指针</li><li>拷贝该类对象会引发程序行为异常</li></ol><p>利用<a href=%E5%87%BD%E6%95%B0%E6%A8%A1%E6%9D%BF_2RkxMjKPgnjuMRxCQ882jV.md title=函数模板>函数模板</a>编程：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>smart_ptr</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl><span class=k>public</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>  <span class=k>explicit</span> <span class=n>smart_ptr</span><span class=p>(</span><span class=n>T</span><span class=o>*</span> <span class=n>ptr</span> <span class=o>=</span> <span class=k>nullptr</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=o>:</span> <span class=n>ptr_</span><span class=p>(</span><span class=n>ptr</span><span class=p>)</span> <span class=p>{}</span>
+</span></span><span class=line><span class=cl>  <span class=o>~</span><span class=n>smart_ptr</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>delete</span> <span class=n>ptr_</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=n>T</span><span class=o>*</span> <span class=nf>get</span><span class=p>()</span> <span class=k>const</span> <span class=p>{</span> <span class=k>return</span> <span class=n>ptr_</span><span class=p>;</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=k>private</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>  <span class=n>T</span><span class=o>*</span> <span class=n>ptr_</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></div><p>目前这个 smart_ptr 的行为还是和指针有点差异的：</p><ul><li>它不能用<code>*</code> 运算符解引用</li><li>它不能用 <code>-></code> 运算符指向对象成员</li><li>它不能像指针一样用在布尔表达式里</li></ul><p>这样的问题其实也好解决，在里面加入成员函数并且把这些符号重载</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>smart_ptr</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl><span class=k>public</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>  <span class=err>…</span>
+</span></span><span class=line><span class=cl>  <span class=n>T</span><span class=o>&amp;</span> <span class=k>operator</span><span class=o>*</span><span class=p>()</span> <span class=k>const</span> <span class=p>{</span> <span class=k>return</span> <span class=o>*</span><span class=n>ptr_</span><span class=p>;</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=n>T</span><span class=o>*</span> <span class=k>operator</span><span class=o>-&gt;</span><span class=p>()</span> <span class=k>const</span> <span class=p>{</span> <span class=k>return</span> <span class=n>ptr_</span><span class=p>;</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=k>operator</span> <span class=nf>bool</span><span class=p>()</span> <span class=k>const</span> <span class=p>{</span> <span class=k>return</span> <span class=n>ptr_</span><span class=p>;</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><h2 id=拷贝构造和赋值>拷贝构造和赋值</h2><p>拷贝构造和赋值，我们暂且简称为拷贝，这是个比较复杂的问题了。关键还不是实现问题，而是我们该如何定义其行为。假设有下面的代码：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=n>smart_ptr</span><span class=o>&lt;</span><span class=n>shape</span><span class=o>&gt;</span> <span class=n>ptr1</span><span class=p>{</span><span class=n>create_shape</span><span class=p>(</span><span class=n>shape_type</span><span class=o>::</span><span class=n>circle</span><span class=p>)};</span>
+</span></span><span class=line><span class=cl><span class=n>smart_ptr</span><span class=o>&lt;</span><span class=n>shape</span><span class=o>&gt;</span> <span class=n>ptr2</span><span class=p>{</span><span class=n>ptr1</span><span class=p>};</span>
+</span></span></code></pre></div><p>对于第二行，究竟应当让编译时发生错误，还是可以有一个更合理的行为？我们来逐一检查一下各种可能性。
+最简单的情况显然是禁止拷贝。我们可以使用下面的代码：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>smart_ptr</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=err>…</span>
+</span></span><span class=line><span class=cl>  <span class=n>smart_ptr</span><span class=p>(</span><span class=k>const</span> <span class=n>smart_ptr</span><span class=o>&amp;</span><span class=p>)</span><span class=c1>//重载拷贝构造函数
+</span></span></span><span class=line><span class=cl>    <span class=o>=</span> <span class=k>delete</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>smart_ptr</span><span class=o>&amp;</span> <span class=k>operator</span><span class=o>=</span><span class=p>(</span><span class=k>const</span> <span class=n>smart_ptr</span><span class=o>&amp;</span><span class=p>)</span> <span class=c1>//重载等号运算符
+</span></span></span><span class=line><span class=cl>    <span class=o>=</span> <span class=k>delete</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=err>…</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></div><p>禁用这两个函数非常简单，但却解决了一种可能出错的情况。否则，<code>smart_ptr&lt;shape>ptr2{ptr1};</code> 在编译时不会出错，但在运行时却会有未定义行为——由于会对同一内存释放两次，通常情况下会导致程序崩溃。</p><p>我们是不是可以考虑在拷贝智能指针时把对象拷贝一份？不行，通常人们不会这么用，因为使用智能指针的目的就是要减少对象的拷贝啊。何况，虽然我们的指针类型是 shape，但实际指向的却应该是 circle 或 triangle 之类的对象。在 C++ 里没有像 Java 的clone 方法这样的约定；一般而言，并没有通用的方法可以通过基类的指针来构造出一个子类的对象来。
+我们要么试试在拷贝时转移指针的所有权？大致实现如下：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>smart_ptr</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=err>…</span>
+</span></span><span class=line><span class=cl>  <span class=n>smart_ptr</span><span class=p>(</span><span class=n>smart_ptr</span><span class=o>&amp;</span> <span class=n>other</span><span class=p>)</span><span class=c1>//拷贝操作
+</span></span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>ptr_</span> <span class=o>=</span> <span class=n>other</span><span class=p>.</span><span class=n>release</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=n>smart_ptr</span><span class=o>&amp;</span> <span class=k>operator</span><span class=o>=</span><span class=p>(</span><span class=n>smart_ptr</span><span class=o>&amp;</span> <span class=n>rhs</span><span class=p>)</span> 
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>smart_ptr</span><span class=p>(</span><span class=n>rhs</span><span class=p>).</span><span class=n>swap</span><span class=p>(</span><span class=o>*</span><span class=k>this</span><span class=p>);</span> <span class=c1>//调用swap函数
+</span></span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=o>*</span><span class=k>this</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=err>…</span>
+</span></span><span class=line><span class=cl>  <span class=n>T</span><span class=o>*</span> <span class=n>release</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>T</span><span class=o>*</span> <span class=n>ptr</span> <span class=o>=</span> <span class=n>ptr_</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>ptr_</span> <span class=o>=</span> <span class=k>nullptr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>ptr</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=kt>void</span> <span class=nf>swap</span><span class=p>(</span><span class=n>smart_ptr</span><span class=o>&amp;</span> <span class=n>rhs</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>using</span> <span class=n>std</span><span class=o>::</span><span class=n>swap</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>swap</span><span class=p>(</span><span class=n>ptr_</span><span class=p>,</span> <span class=n>rhs</span><span class=p>.</span><span class=n>ptr_</span><span class=p>);</span><span class=c1>//交换指针所有权
+</span></span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=err>…</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></div><p>在拷贝构造函数中，通过调用 <code>other</code> 的 <code>release</code> 方法来释放它对指针的所有权。在赋值函数中，则通过拷贝构造产生一个临时对象并调用 swap 来交换对指针的所有权。实现上是不复杂的。
+如果你学到的赋值函数还有一个类似于 <code>if (this != &amp;rhs)</code> 的判断的话，那种用法更啰嗦，而且异常安全性不够好——如果在赋值过程中发生异常的话，this 对象的内容可能已经被部分破坏了，对象不再处于一个完整的状态。</p><p>目前这种惯用法（见参考资料<sup id=fnref:1><a href=#fn:1 class=footnote-ref role=doc-noteref>1</a></sup>）则保证了强异常安全性：赋值分为拷贝构造和交换两步，异常只可能在第一步发生；而第一步如果发生异常的话，this 对象完全不受任何影响。无论拷贝构造成功与否，结果只有赋值成功和赋值没有效果两种状态，而不会发生因为赋值破坏了当前对象这种场景</p><p>上面实现的最大问题是，它的行为会让程序员非常容易犯错。一不小心把它传递给另外一个<code>smart_ptr</code>，你就不再拥有这个对象了……</p><h2 id=移动指针>移动指针</h2><p>smart_ptr 可以如何使用“移动”来改善其行为。
+我们需要对代码做两处小修改：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>T</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=k>class</span> <span class=nc>smart_ptr</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=err>…</span>
+</span></span><span class=line><span class=cl>  <span class=n>smart_ptr</span><span class=p>(</span><span class=n>smart_ptr</span><span class=o>&amp;&amp;</span> <span class=n>other</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>ptr_</span> <span class=o>=</span> <span class=n>other</span><span class=p>.</span><span class=n>release</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=n>smart_ptr</span><span class=o>&amp;</span> <span class=k>operator</span><span class=o>=</span><span class=p>(</span><span class=n>smart_ptr</span> <span class=n>rhs</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>rhs</span><span class=p>.</span><span class=n>swap</span><span class=p>(</span><span class=o>*</span><span class=k>this</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=o>*</span><span class=k>this</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=err>…</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></div><ul><li>把拷贝构造函数中的参数类型 <code>smart_ptr&</code> 改成了 <code>smart_ptr&&</code>；现在它成了移动构造函数（why？）。</li><li>把赋值函数中的参数类型 <code>smart_ptr& </code>改成了 <code>smart_ptr</code>，在构造参数时直接生成新的智能指针，从而不再需要在函数体中构造临时对象。现在赋值函数的行为是移动还是拷贝，完全依赖于构造参数时走的是移动构造还是拷贝构造。</li></ul><p>根据 C++ 的规则，如果我提供了移动构造函数而没有手动提供拷贝构造函数，那后者自动被禁用（记住，C++ 里那些复杂的规则也是为方便编程而设立的）。于是，我们自然地得到了以下结果：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=n>smart_ptr</span><span class=o>&lt;</span><span class=n>shape</span><span class=o>&gt;</span> <span class=n>ptr1</span><span class=p>{</span><span class=n>create_shape</span><span class=p>(</span><span class=n>shape_type</span><span class=o>::</span><span class=n>circle</span><span class=p>)};</span>
+</span></span><span class=line><span class=cl><span class=n>smart_ptr</span><span class=o>&lt;</span><span class=n>shape</span><span class=o>&gt;</span> <span class=n>ptr2</span><span class=p>{</span><span class=n>ptr1</span><span class=p>};</span> <span class=c1>// 编译出错
+</span></span></span><span class=line><span class=cl><span class=n>smart_ptr</span><span class=o>&lt;</span><span class=n>shape</span><span class=o>&gt;</span> <span class=n>ptr3</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=n>ptr3</span> <span class=o>=</span> <span class=n>ptr1</span><span class=p>;</span> <span class=c1>// 编译出错
+</span></span></span><span class=line><span class=cl><span class=n>ptr3</span> <span class=o>=</span> <span class=n>std</span><span class=o>::</span><span class=n>move</span><span class=p>(</span><span class=n>ptr1</span><span class=p>);</span> <span class=c1>// OK，可以
+</span></span></span><span class=line><span class=cl><span class=n>smart_ptr</span><span class=o>&lt;</span><span class=n>shape</span><span class=o>&gt;</span> <span class=n>ptr4</span><span class=p>{</span><span class=n>std</span><span class=o>::</span><span class=n>move</span><span class=p>(</span><span class=n>ptr3</span><span class=p>)};</span> <span class=c1>// OK，可以
+</span></span></span></code></pre></div><p>这也是 C++11 的 <code>unique_ptr</code> 的基本行为。</p><h2 id=子类指针向基类指针的转换>子类指针向基类指针的转换</h2><p>对，上一篇我们的例子里面出现了用基类指针指向子类,其实子类的指针<code>circle*</code>是可以隐式转换到<code>shape*</code>:又子类指针转换成父类指针，但是看上面我们定义的智能指针确是不行的。</p><p>所以还是用模板编程去解决这个问题：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=k>template</span> <span class=o>&lt;</span><span class=k>typename</span> <span class=n>U</span><span class=o>&gt;</span>
+</span></span><span class=line><span class=cl><span class=n>smart_ptr</span><span class=p>(</span><span class=n>smart_ptr</span><span class=o>&lt;</span><span class=n>U</span><span class=o>&gt;&amp;&amp;</span> <span class=n>other</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=n>ptr_</span> <span class=o>=</span> <span class=n>other</span><span class=p>.</span><span class=n>release</span><span class=p>();</span><span class=c1>//更改指针指向方向实现平滑的移动
+</span></span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>这样，我们自然而然利用了指针的转换特性：现在 <code>smart_ptr&lt;circle> </code>可以移动给<code>smart_ptr&lt;shape></code>，但不能移动给 <code>smart_ptr&lt;triangle></code>。不正确的转换会在代码编译时直接报错。</p><p>非隐式转换在后面再进行讨论</p><h2 id=引用计数>引用计数</h2><p><code>unique_ptr</code> 算是一种较为安全的智能指针了。但是，一个对象只能被单个 <code>unique_ptr</code>所拥有，这显然不能满足所有使用场合的需求。一种常见的情况是，多个智能指针同时拥有一个对象；当它们全部都失效时，这个对象也同时会被删除。这也就是 <code>shared_ptr</code>了。
+<code>unique_ptr</code> 和 <code>shared_ptr</code> 的主要区别如下图所示：</p><p><img src=/images/imported/w-ktny/image_mt407J-UN-.png alt></p><p>这种方案的内存管理其实有点类似于linux系统中对于文件的管理方式，链接的本质也是指针，如果是通过硬链接实现对文件的引用，在删除某一个文件的时候也需要查看计数，如果计数值归零才真正删除掉</p><p>多个不同的 <code>shared_ptr</code> 不仅可以共享一个对象，在共享同一对象时也需要同时共享同一个计数。当最后一个指向对象（和共享计数）的<code>shared_ptr</code>析构时，它需要删除对象和共享计数。我们下面就来实现一下。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=k>class</span> <span class=nc>shared_count</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl><span class=k>public</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>  <span class=n>shared_count</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>  <span class=kt>void</span> <span class=nf>add_count</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>  <span class=kt>long</span> <span class=nf>reduce_count</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>  <span class=kt>long</span> <span class=nf>get_count</span><span class=p>()</span> <span class=k>const</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></div><p>这个 <code>shared_count</code> 类除构造函数之外有三个方法：一个增加计数，一个减少计数，一个获取计数。注意上面的接口增加计数不需要返回计数值；但减少计数时需要返回计数值，以供调用者判断是否它已经是最后一个指向共享计数的 shared_ptr 了。由于真正多线程安全的版本需要用到我们目前还没学到的知识，我们目前先实现一个简单化的版本：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=k>class</span> <span class=nc>shared_count</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl><span class=k>public</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>  <span class=n>shared_count</span><span class=p>()</span> <span class=o>:</span> <span class=n>count_</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span> <span class=p>{}</span>
+</span></span><span class=line><span class=cl>  <span class=kt>void</span> <span class=nf>add_count</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=o>++</span><span class=n>count_</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=kt>long</span> <span class=nf>reduce_count</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=o>--</span><span class=n>count_</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=kt>long</span> <span class=nf>get_count</span><span class=p>()</span> <span class=k>const</span>
+</span></span><span class=line><span class=cl>  <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=n>count_</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=k>private</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>  <span class=kt>long</span> <span class=n>count_</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>};</span>
+</span></span></code></pre></div><p>现在我们可以实现我们的引用计数智能指针了。首先是构造函数、析构函数和私有成员变量</p><div class=footnotes role=doc-endnotes><hr><ol><li id=fn:1><p><a href=https://stackoverflow.com/questions/3279543/what-is-the-copy-and-swap-idiom/3279550#3279550 title=https://stackoverflow.com/questions/3279543/what-is-the-copy-and-swap-idiom/3279550#3279550>https://stackoverflow.com/questions/3279543/what-is-the-copy-and-swap-idiom/3279550#3279550</a>&#160;<a href=#fnref:1 class=footnote-backref role=doc-backlink>&#8617;&#xfe0e;</a></p></li></ol></div></div></article></main><footer class=site-footer><p>&copy; 2026 HarryLoong</p></footer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js></script><script src=/js/site.js></script></body></html>

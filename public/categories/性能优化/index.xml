@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>性能优化 on HarryLoong's Blog</title><link>https://xzl01.github.io/categories/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/</link><description>Recent content in 性能优化 on HarryLoong's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Wed, 04 Mar 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://xzl01.github.io/categories/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/index.xml" rel="self" type="application/rss+xml"/><item><title>Linux TLP 电源管理指南</title><link>https://xzl01.github.io/blog/linux-tlp-power-management-guide/</link><pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate><guid>https://xzl01.github.io/blog/linux-tlp-power-management-guide/</guid><description>&lt;p&gt;TLP 是适用于 Linux 的功能丰富的命令行实用程序，无需深入研究技术细节即可节省笔记本电脑电池电量&lt;/p&gt;
+&lt;h2 id="工作原理"&gt;工作原理&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;TLP 基本上所做的是调整影响功耗的内核设置，内核态的配置文件存储在RAM中，所以并不具备持久性。TLP将配置存储在用户态中，在内核启动时对其进行配置&lt;/li&gt;
+&lt;li&gt;TLP 处理的大多数内核设置都作为 sysfs 节点导出到用户空间，即 /sys/ 下的文件。&lt;code&gt;tlp-stat&lt;/code&gt; 的输出将显示路径。&lt;/li&gt;
+&lt;li&gt;TLP 提供两组独立的设置，称为配置文件，一组用于电池 （BAT），另一组用于交流操作。这意味着 TLP 不仅在启动时，而且在每次电源更改时都必须应用适当的配置文件（可以据此实现AC BT切换电源调度状态）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="tlp触发事件信号"&gt;TLP触发事件（信号）&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;充电器插入（交流供电）：应用AC配置文件&lt;/li&gt;
+&lt;li&gt;充电器已拔下（电池供电）： 应用BAT配置文件&lt;/li&gt;
+&lt;li&gt;已插入 USB 设备：激活设备的 USB 自动挂起模式（可以在配置文件设置例外或拒绝连接）&lt;/li&gt;
+&lt;li&gt;系统启动（boot）：应用与当前电源 AC/BAT 相对应的设置配置文件。应用充电阈值并根据您的个人设置切换蓝牙、Wi-Fi 和 WWAN 设备（在默认配置中禁用）&lt;/li&gt;
+&lt;li&gt;系统关机 (power off)：保存或切换蓝牙、Wi-Fi 和 WWAN 设备状态，并根据您的个人设置禁用 USB 自动挂起（在默认配置中禁用）&lt;/li&gt;
+&lt;li&gt;系统重启： 相当于关机再启动&lt;/li&gt;
+&lt;li&gt;系统挂起到 ACPI 睡眠状态 S0ix（空闲待机）、S3（挂起到 RAM）或 S4（挂起到磁盘）：保存蓝牙、Wi-Fi 和 WWAN 设备状态，并根据您的个人设置关闭可移动光盘驱动器的电源（在默认配置中禁用）。&lt;/li&gt;
+&lt;li&gt;系统从 ACPI 睡眠状态 S0ix（空闲待机）、S3（挂起到 RAM）或 S4（挂起到磁盘）恢复： 应用与当前电源 AC/BAT 相对应的设置配置文件。恢复充电阈值以及蓝牙、Wi-Fi 和 WWAN 设备状态，具体取决于您的个人设置（在默认配置中禁用）。&lt;/li&gt;
+&lt;li&gt;LAN、Wi-Fi、WWAN 连接/断开连接或笔记本电脑插接/未插接：根据您的个人设置启用或禁用内置蓝牙、Wi-Fi 和 WWAN 设备（在默认配置中禁用）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;除了上述事件之外，TLP 不会对设置进行动态或自适应更改
+特别是，TLP 绝不会因 CPU 负载、电池电量或其他原因而调整设置（如果我们需要去实现这一部分，则可以，则可以通过添加一个信号的方式来实现）&lt;/p&gt;</description></item></channel></rss>

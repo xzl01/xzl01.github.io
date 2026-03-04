@@ -1,0 +1,35 @@
+{{ define "main" }}
+<section class="section-head reveal">
+    <h2>{{ .Title }}</h2>
+    <p>{{ with .Description }}{{ . }}{{ else }}摄影作品持续更新中。{{ end }}</p>
+</section>
+
+{{ $galleryDir := "static/gallery" }}
+{{ $files := readDir $galleryDir }}
+{{ $images := slice }}
+{{ range $files }}
+    {{ if not .IsDir }}
+        {{ $name := lower .Name }}
+        {{ if or (hasSuffix $name ".jpg") (hasSuffix $name ".jpeg") (hasSuffix $name ".png") (hasSuffix $name ".webp") (hasSuffix $name ".gif") }}
+            {{ $images = $images | append .Name }}
+        {{ end }}
+    {{ end }}
+{{ end }}
+
+{{ if gt (len $images) 0 }}
+<section class="gallery-grid reveal">
+    {{ range sort $images "value" "desc" }}
+    <figure class="gallery-card">
+        <a href="/gallery/{{ . }}" target="_blank" rel="noopener noreferrer">
+            <img src="/gallery/{{ . }}" alt="摄影作品 {{ . }}" loading="lazy">
+        </a>
+        <figcaption>{{ . }}</figcaption>
+    </figure>
+    {{ end }}
+</section>
+{{ else }}
+<section class="gallery-empty reveal">
+    <p>图库暂时还没有图片。你可以把作品放到 <code>static/gallery/</code>，刷新后会自动展示。</p>
+</section>
+{{ end }}
+{{ end }}

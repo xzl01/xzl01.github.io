@@ -1,0 +1,49 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>从操作系统维护者的角度去看不可变发行版 - HarryLoong's Blog</title><meta name=description content="各位老师同学，开源社区的同行者们，晚上好，我是来自deepin开源社区的研发工程师——项泽龙，今天我给大家分享的主题是从操作系统的维护者的角度去看不可变发行版。 正如这次讨论的主题所说，不可变发新版是很多linux发行版..."><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet href=/css/site.css><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css></head><body><div class="bg-shape bg-shape-a" aria-hidden=true></div><div class="bg-shape bg-shape-b" aria-hidden=true></div><header class=hero><div class="container hero-inner reveal"><p class=eyebrow>ARTICLE</p><h1>从操作系统维护者的角度去看不可变发行版</h1><p class=subtitle>各位老师同学，开源社区的同行者们，晚上好，我是来自deepin开源社区的研发工程师——项泽龙，今天我给大家分享的主题是从操作系统的维护者的角度去看不可变发行版。 正如这次讨论的主题所说，不可变发新版是很多linux发行版...</p></div></header><nav class=top-nav><div class="container nav-inner"><a href=/>首页</a>
+<a href=/blog/>文章</a>
+<a href=https://github.com/xzl01 target=_blank rel="noopener noreferrer">GitHub</a></div></nav><main class="container main-wrap"><article class="single-post reveal"><div class=post-meta><span>2026-03-04</span>
+<span>·</span>
+<span>1 个标签</span></div><div class="tag-list post-tags"><span class=tag>Linux</span></div><div class=post-content><h1 id=从操作系统维护者的角度去看不可变发行版>从操作系统维护者的角度去看不可变发行版</h1><p>各位老师同学，开源社区的同行者们，晚上好，我是来自deepin开源社区的研发工程师——项泽龙，今天我给大家分享的主题是从操作系统的维护者的角度去看不可变发行版。</p><h2 id=不可变发行版>不可变发行版</h2><p>正如这次讨论的主题所说，不可变发新版是很多linux发行版所考虑的未来系统维护方案。这里给不了解不可变系统的朋友们快速介绍下：就如果你现在使用的安卓手机一样，你是以用户的身份去使用，你可以自由的去安装应用和使用GUI配置设备和系统，无需使用命令行和关心系统的细节，但同时也无法完全控制和更改你自己的设备。</p><p>下面我用一个表格来对比下这二者之间的区别：</p><table><thead><tr><th>项目</th><th>传统发行版</th><th>不可变发行版</th></tr></thead><tbody><tr><td>配置系统</td><td>配置文件+命令+GUI</td><td>GUI 和用户级配置文件</td></tr><tr><td>应用</td><td>安装在系统级或用户级</td><td>安装在用户级或容器内</td></tr><tr><td>面向用户</td><td>开发者和有一定操作系统管理能力的人</td><td>不关心操作系统实现的普通用户（和windows macos一样）</td></tr><tr><td>特点</td><td>绝对的自由</td><td>相对的自由</td></tr></tbody></table><h2 id=不可变发行版解决了什么问题>不可变发行版解决了什么问题</h2><h3 id=解耦了系统和应用>解耦了系统和应用</h3><p>Linux是一个非常强大的操作系统，因为它允许用户对系统进行更深入的定制和修改。然而，这种自由和灵活性也意味着用户需要花费更多的时间和精力来管理系统的依赖关系。在Linux中，软件包通常依赖于其他软件包来正常运行，因此，用户需要了解系统中的每个组件和它们之间的依赖关系。</p><p>如果系统中的某个关键软件包无法正常安装，那么可能会导致整个系统无法运行。例如，如果一个关键软件包需要其他组件才能正常运行，但是这些组件不存在或已经过时，那么用户将无法安装该软件包，从而无法正常使用该应用程序。</p><p>此外，Linux系统中的软件包通常都是不可移植的，也就是说，当用户在不同的系统上安装相同的软件包时，可能会出现兼容性问题。例如，某个软件包在某个Linux发行版上能够正常运行，但是在另一个Linux发行版上可能无法正常工作。</p><p>为了解决这些问题，许多Linux发行版开始采用不可变发行版的概念。不可变发行版将系统和应用程序完全隔离开来，彼此之间没有依赖关系。这意味着，当用户安装一个不可变发行版时，他们可以确保系统和应用程序之间没有任何依赖关系，因此可以更加方便和自由地使用系统。</p><p>总之，Linux系统的自由和灵活性使其非常强大，但也需要用户花费更多的时间和精力来管理系统的依赖关系。采用不可变发行版的概念可以帮助用户更加方便和自由地使用Linux系统。</p><h3 id=易用性和应用生态>易用性和应用生态</h3><p>大多数人认为 Linux 用户是懂电脑的人和黑客，这种刻板印象是由于大多数 Linux 用户不可避免地需要使用终端交互，因为很多 Linux 桌面操作系统的配置和使用都需要终端命令。而不可变操作系统可以消除这一状态，保证用户权限管理向 Windows 和 MacOS 看齐，不用担心使用危险命令导致系统受损。这种操作系统会为用户提供一些常用的配置和功能，让使用 Linux 变得更加流畅。</p><h3 id=安全的系统>安全的系统</h3><p>不可变操作系统的设计理念要求系统稳定且安全，因此在该设计中，采用了AB root和ostree等方案来保证系统的可靠性。同时，锁定root分区的权限，以确保系统的安全性。</p><h2 id=不可变发行版带来了什么问题>不可变发行版带来了什么问题</h2><h3 id=似乎部分需要sudo变的不可用>似乎部分需要sudo变的不可用</h3><p>我和玲珑的开发者讨论过这个问题，如果在玲珑中使用终端会怎么样：sudo权限不在容器中存在，如果你需要在容器中的终端使用sudo 那么在启动容器的时候必须对整个容器进行提权才可以，这显然不太能被接受。</p><h3 id=系统和应用的分界线不是那么明显>系统和应用的分界线不是那么明显</h3><p>在Linux桌面领域，由于发展多年，现有的系统和应用的边界已经变得非常模糊。举个例子，终端通常被视为系统的一部分，但它也属于应用程序。因此，我们需要一种解决方案来分离维护这些组件。一种可行的解决方案是使用容器化的应用程序，如flatpak、snap和linglong等，它们能够提供更高的灵活性和可维护性。另外，一些系统应用程序也可以在容器中使用，以实现更好的可移植性和可维护性。</p><h3 id=需要一套全新的sudo>需要一套全新的sudo</h3><p>对于权限管理，不同的操作系统有不同的实现方式。以Windows、MacOS和Linux为例，它们的权限设置如下：</p><table><thead><tr><th>用户权限</th><th>windows</th><th>macos</th><th>linux</th></tr></thead><tbody><tr><td>最高</td><td>System</td><td>System</td><td>root（sudo）</td></tr><tr><td></td><td>Admin</td><td>root（sudo）</td><td>User</td></tr><tr><td></td><td>User</td><td>User</td><td></td></tr></tbody></table><p>这些系统中，都有一个System级别的用户权限，用于对系统进行一些必要的更改。管理员权限可以以root（sudo）的形式提供给用户，以便用户能够执行更高级别的任务。然而，使用sudo也会存在一些安全问题，因此需要一些解决方案。</p><p>下面我倒是有比较好的想法去实现：</p><ul><li>使用原子更新或者AB root的方式，把一切不靠谱的行为全给回滚，就算你以root身份乱来了，重启之后就什么都没发生</li><li>锁住根目录，不让用户做任何更改，并且把一部分修改之后影响较小的修改从fakeroot那边同步过来（sudo拿到的权限就是fakeroot的root权限</li><li>完全禁止root权限，类似一些商业发行版的做法。</li></ul><pre tabindex=0><code class=language-纯文本 data-lang=纯文本>---
+marp：true
+---
+# 从系统维护者的角度看不可变发行版
+
+   deepin 开源社区系统研发：longlong
+
+---
+
+## 暴论：现在的不可变发行版都是骗人的
+
+我为何出此暴论，因为现在的不可变发行版都没弄清楚事情的本质是什么，各自都有各自的想法。而我们的用户对不可变发行版的认知也不同
+
+---
+
+## 定义：不可变发行版——现代的桌面发行版
+
+||||
+|-------|----|----|
+|项目 | 传统发行版 | 不可变发行版 |
+|配置系统 | 配置文件 + 命令+GUI|GUI 和用户级配置文件 |
+|应用 | 安装在系统级或用户级 | 安装在用户级或容器内 |
+|面向用户 | 开发者和有一定操作系统管理能力的人 | 不关心操作系统实现的普通用户（和 windows macos 一样）|
+|特点 | 绝对的自由 | 相对的自由|
+
+---
+
+## 不可变发行版解决的问题
+
+---
+
+### 解耦系统和应用
+
+&gt; windows 可以在 win11 上玩 winXP 年代的红色警戒，用 linux 可以吗？
+
+对于闭源软件，liunx 的向前兼容性似乎不是很好
+
+系统开发者不敢随意升级底层库的问题，通过解耦系统和应用，两者分离维护来解决
+
+---
+
+### 易用性和生态
+
+系统更为健壮，一行命令炸掉系统的事情不会再发生了
+</code></pre></div></article></main><footer class=site-footer><p>&copy; 2026 HarryLoong</p></footer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js></script><script src=/js/site.js></script></body></html>

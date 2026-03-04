@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>系统维护 on HarryLoong's Blog</title><link>https://xzl01.github.io/tags/%E7%B3%BB%E7%BB%9F%E7%BB%B4%E6%8A%A4/</link><description>Recent content in 系统维护 on HarryLoong's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Wed, 04 Mar 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://xzl01.github.io/tags/%E7%B3%BB%E7%BB%9F%E7%BB%B4%E6%8A%A4/index.xml" rel="self" type="application/rss+xml"/><item><title>从维护者视角看不可变 Linux 发行版</title><link>https://xzl01.github.io/blog/immutable-linux-distro-maintainer-view/</link><pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate><guid>https://xzl01.github.io/blog/immutable-linux-distro-maintainer-view/</guid><description>&lt;p&gt;从系统维护者的角度看，不可变发行版不是“换一种打包方式”，而是一次系统边界的重划分：
+系统该负责什么，应用该负责什么，用户应该拥有什么权限，以及升级失败时如何可回滚。&lt;/p&gt;
+&lt;h2 id="什么是不可变发行版"&gt;什么是不可变发行版&lt;/h2&gt;
+&lt;p&gt;可以把不可变发行版理解为“系统层尽量只读、应用层尽量隔离、升级过程可回滚”的桌面系统形态。&lt;/p&gt;
+&lt;p&gt;对普通用户来说，它的目标很明确：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;降低系统被误操作破坏的概率&lt;/li&gt;
+&lt;li&gt;降低维护成本&lt;/li&gt;
+&lt;li&gt;提高升级成功率与可恢复性&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;下面是一个直观对比：&lt;/p&gt;
+&lt;table&gt;
+ &lt;thead&gt;
+ &lt;tr&gt;
+ &lt;th&gt;项目&lt;/th&gt;
+ &lt;th&gt;传统发行版&lt;/th&gt;
+ &lt;th&gt;不可变发行版&lt;/th&gt;
+ &lt;/tr&gt;
+ &lt;/thead&gt;
+ &lt;tbody&gt;
+ &lt;tr&gt;
+ &lt;td&gt;配置方式&lt;/td&gt;
+ &lt;td&gt;配置文件 + 命令 + GUI&lt;/td&gt;
+ &lt;td&gt;以 GUI 和用户级配置为主&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;应用安装位置&lt;/td&gt;
+ &lt;td&gt;系统级或用户级&lt;/td&gt;
+ &lt;td&gt;用户级或容器内&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;目标人群&lt;/td&gt;
+ &lt;td&gt;开发者/运维能力较强用户&lt;/td&gt;
+ &lt;td&gt;普通桌面用户&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;tr&gt;
+ &lt;td&gt;核心特征&lt;/td&gt;
+ &lt;td&gt;高自由度&lt;/td&gt;
+ &lt;td&gt;受控自由 + 高稳定性&lt;/td&gt;
+ &lt;/tr&gt;
+ &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id="它解决了什么问题"&gt;它解决了什么问题&lt;/h2&gt;
+&lt;h3 id="1-系统与应用解耦"&gt;1. 系统与应用解耦&lt;/h3&gt;
+&lt;p&gt;传统 Linux 桌面常见的问题是依赖耦合：
+一个关键库升级或缺失，可能影响多个应用，甚至影响系统可用性。&lt;/p&gt;
+&lt;p&gt;不可变发行版通过“系统层稳定、应用层隔离”的方式降低耦合，
+让应用生命周期和系统生命周期不再强绑定。&lt;/p&gt;
+&lt;h3 id="2-降低使用门槛"&gt;2. 降低使用门槛&lt;/h3&gt;
+&lt;p&gt;很多桌面 Linux 场景仍然依赖终端与 root 级操作。
+不可变方案希望把日常配置与使用尽量放在用户态，
+使普通用户也能在不理解底层细节的情况下稳定使用系统。&lt;/p&gt;
+&lt;h3 id="3-提升安全与可恢复性"&gt;3. 提升安全与可恢复性&lt;/h3&gt;
+&lt;p&gt;不可变架构通常会配合 AB root、原子更新、版本回滚等机制。
+当更新失败或配置损坏时，系统可回退到上一个可用状态，
+这对“桌面可用性”比“理论自由度”更关键。&lt;/p&gt;
+&lt;h2 id="它带来的新问题"&gt;它带来的新问题&lt;/h2&gt;
+&lt;h3 id="1-权限模型需要重设计"&gt;1. 权限模型需要重设计&lt;/h3&gt;
+&lt;p&gt;在容器化或受限环境下，传统 &lt;code&gt;sudo&lt;/code&gt; 习惯并不总是成立。
+很多操作到底属于“系统管理”还是“应用管理”，边界并不清晰。&lt;/p&gt;
+&lt;h3 id="2-历史生态迁移成本高"&gt;2. 历史生态迁移成本高&lt;/h3&gt;
+&lt;p&gt;Linux 桌面发展多年，很多组件既像系统组件又像应用组件（例如终端、部分控制中心能力）。
+在不可变模型中，需要逐步拆分职责，否则维护成本会从“技术问题”变成“边界问题”。&lt;/p&gt;
+&lt;h3 id="3-兼容性与可维护性之间需要平衡"&gt;3. 兼容性与可维护性之间需要平衡&lt;/h3&gt;
+&lt;p&gt;隔离能提升稳定性，但也会增加联调复杂度。
+如果工程规范和接口边界不清楚，会把问题从“依赖冲突”转成“跨层协作成本”。&lt;/p&gt;</description></item></channel></rss>

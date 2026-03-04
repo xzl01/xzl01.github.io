@@ -1,0 +1,225 @@
+<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Linux 内核中的进程销毁流程 - HarryLoong's Blog</title><meta name=description content="首先是一个系统调用`do_exit`&amp;#x20; 进程销毁的过程： 1. 进行一个系统调用：`do_exit` 2. 如果销毁的进程有子进程的存在，则让子进程的father置为1（init进程）如果该子进程已经处于僵死(..."><script>document.documentElement.classList.add("js")</script><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet href=/css/site.css><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css></head><body class=inner-page><div class="bg-shape bg-shape-a" aria-hidden=true></div><div class="bg-shape bg-shape-b" aria-hidden=true></div><header class=hero><div class="container hero-inner reveal"><p class=eyebrow>ARTICLE</p><h1>Linux 内核中的进程销毁流程</h1><p class=subtitle>首先是一个系统调用`do_exit`&amp;#x20; 进程销毁的过程： 1. 进行一个系统调用：`do_exit` 2. 如果销毁的进程有子进程的存在，则让子进程的father置为1（init进程）如果该子进程已经处于僵死(...</p></div></header><nav class=top-nav><div class="container nav-inner"><a href=/>首页</a>
+<a href=/blog/>文章</a>
+<a href=/gallery/>图库</a></div></nav><main class="container main-wrap"><section class=single-layout><article class=single-post><div class=post-meta><span>2026-03-04</span>
+<span>·</span>
+<span>4 个标签</span></div><div class="tag-list post-tags"><span class=tag>Linux</span>
+<span class=tag>内核</span>
+<span class=tag>进程管理</span>
+<span class=tag>do_exit</span></div><div class=post-content><h2 id=进程的销毁>进程的销毁</h2><p>首先是一个系统调用<code>do_exit</code></p><div class=highlight><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=c1>//// 程序退出处理函数。
+</span></span></span><span class=line><span class=cl><span class=c1>// 该函数将把当前进程置为TASK_ZOMBIE状态，然后去执行调度函数schedule()，不再返回。
+</span></span></span><span class=line><span class=cl><span class=c1>// 参数code是退出状态码，或称为错误码。
+</span></span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>do_exit</span><span class=p>(</span><span class=kt>long</span> <span class=n>code</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>i</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 首先释放当前进程代码段和数据段所占的内存页。函数free_page_tables()的第一个参数
+</span></span></span><span class=line><span class=cl>    <span class=c1>// (get_base()返回值)指明在CPU线性地址空间中起始基地址，第2个(get_limit()返回值)
+</span></span></span><span class=line><span class=cl>    <span class=c1>// 说明欲释放的字节长度值。get_base()宏中的current-&gt;ldt[1]给出进程代码段描述符的
+</span></span></span><span class=line><span class=cl>    <span class=c1>// 位置(current-&gt;ldt[2]给出进程代码段描述符的位置)；get_limit()中0x0f是进程代码段
+</span></span></span><span class=line><span class=cl>    <span class=c1>// 的选择符(0x17是进城数据段的选择符)。即在取段基地址时使用该段的描述符所处地址作为
+</span></span></span><span class=line><span class=cl>    <span class=c1>// 参数，取段长度时使用该段的选择符作为参数。free_page_tables()函数位于mm/memory.c
+</span></span></span><span class=line><span class=cl>    <span class=c1>// 文件中。
+</span></span></span><span class=line><span class=cl>  <span class=nf>free_page_tables</span><span class=p>(</span><span class=nf>get_base</span><span class=p>(</span><span class=n>current</span><span class=o>-&gt;</span><span class=n>ldt</span><span class=p>[</span><span class=mi>1</span><span class=p>]),</span><span class=nf>get_limit</span><span class=p>(</span><span class=mh>0x0f</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>  <span class=nf>free_page_tables</span><span class=p>(</span><span class=nf>get_base</span><span class=p>(</span><span class=n>current</span><span class=o>-&gt;</span><span class=n>ldt</span><span class=p>[</span><span class=mi>2</span><span class=p>]),</span><span class=nf>get_limit</span><span class=p>(</span><span class=mh>0x17</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>    <span class=c1>//  如果当前进程有子进程，就将子进程的father置为1(其父进程改为进程1，即init进程) 。
+</span></span></span><span class=line><span class=cl>    <span class=c1>// 如果该子进程已经处于僵死(ZOMBIE)状态，则向进程1发送子进程中止信号SIGCHLD。
+</span></span></span><span class=line><span class=cl>  <span class=k>for</span> <span class=p>(</span><span class=n>i</span><span class=o>=</span><span class=mi>0</span> <span class=p>;</span> <span class=n>i</span><span class=o>&lt;</span><span class=n>NR_TASKS</span> <span class=p>;</span> <span class=n>i</span><span class=o>++</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>task</span><span class=p>[</span><span class=n>i</span><span class=p>]</span> <span class=o>&amp;&amp;</span> <span class=n>task</span><span class=p>[</span><span class=n>i</span><span class=p>]</span><span class=o>-&gt;</span><span class=n>father</span> <span class=o>==</span> <span class=n>current</span><span class=o>-&gt;</span><span class=n>pid</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=n>task</span><span class=p>[</span><span class=n>i</span><span class=p>]</span><span class=o>-&gt;</span><span class=n>father</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=k>if</span> <span class=p>(</span><span class=n>task</span><span class=p>[</span><span class=n>i</span><span class=p>]</span><span class=o>-&gt;</span><span class=n>state</span> <span class=o>==</span> <span class=n>TASK_ZOMBIE</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=cm>/* assumption task[1] is always init */</span>
+</span></span><span class=line><span class=cl>        <span class=p>(</span><span class=kt>void</span><span class=p>)</span> <span class=nf>send_sig</span><span class=p>(</span><span class=n>SIGCHLD</span><span class=p>,</span> <span class=n>task</span><span class=p>[</span><span class=mi>1</span><span class=p>],</span> <span class=mi>1</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>     <span class=c1>// 关闭当前进程打开着的所有文件。
+</span></span></span><span class=line><span class=cl>  <span class=k>for</span> <span class=p>(</span><span class=n>i</span><span class=o>=</span><span class=mi>0</span> <span class=p>;</span> <span class=n>i</span><span class=o>&lt;</span><span class=n>NR_OPEN</span> <span class=p>;</span> <span class=n>i</span><span class=o>++</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>current</span><span class=o>-&gt;</span><span class=n>filp</span><span class=p>[</span><span class=n>i</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>      <span class=nf>sys_close</span><span class=p>(</span><span class=n>i</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 对当前进程的工作目录pwd，根目录root以及执行程序文件的i节点进行同步操作，放回
+</span></span></span><span class=line><span class=cl>    <span class=c1>// 各个i节点并分别置空(释放)。
+</span></span></span><span class=line><span class=cl>  <span class=nf>iput</span><span class=p>(</span><span class=n>current</span><span class=o>-&gt;</span><span class=n>pwd</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=n>current</span><span class=o>-&gt;</span><span class=n>pwd</span><span class=o>=</span><span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=nf>iput</span><span class=p>(</span><span class=n>current</span><span class=o>-&gt;</span><span class=n>root</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=n>current</span><span class=o>-&gt;</span><span class=n>root</span><span class=o>=</span><span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=nf>iput</span><span class=p>(</span><span class=n>current</span><span class=o>-&gt;</span><span class=n>executable</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=n>current</span><span class=o>-&gt;</span><span class=n>executable</span><span class=o>=</span><span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=c1>//  如果当前进程是会话头领(leader)进程并且其有控制终端，则释放该终端。
+</span></span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=n>current</span><span class=o>-&gt;</span><span class=n>leader</span> <span class=o>&amp;&amp;</span> <span class=n>current</span><span class=o>-&gt;</span><span class=n>tty</span> <span class=o>&gt;=</span> <span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>tty_table</span><span class=p>[</span><span class=n>current</span><span class=o>-&gt;</span><span class=n>tty</span><span class=p>].</span><span class=n>pgrp</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 如果当前进程上次使用过协处理器，则将last_task_used_math置空。
+</span></span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=n>last_task_used_math</span> <span class=o>==</span> <span class=n>current</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=n>last_task_used_math</span> <span class=o>=</span> <span class=nb>NULL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 如果当前进程是leader进程，则终止该会话的所有相关进程。
+</span></span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=n>current</span><span class=o>-&gt;</span><span class=n>leader</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=nf>kill_session</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=c1>//  把当前进程置为僵死状态，表明当前进程已经释放了资源。并保存将由父进程读取的退出码 。
+</span></span></span><span class=line><span class=cl>  <span class=n>current</span><span class=o>-&gt;</span><span class=n>state</span> <span class=o>=</span> <span class=n>TASK_ZOMBIE</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=n>current</span><span class=o>-&gt;</span><span class=n>exit_code</span> <span class=o>=</span> <span class=n>code</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=c1>//  通知父进程，也即向父进程发送信号SIGCHLD - 子进程将停止或终止。
+</span></span></span><span class=line><span class=cl>  <span class=nf>tell_father</span><span class=p>(</span><span class=n>current</span><span class=o>-&gt;</span><span class=n>father</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=nf>schedule</span><span class=p>();</span>                     <span class=c1>// 重新调度进程运行，以让父进程处理僵死其他的善后事宜。
+</span></span></span><span class=line><span class=cl>    <span class=c1>// 下面的return语句仅用于去掉警告信息。因为这个函数不返回，所以若在函数名前加关键字
+</span></span></span><span class=line><span class=cl>    <span class=c1>// volatile，就可以告诉gcc编译器本函数不会返回的特殊情况。这样可让gcc产生更好一些的代码，
+</span></span></span><span class=line><span class=cl>    <span class=c1>// 并且可以不用再写return语句也不会产生假警告信息。
+</span></span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=p>(</span><span class=o>-</span><span class=mi>1</span><span class=p>);</span>  <span class=cm>/* just to suppress warnings */</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>进程销毁的过程：</p><ol><li><p>进行一个系统调用：<code>do_exit</code></p></li><li><p>如果销毁的进程有子进程的存在，则让子进程的father置为1（init进程）如果该子进程已经处于僵死(ZOMBIE)状态，则向进程1发送子进程中止信号SIGCHLD。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=c1>//// 向指定任务p发送信号sig, 权限priv。
+</span></span></span><span class=line><span class=cl><span class=c1>// 参数：sig - 信号值；p - 指定任务的指针；priv - 强制发送信号的标志。即不需要考虑进程
+</span></span></span><span class=line><span class=cl><span class=c1>// 用户属性或级别而能发送信号的权利。该函数首先判断参数的正确性，然后判断条件是否满足。
+</span></span></span><span class=line><span class=cl><span class=c1>// 如果满足就向指定进程发送信号sig并退出，否则返回为许可错误号。
+</span></span></span><span class=line><span class=cl><span class=k>static</span> <span class=kr>inline</span> <span class=kt>int</span> <span class=nf>send_sig</span><span class=p>(</span><span class=kt>long</span> <span class=n>sig</span><span class=p>,</span><span class=k>struct</span> <span class=n>task_struct</span> <span class=o>*</span> <span class=n>p</span><span class=p>,</span><span class=kt>int</span> <span class=n>priv</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 若信号不正确或任务指针为空，则出错退出。
+</span></span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=n>p</span> <span class=o>||</span> <span class=n>sig</span><span class=o>&lt;</span><span class=mi>1</span> <span class=o>||</span> <span class=n>sig</span><span class=o>&gt;</span><span class=mi>32</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=o>-</span><span class=n>EINVAL</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 如果强制发送标志置位，或者当前进程的有效用户标识符(euid)就是指定进程的euid（也
+</span></span></span><span class=line><span class=cl>    <span class=c1>// 即是自己），或者当前进程是超级用婚，则向进程p发送信号sig，即在进程p位图中添加该
+</span></span></span><span class=line><span class=cl>    <span class=c1>// 信号，否则出错退出。其中suser()定义为(current-&gt;euid==0)，用于判断是否是超级用户。
+</span></span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=n>priv</span> <span class=o>||</span> <span class=p>(</span><span class=n>current</span><span class=o>-&gt;</span><span class=n>euid</span><span class=o>==</span><span class=n>p</span><span class=o>-&gt;</span><span class=n>euid</span><span class=p>)</span> <span class=o>||</span> <span class=nf>suser</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>    <span class=n>p</span><span class=o>-&gt;</span><span class=n>signal</span> <span class=o>|=</span> <span class=p>(</span><span class=mi>1</span><span class=o>&lt;&lt;</span><span class=p>(</span><span class=n>sig</span><span class=o>-</span><span class=mi>1</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>  <span class=k>else</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span> <span class=o>-</span><span class=n>EPERM</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div></li><li><p>关闭进程打开的所有文件，对当前目录和i节点同步操作</p></li><li><p>如果当前进程是会话头领(leader)进程并且其有控制终端，则释放该终端。</p></li><li><p>把当前进程置为僵死状态，表明当前进程已经释放了资源。并保存将由父进程读取的退出码</p></li></ol><p>然后父进程在运行子进程的时候，一般都会运行<code>wait()</code>函数和<code>waitpid()</code>函数：父进程等待某个子进程终止时返回的信号，收到信号后由父进程终止僵死状态的子进程：</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=c1>//// 通知父进程 - 向进程pid发送信号SIGCHLD；默认情况下子进程将停止或终止。
+</span></span></span><span class=line><span class=cl><span class=c1>// 如果没有找到父进程，则自己释放。但根据POSIX.1要求，若父进程已先行终止，
+</span></span></span><span class=line><span class=cl><span class=c1>// 则子进程应该被初始进程1收容。
+</span></span></span><span class=line><span class=cl><span class=k>static</span> <span class=kt>void</span> <span class=nf>tell_father</span><span class=p>(</span><span class=kt>int</span> <span class=n>pid</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>i</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=n>pid</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 扫描进程数组表，寻找指定进程pid，并向其发送子进程将停止或终止信号SIGCHLD。
+</span></span></span><span class=line><span class=cl>    <span class=k>for</span> <span class=p>(</span><span class=n>i</span><span class=o>=</span><span class=mi>0</span><span class=p>;</span><span class=n>i</span><span class=o>&lt;</span><span class=n>NR_TASKS</span><span class=p>;</span><span class=n>i</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=n>task</span><span class=p>[</span><span class=n>i</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>        <span class=k>continue</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=k>if</span> <span class=p>(</span><span class=n>task</span><span class=p>[</span><span class=n>i</span><span class=p>]</span><span class=o>-&gt;</span><span class=n>pid</span> <span class=o>!=</span> <span class=n>pid</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>continue</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>      <span class=n>task</span><span class=p>[</span><span class=n>i</span><span class=p>]</span><span class=o>-&gt;</span><span class=n>signal</span> <span class=o>|=</span> <span class=p>(</span><span class=mi>1</span><span class=o>&lt;&lt;</span><span class=p>(</span><span class=n>SIGCHLD</span><span class=o>-</span><span class=mi>1</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>      <span class=k>return</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=cm>/* if we don&#39;t find any fathers, we just release ourselves */</span>
+</span></span><span class=line><span class=cl><span class=cm>/* This is not really OK. Must change it to make father 1 */</span>
+</span></span><span class=line><span class=cl>  <span class=nf>printk</span><span class=p>(</span><span class=s>&#34;BAD BAD - no father found</span><span class=se>\n\r</span><span class=s>&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>  <span class=nf>release</span><span class=p>(</span><span class=n>current</span><span class=p>);</span>               <span class=c1>// 如果没有找到父进程，则自己释放
+</span></span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><ol><li>父进程把子进程的运行时间累加到自己的进程变量中</li><li>释放对应子进程的进程描述结构体，置空</li></ol><h3 id=其他函数>其他函数</h3><div class=highlight><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=c1>//// 系统调用 kill()可用于向任何进程或进程组发送任何信号 ，而并非只是杀死进程。:-)
+</span></span></span><span class=line><span class=cl><span class=c1>// 参数pid是进程号；sig是需要发送的信号。
+</span></span></span><span class=line><span class=cl><span class=c1>// 如果pid &gt; 0, 则信号被发送给进程号是pid的进程。
+</span></span></span><span class=line><span class=cl><span class=c1>// 如果pid = 0, 那么信号就会被发送给当前进程的进程组中的所有进程。
+</span></span></span><span class=line><span class=cl><span class=c1>// 如果pid = -1,则信号sig就会发送给除第一个进程(初始进程init)外的所有进程
+</span></span></span><span class=line><span class=cl><span class=c1>// 如果pid &lt; -1,则信号sig将发送给进程组-pid的所有进程。
+</span></span></span><span class=line><span class=cl><span class=c1>// 如果信号sig=0,则不发送信号，但仍会进行错误检查。如果成功则返回0.
+</span></span></span><span class=line><span class=cl><span class=c1>// 该函数扫描任务数组表，并根据pid的值对满足条件的进程发送指定信号sig。若pid=0,
+</span></span></span><span class=line><span class=cl><span class=c1>// 表明当前进程是进程组组长，因此需要向所有组内进程强制发送信号sig.
+</span></span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>sys_kill</span><span class=p>(</span><span class=kt>int</span> <span class=n>pid</span><span class=p>,</span><span class=kt>int</span> <span class=n>sig</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=k>struct</span> <span class=n>task_struct</span> <span class=o>**</span><span class=n>p</span> <span class=o>=</span> <span class=n>NR_TASKS</span> <span class=o>+</span> <span class=n>task</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>err</span><span class=p>,</span> <span class=n>retval</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=n>pid</span><span class=p>)</span> <span class=k>while</span> <span class=p>(</span><span class=o>--</span><span class=n>p</span> <span class=o>&gt;</span> <span class=o>&amp;</span><span class=n>FIRST_TASK</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span> <span class=o>&amp;&amp;</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span><span class=p>)</span><span class=o>-&gt;</span><span class=n>pgrp</span> <span class=o>==</span> <span class=n>current</span><span class=o>-&gt;</span><span class=n>pid</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>      <span class=k>if</span> <span class=p>((</span><span class=n>err</span><span class=o>=</span><span class=nf>send_sig</span><span class=p>(</span><span class=n>sig</span><span class=p>,</span><span class=o>*</span><span class=n>p</span><span class=p>,</span><span class=mi>1</span><span class=p>)))</span>           <span class=c1>// 强制发送信号
+</span></span></span><span class=line><span class=cl>        <span class=n>retval</span> <span class=o>=</span> <span class=n>err</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=n>pid</span><span class=o>&gt;</span><span class=mi>0</span><span class=p>)</span> <span class=k>while</span> <span class=p>(</span><span class=o>--</span><span class=n>p</span> <span class=o>&gt;</span> <span class=o>&amp;</span><span class=n>FIRST_TASK</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span> <span class=o>&amp;&amp;</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span><span class=p>)</span><span class=o>-&gt;</span><span class=n>pid</span> <span class=o>==</span> <span class=n>pid</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>      <span class=k>if</span> <span class=p>((</span><span class=n>err</span><span class=o>=</span><span class=nf>send_sig</span><span class=p>(</span><span class=n>sig</span><span class=p>,</span><span class=o>*</span><span class=n>p</span><span class=p>,</span><span class=mi>0</span><span class=p>)))</span>
+</span></span><span class=line><span class=cl>        <span class=n>retval</span> <span class=o>=</span> <span class=n>err</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=n>pid</span> <span class=o>==</span> <span class=o>-</span><span class=mi>1</span><span class=p>)</span> <span class=k>while</span> <span class=p>(</span><span class=o>--</span><span class=n>p</span> <span class=o>&gt;</span> <span class=o>&amp;</span><span class=n>FIRST_TASK</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>((</span><span class=n>err</span> <span class=o>=</span> <span class=nf>send_sig</span><span class=p>(</span><span class=n>sig</span><span class=p>,</span><span class=o>*</span><span class=n>p</span><span class=p>,</span><span class=mi>0</span><span class=p>)))</span>
+</span></span><span class=line><span class=cl>      <span class=n>retval</span> <span class=o>=</span> <span class=n>err</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span> <span class=k>else</span> <span class=k>while</span> <span class=p>(</span><span class=o>--</span><span class=n>p</span> <span class=o>&gt;</span> <span class=o>&amp;</span><span class=n>FIRST_TASK</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span> <span class=o>&amp;&amp;</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span><span class=p>)</span><span class=o>-&gt;</span><span class=n>pgrp</span> <span class=o>==</span> <span class=o>-</span><span class=n>pid</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>      <span class=k>if</span> <span class=p>((</span><span class=n>err</span> <span class=o>=</span> <span class=nf>send_sig</span><span class=p>(</span><span class=n>sig</span><span class=p>,</span><span class=o>*</span><span class=n>p</span><span class=p>,</span><span class=mi>0</span><span class=p>)))</span>
+</span></span><span class=line><span class=cl>        <span class=n>retval</span> <span class=o>=</span> <span class=n>err</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=n>retval</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div><p>这就是常见的shell命令 <code>kill</code> 命令的系统调用,kill并非杀死进程，而是传递信号</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-c data-lang=c><span class=line><span class=cl><span class=c1>//// 系统调用waipid().挂起当前进程，直到pid指定的子进程退出(终止)或收到要求终止该进程的信号，
+</span></span></span><span class=line><span class=cl><span class=c1>// 或者是需要调用一个信号句柄(信号处理程序)。如果pid所指向的子进程早已退出(已成所谓的僵死进程)，
+</span></span></span><span class=line><span class=cl><span class=c1>// 则本调用将立刻返回。子进程使用的所有资源将释放。
+</span></span></span><span class=line><span class=cl><span class=c1>// 如果pid &gt; 0，表示等待进程号等于pid的子进程。
+</span></span></span><span class=line><span class=cl><span class=c1>// 如果pid = 0, 表示等待进程组号等于当前进程组号的任何子进程。
+</span></span></span><span class=line><span class=cl><span class=c1>// 如果pid &lt; -1,表示等待进程组号等于pid绝对值的任何子进程。
+</span></span></span><span class=line><span class=cl><span class=c1>// 如果pid = -1,表示等待任何子进程。
+</span></span></span><span class=line><span class=cl><span class=c1>// 如 options = WUNTRACED,表示如果子进程是停止的，也马上返回(无须跟踪)
+</span></span></span><span class=line><span class=cl><span class=c1>// 若 options = WNOHANG, 表示如果没有子进程退出或终止就马上返回。
+</span></span></span><span class=line><span class=cl><span class=c1>// 如果返回状态指针 stat_addr不为空，则就将状态信息保存到那里。
+</span></span></span><span class=line><span class=cl><span class=c1>// 参数pid是进程号，*stat_addr是保存状态信息位置的指针，options是waitpid选项。
+</span></span></span><span class=line><span class=cl><span class=kt>int</span> <span class=nf>sys_waitpid</span><span class=p>(</span><span class=kt>pid_t</span> <span class=n>pid</span><span class=p>,</span><span class=kt>unsigned</span> <span class=kt>long</span> <span class=o>*</span> <span class=n>stat_addr</span><span class=p>,</span> <span class=kt>int</span> <span class=n>options</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=kt>int</span> <span class=n>flag</span><span class=p>,</span> <span class=n>code</span><span class=p>;</span>             <span class=c1>// flag标志用于后面表示所选出的子进程处于就绪或睡眠态。
+</span></span></span><span class=line><span class=cl>  <span class=k>struct</span> <span class=n>task_struct</span> <span class=o>**</span> <span class=n>p</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>  <span class=nf>verify_area</span><span class=p>(</span><span class=n>stat_addr</span><span class=p>,</span><span class=mi>4</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=nl>repeat</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>  <span class=n>flag</span><span class=o>=</span><span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 从任务数组末端开始扫描所有任务，跳过空项、本进程项以及非当前进程的子进程项。
+</span></span></span><span class=line><span class=cl>  <span class=k>for</span><span class=p>(</span><span class=n>p</span> <span class=o>=</span> <span class=o>&amp;</span><span class=n>LAST_TASK</span> <span class=p>;</span> <span class=n>p</span> <span class=o>&gt;</span> <span class=o>&amp;</span><span class=n>FIRST_TASK</span> <span class=p>;</span> <span class=o>--</span><span class=n>p</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=o>!*</span><span class=n>p</span> <span class=o>||</span> <span class=o>*</span><span class=n>p</span> <span class=o>==</span> <span class=n>current</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>      <span class=k>continue</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>((</span><span class=o>*</span><span class=n>p</span><span class=p>)</span><span class=o>-&gt;</span><span class=n>father</span> <span class=o>!=</span> <span class=n>current</span><span class=o>-&gt;</span><span class=n>pid</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>      <span class=k>continue</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 此时扫描选择到的进程p肯定是当前进程的子进程。
+</span></span></span><span class=line><span class=cl>        <span class=c1>// 如果等待的子进程号pid&gt;0，但与被扫描子进程p的pid不相等，说明它是当前进程另外的
+</span></span></span><span class=line><span class=cl>        <span class=c1>// 子进程，于是跳过该进程，接着扫描下一个进程。
+</span></span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>pid</span><span class=o>&gt;</span><span class=mi>0</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=k>if</span> <span class=p>((</span><span class=o>*</span><span class=n>p</span><span class=p>)</span><span class=o>-&gt;</span><span class=n>pid</span> <span class=o>!=</span> <span class=n>pid</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>continue</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 否则，如果指定等待进程的pid=0,表示正在等待进程组号等于当前进程组号的任何子进程。
+</span></span></span><span class=line><span class=cl>        <span class=c1>// 如果此时被扫描进程p的进程组号与当前进程的组号不等，则跳过。
+</span></span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=n>pid</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=k>if</span> <span class=p>((</span><span class=o>*</span><span class=n>p</span><span class=p>)</span><span class=o>-&gt;</span><span class=n>pgrp</span> <span class=o>!=</span> <span class=n>current</span><span class=o>-&gt;</span><span class=n>pgrp</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>continue</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 否则，如果指定的pid &lt; -1,表示正在等待进程组号等于pid绝对值的任何子进程。如果此时
+</span></span></span><span class=line><span class=cl>        <span class=c1>// 被扫描进程p的组号与pid的绝对值不等，则跳过。
+</span></span></span><span class=line><span class=cl>    <span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=p>(</span><span class=n>pid</span> <span class=o>!=</span> <span class=o>-</span><span class=mi>1</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=k>if</span> <span class=p>((</span><span class=o>*</span><span class=n>p</span><span class=p>)</span><span class=o>-&gt;</span><span class=n>pgrp</span> <span class=o>!=</span> <span class=o>-</span><span class=n>pid</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=k>continue</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 如果前3个对pid的判断都不符合，则表示当前进程正在等待其任何子进程，也即pid=-1的情况，
+</span></span></span><span class=line><span class=cl>        <span class=c1>// 此时所选择到的进程p或者是其进程号等于指定pid，或者是当前进程组中的任何子进程，或者
+</span></span></span><span class=line><span class=cl>        <span class=c1>// 是进程号等于指定pid绝对值的子进程，或者是任何子进程(此时指定的pid等于-1).接下来根据
+</span></span></span><span class=line><span class=cl>        <span class=c1>// 这个子进程p所处的状态来处理。
+</span></span></span><span class=line><span class=cl>    <span class=k>switch</span> <span class=p>((</span><span class=o>*</span><span class=n>p</span><span class=p>)</span><span class=o>-&gt;</span><span class=n>state</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 子进程p处于停止状态时，如果此时WUNTRACED标志没有置位，表示程序无须立刻返回，于是
+</span></span></span><span class=line><span class=cl>            <span class=c1>// 继续扫描处理其他进程。如果WUNTRACED置位，则把状态信息0x7f放入*stat_addr，并立刻
+</span></span></span><span class=line><span class=cl>            <span class=c1>// 返回子进程号pid.这里0x7f表示的返回状态是wifstopped（）宏为真。
+</span></span></span><span class=line><span class=cl>      <span class=k>case</span> <span class=nl>TASK_STOPPED</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=p>(</span><span class=n>options</span> <span class=o>&amp;</span> <span class=n>WUNTRACED</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>          <span class=k>continue</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=nf>put_fs_long</span><span class=p>(</span><span class=mh>0x7f</span><span class=p>,</span><span class=n>stat_addr</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span><span class=p>)</span><span class=o>-&gt;</span><span class=n>pid</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>            <span class=c1>// 如果子进程p处于僵死状态，则首先把它在用户态和内核态运行的时间分别累计到当前进程
+</span></span></span><span class=line><span class=cl>            <span class=c1>// (父进程)中，然后取出子进程的pid和退出码，并释放该子进程。最后返回子进程的退出码和pid.
+</span></span></span><span class=line><span class=cl>      <span class=k>case</span> <span class=nl>TASK_ZOMBIE</span><span class=p>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>current</span><span class=o>-&gt;</span><span class=n>cutime</span> <span class=o>+=</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span><span class=p>)</span><span class=o>-&gt;</span><span class=n>utime</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=n>current</span><span class=o>-&gt;</span><span class=n>cstime</span> <span class=o>+=</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span><span class=p>)</span><span class=o>-&gt;</span><span class=n>stime</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=n>flag</span> <span class=o>=</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span><span class=p>)</span><span class=o>-&gt;</span><span class=n>pid</span><span class=p>;</span>                   <span class=c1>// 临时保存子进程pid
+</span></span></span><span class=line><span class=cl>        <span class=n>code</span> <span class=o>=</span> <span class=p>(</span><span class=o>*</span><span class=n>p</span><span class=p>)</span><span class=o>-&gt;</span><span class=n>exit_code</span><span class=p>;</span>             <span class=c1>// 取子进程的退出码
+</span></span></span><span class=line><span class=cl>        <span class=nf>release</span><span class=p>(</span><span class=o>*</span><span class=n>p</span><span class=p>);</span>                        <span class=c1>// 释放该子进程
+</span></span></span><span class=line><span class=cl>        <span class=nf>put_fs_long</span><span class=p>(</span><span class=n>code</span><span class=p>,</span><span class=n>stat_addr</span><span class=p>);</span>        <span class=c1>// 置状态信息为退出码值
+</span></span></span><span class=line><span class=cl>        <span class=k>return</span> <span class=n>flag</span><span class=p>;</span>                        <span class=c1>// 返回子进程的pid
+</span></span></span><span class=line><span class=cl>            <span class=c1>// 如果这个子进程p的状态既不是停止也不是僵死，那么就置flag=1,表示找到过一个符合
+</span></span></span><span class=line><span class=cl>            <span class=c1>// 要求的子进程，但是它处于运行态或睡眠态。
+</span></span></span><span class=line><span class=cl>      <span class=k>default</span><span class=o>:</span>
+</span></span><span class=line><span class=cl>        <span class=n>flag</span><span class=o>=</span><span class=mi>1</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=k>continue</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 在上面对任务数组扫描结束后，如果flag被置位，说明有符合等待要求的子进程并没有处于退出或
+</span></span></span><span class=line><span class=cl>    <span class=c1>// 僵死状态。如果此时已设置WNOHANG选项(表示若没有子进程处于退出或终止态就立刻返回)，就
+</span></span></span><span class=line><span class=cl>    <span class=c1>// 立刻返回0，退出。否则把当前进程置为可中断等待状态并重新执行调度。当又开始执行本进程时，
+</span></span></span><span class=line><span class=cl>    <span class=c1>// 如果本进程没有收到除SIGCHLD以外的信号，则还是重复处理。否则，返回出错码‘中断系统调用’
+</span></span></span><span class=line><span class=cl>    <span class=c1>// 并退出。针对这个出错号用户程序应该再继续调用本函数等待子进程。
+</span></span></span><span class=line><span class=cl>  <span class=k>if</span> <span class=p>(</span><span class=n>flag</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>options</span> <span class=o>&amp;</span> <span class=n>WNOHANG</span><span class=p>)</span>                  <span class=c1>// options = WNOHANG,则立刻返回。
+</span></span></span><span class=line><span class=cl>      <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>current</span><span class=o>-&gt;</span><span class=n>state</span><span class=o>=</span><span class=n>TASK_INTERRUPTIBLE</span><span class=p>;</span>      <span class=c1>// 置当前进程为可中断等待态
+</span></span></span><span class=line><span class=cl>    <span class=nf>schedule</span><span class=p>();</span>                             <span class=c1>// 重新调度。
+</span></span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=p>(</span><span class=n>current</span><span class=o>-&gt;</span><span class=n>signal</span> <span class=o>&amp;=</span> <span class=o>~</span><span class=p>(</span><span class=mi>1</span><span class=o>&lt;&lt;</span><span class=p>(</span><span class=n>SIGCHLD</span><span class=o>-</span><span class=mi>1</span><span class=p>))))</span>
+</span></span><span class=line><span class=cl>      <span class=k>goto</span> <span class=n>repeat</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=k>else</span>
+</span></span><span class=line><span class=cl>      <span class=k>return</span> <span class=o>-</span><span class=n>EINTR</span><span class=p>;</span>                      <span class=c1>// 返回出错码(中断的系统调用)
+</span></span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 若没有找到符合要求的子进程，则返回出错码(子进程不存在)。
+</span></span></span><span class=line><span class=cl>  <span class=k>return</span> <span class=o>-</span><span class=n>ECHILD</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></div></div></article><aside class=post-toc><div class=post-toc-inner><p class=post-toc-title>目录</p><nav id=TableOfContents><ul><li><a href=#进程的销毁>进程的销毁</a><ul><li><a href=#其他函数>其他函数</a></li></ul></li></ul></nav></div></aside></section></main><footer class=site-footer><a class=footer-github href=https://github.com/xzl01 target=_blank rel="noopener noreferrer" aria-label=GitHub><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5A11.5 11.5.0 00.5 12.27a11.8 11.8.0 007.86 11.3c.58.11.8-.26.8-.57v-2.02c-3.2.72-3.88-1.58-3.88-1.58-.53-1.38-1.3-1.75-1.3-1.75-1.06-.75.08-.74.08-.74 1.18.09 1.79 1.25 1.79 1.25 1.05 1.86 2.75 1.32 3.42 1 .11-.78.41-1.32.74-1.62-2.55-.3-5.24-1.31-5.24-5.85.0-1.29.45-2.35 1.2-3.18-.12-.3-.52-1.52.11-3.17.0.0.98-.32 3.2 1.21a10.86 10.86.0 015.83.0c2.22-1.53 3.2-1.21 3.2-1.21.63 1.65.23 2.87.11 3.17.75.83 1.2 1.89 1.2 3.18.0 4.56-2.69 5.55-5.25 5.84.42.37.79 1.09.79 2.2V23c0 .31.21.68.8.57a11.8 11.8.0 007.85-11.3A11.5 11.5.0 0012 .5z"/></svg></a><p>&copy; 2026 HarryLoong</p></footer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js></script><script src=/js/site.js></script></body></html>
