@@ -15,6 +15,7 @@
 <body class="{{ if .IsHome }}home-page{{ else }}inner-page{{ end }}">
     <div class="bg-shape bg-shape-a" aria-hidden="true"></div>
     <div class="bg-shape bg-shape-b" aria-hidden="true"></div>
+    <div class="solar-blob" aria-hidden="true"></div>
 
     <header class="hero">
         <div class="container hero-inner reveal">
@@ -32,9 +33,25 @@
 
     <nav class="top-nav">
         <div class="container nav-inner">
-            <a href="/">首页</a>
-            <a href="/blog/">文章</a>
-            <a href="/gallery/">图库</a>
+            <div class="nav-links" aria-label="主导航">
+                <a href="/">首页</a>
+                <a href="/blog/">文章</a>
+                <a href="/gallery/">图库</a>
+            </div>
+            <div class="theme-controls" aria-label="主题控制">
+                <select id="theme-mode-select" class="theme-select" aria-label="主题模式">
+                    <option value="auto">自动</option>
+                    <option value="manual">手动</option>
+                </select>
+                <select id="theme-palette-select" class="theme-select" aria-label="主题配色">
+                    <option value="sunrise">莫兰迪·日出</option>
+                    <option value="noon">莫兰迪·中午</option>
+                    <option value="dusk">莫兰迪·傍晚</option>
+                    <option value="midnight">莫兰迪·深夜</option>
+                    <option value="mist">莫兰迪·雾青</option>
+                    <option value="rose">莫兰迪·灰粉</option>
+                </select>
+            </div>
         </div>
     </nav>
 
