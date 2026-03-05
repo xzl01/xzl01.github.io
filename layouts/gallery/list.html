@@ -17,14 +17,37 @@
 {{ end }}
 
 {{ if gt (len $images) 0 }}
-<section class="gallery-grid reveal">
-    {{ range sort $images "value" "desc" }}
-    <figure class="gallery-card">
-        <a href="/gallery/{{ . }}" target="_blank" rel="noopener noreferrer">
-            <img src="/gallery/{{ . }}" alt="摄影作品 {{ . }}" loading="lazy">
+{{ $sorted := sort $images "value" "desc" }}
+{{ $first := index $sorted 0 }}
+{{ $firstName := replaceRE "\\.[^.]+$" "" $first }}
+<section class="gallery-spotlight reveal">
+    <a class="gallery-spotlight-media" href="/gallery/{{ $first }}" target="_blank" rel="noopener noreferrer">
+        <img src="/gallery/{{ $first }}" alt="精选作品 {{ $first }}" loading="eager" fetchpriority="high">
+    </a>
+    <div class="gallery-spotlight-meta">
+        <p class="gallery-kicker">Featured Shot</p>
+        <h3>{{ $firstName | title }}</h3>
+        <p>最新一张作品作为主视觉展示，后续作品会在下方信息流持续更新。</p>
+        <div class="gallery-meta-row">
+            <span>总作品：{{ len $sorted }}</span>
+            <span>文件：{{ $first }}</span>
+        </div>
+    </div>
+</section>
+
+<section class="gallery-feed reveal">
+    {{ range $idx, $item := $sorted }}
+    <article class="gallery-feed-item">
+        <a class="gallery-feed-thumb" href="/gallery/{{ $item }}" target="_blank" rel="noopener noreferrer">
+            <img src="/gallery/{{ $item }}" alt="摄影作品 {{ $item }}" loading="lazy">
         </a>
-        <figcaption>{{ . }}</figcaption>
-    </figure>
+        <div class="gallery-feed-body">
+            <p class="gallery-feed-index">#{{ add $idx 1 }}</p>
+            <h4>{{ (replaceRE "\\.[^.]+$" "" $item) | replaceRE "[-_]+" " " | title }}</h4>
+            <p class="gallery-feed-desc">一张持续更新中的摄影作品，点击可查看原图细节。</p>
+            <a class="gallery-feed-link" href="/gallery/{{ $item }}" target="_blank" rel="noopener noreferrer">查看原图</a>
+        </div>
+    </article>
     {{ end }}
 </section>
 {{ else }}

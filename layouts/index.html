@@ -1,81 +1,66 @@
 {{ define "main" }}
 {{ $posts := where .Site.RegularPages "Section" "blog" }}
-<section class="home-hero-card reveal">
-    <div class="home-hero-art" aria-hidden="true">
-        <div class="home-orb home-orb-a"></div>
-        <div class="home-orb home-orb-b"></div>
-        <div class="home-orb home-orb-c"></div>
-    </div>
-    <div class="home-hero-copy">
-        <p class="home-label">Studio Notes</p>
-        <h2>Slow, Solid, and Maintainable Engineering</h2>
-        <p>从 Linux 系统维护到工程实践，整理可长期复用的技术方法和真实经验。</p>
-        <a class="home-cta" href="/blog/">进入文章库</a>
-    </div>
-</section>
-
-<section class="home-metric-strip reveal">
-    <div class="home-metric-item">
-        <span class="home-metric-num">{{ len $posts }}</span>
-        <span class="home-metric-label">篇文章</span>
-    </div>
-    <div class="home-metric-item">
-        <span class="home-metric-num">{{ len .Site.Taxonomies.tags }}</span>
-        <span class="home-metric-label">个标签</span>
-    </div>
-    <div class="home-metric-item">
-        <span class="home-metric-num">{{ (index ($posts.ByDate.Reverse) 0).Date.Format "2006-01-02" }}</span>
-        <span class="home-metric-label">最近更新</span>
-    </div>
-</section>
-
-<section class="home-feature-grid">
-    {{ range first 3 ($posts.ByDate.Reverse) }}
-    <article class="home-feature-card reveal">
-        <div class="home-feature-thumb"></div>
-        <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-        <p>{{ with .Description }}{{ . | truncate 80 }}{{ else }}{{ .Summary | plainify | truncate 80 }}{{ end }}</p>
-        <a class="home-readmore" href="{{ .RelPermalink }}">继续阅读</a>
-    </article>
+{{ $galleryDir := "static/gallery" }}
+{{ $galleryFiles := readDir $galleryDir }}
+{{ $galleryImages := slice }}
+{{ range $galleryFiles }}
+    {{ if not .IsDir }}
+        {{ $name := lower .Name }}
+        {{ if or (hasSuffix $name ".jpg") (hasSuffix $name ".jpeg") (hasSuffix $name ".png") (hasSuffix $name ".webp") (hasSuffix $name ".gif") }}
+            {{ $galleryImages = $galleryImages | append .Name }}
+        {{ end }}
     {{ end }}
+{{ end }}
+{{ $latestGallery := "" }}
+{{ if gt (len $galleryImages) 0 }}
+    {{ $latestGallery = index (sort $galleryImages "value" "desc") 0 }}
+{{ end }}
+
+<section class="home-intro reveal">
+    <p class="home-label">Home</p>
+    <h2>简洁、稳定、持续更新</h2>
+    <p>这里按两条主线组织内容：博客记录技术实践，图库记录摄影作品。</p>
 </section>
 
-<section class="home-topic-row reveal">
-    <a href="/tags/linux/" class="home-topic">Linux</a>
-    <a href="/tags/qemu/" class="home-topic">System</a>
-    <a href="/tags/chroot/" class="home-topic">Tooling</a>
-    <a href="/tags/%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91/" class="home-topic">Practice</a>
+<section class="home-channel-stack">
+    <article class="home-channel-card reveal">
+        <div class="home-channel-media home-channel-media-blog" aria-hidden="true"></div>
+        <div class="home-channel-body">
+            <p class="home-label">Blog</p>
+            <h3>技术博客</h3>
+            <p>Linux、系统维护、工程实践与排障记录。</p>
+            <a class="home-channel-link" href="/blog/">进入博客</a>
+        </div>
+    </article>
+    <article class="home-channel-card reveal">
+        {{ if ne $latestGallery "" }}
+        <a class="home-channel-media-link" href="/gallery/">
+            <img class="home-channel-image" src="/gallery/{{ $latestGallery }}" alt="摄影图库封面" loading="lazy">
+        </a>
+        {{ else }}
+        <div class="home-channel-media home-channel-media-gallery" aria-hidden="true"></div>
+        {{ end }}
+        <div class="home-channel-body">
+            <p class="home-label">Gallery</p>
+            <h3>摄影图库</h3>
+            <p>一个大图入口，向下延展为持续更新的信息流。</p>
+            <a class="home-channel-link" href="/gallery/">进入图库</a>
+        </div>
+    </article>
 </section>
 
-
-<section class="home-gallery-entry reveal">
-    <div class="home-gallery-copy">
-        <p class="home-label">Photography</p>
-        <h3>摄影图库</h3>
-        <p>记录我的光影练习与日常观察，后续会持续更新作品。</p>
+<section class="home-recent-simple reveal">
+    <div class="home-recent-head">
+        <h3>最新文章</h3>
+        <a href="/blog/">查看全部</a>
     </div>
-    <a class="home-gallery-btn" href="/gallery/">查看图库</a>
-</section>
-
-<section class="home-bottom-grid">
-    <aside class="home-author-card reveal">
-        <p class="home-label">About</p>
-        <div class="home-author-avatar">XL</div>
-        <h3>HarryLoong</h3>
-        <p>专注 Linux 桌面与系统维护，持续输出可落地的技术笔记。</p>
-        <a class="home-author-link" href="https://github.com/xzl01" target="_blank" rel="noopener noreferrer">GitHub</a>
-    </aside>
-
-    <div class="home-recent-card reveal">
-        <h3>Recent Posts</h3>
-        <ul class="home-recent-list">
-            {{ range first 8 ($posts.ByDate.Reverse) }}
-            <li>
-                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-                <span>{{ .Date.Format "2006-01-02" }}</span>
-            </li>
-            {{ end }}
-        </ul>
-    </div>
+    <ul class="home-recent-list">
+        {{ range first 6 ($posts.ByDate.Reverse) }}
+        <li>
+            <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+            <span>{{ .Date.Format "2006-01-02" }}</span>
+        </li>
+        {{ end }}
+    </ul>
 </section>
 {{ end }}
