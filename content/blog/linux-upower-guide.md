@@ -1,7 +1,7 @@
 ---
 title: "UPower 接口与 Linux 电源管理"
 date: 2026-03-04
-description: "GNU 自由文档许可证1.1 版 UPower 是枚举电源设备、监听设备事件以及查询历史和统计数据的抽象。`org.freedesktop.UPower`系统上的任何应用程序或服务都可以通过系统消息总线 访问该 服务。 ..."
+description: "解读 UPower 的 D-Bus 接口模型与事件机制，帮助你在 Linux 上实现电源状态查询与管理集成。"
 categories: ["Linux系统", "系统服务"]
 tags: ["Linux", "UPower", "D-Bus", "电源管理"]
 ---

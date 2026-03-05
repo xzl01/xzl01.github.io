@@ -1,7 +1,7 @@
 ---
 title: "Linux 内核中的进程销毁流程"
 date: 2026-03-04
-description: "首先是一个系统调用`do_exit`&#x20; 进程销毁的过程： 1. 进行一个系统调用：`do_exit` 2. 如果销毁的进程有子进程的存在，则让子进程的father置为1（init进程）如果该子进程已经处于僵死(..."
+description: "围绕 `do_exit` 展开，梳理 Linux 内核进程退出时的关键步骤、资源回收和僵尸进程处理机制。"
 categories: ["Linux系统", "系统原理"]
 tags: ["Linux", "内核", "进程管理", "do_exit"]
 ---

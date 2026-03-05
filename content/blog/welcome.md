@@ -1,6 +1,9 @@
 ---
 title: "欢迎来到我的博客"
 date: 2026-03-02
+description: "博客起始页：介绍站点定位、内容方向与后续更新主题。"
+categories: ["博客公告"]
+tags: ["博客", "欢迎"]
 draft: false
 ---
 

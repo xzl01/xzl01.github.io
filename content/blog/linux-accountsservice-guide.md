@@ -1,7 +1,7 @@
 ---
 title: "AccountsService 接口说明"
 date: 2026-03-04
-description: "CacheUser (in 's' name, out 'o' user) 缓存一个用户帐户，以便它显示在ListCachedUsers() 输出中。用户名可以是远程用户，但是系统必须能够查找用户名并解析用户信息。 传入..."
+description: "整理 AccountsService 常见接口语义与调用方式，帮助理解 Linux 用户信息缓存与会话相关能力。"
 categories: ["Linux系统", "系统服务"]
 tags: ["Linux", "AccountsService", "D-Bus"]
 ---

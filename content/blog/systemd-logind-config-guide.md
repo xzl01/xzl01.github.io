@@ -1,7 +1,7 @@
 ---
 title: "systemd-logind 配置文件指南"
 date: 2026-03-04
-description: "logind.conf, logind.conf.d — Login manager configuration files `etc/systemd/logind.conf` `/etc/systemd/logind...."
+description: "聚焦 logind.conf 关键项，说明 systemd-logind 的会话、电源键与用户行为控制配置方法。"
 categories: ["Linux系统", "系统服务"]
 tags: ["Linux", "systemd", "logind", "配置"]
 ---

@@ -1,7 +1,7 @@
 ---
 title: "Linux TLP 电源管理指南"
 date: 2026-03-04
-description: "TLP 是适用于 Linux 的功能丰富的命令行实用程序，无需深入研究技术细节即可节省笔记本电脑电池电量 - TLP 基本上所做的是调整影响功耗的内核设置，内核态的配置文件存储在RAM中，所以并不具备持久性。TLP将配置..."
+description: "介绍 TLP 在 Linux 笔记本上的节能机制与配置方法，覆盖原理、关键参数和续航优化实践。"
 categories: ["Linux系统", "性能优化"]
 tags: ["Linux", "TLP", "电源管理", "续航优化"]
 ---

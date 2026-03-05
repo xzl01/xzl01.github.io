@@ -2,6 +2,7 @@
 title: "Linux 下罗技键鼠配置指南 - logiops 使用教程"
 date: 2026-03-02
 description: "详解 Linux 下罗技鼠标键位配置，包含 logiops 安装、配置和调试"
+categories: ["Linux系统", "外设配置"]
 tags: ["Linux", "Logitech", "鼠标", "配置教程"]
 ---
 

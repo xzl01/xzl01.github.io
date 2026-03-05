@@ -1,7 +1,7 @@
 ---
 title: "systemd-logind D-Bus 接口详解"
 date: 2026-03-04
-description: "org.freedesktop.login1 — systemd-logind 的 D-Bus 接口 systemd-logind.service (8)') 是一个跟踪用户登录和seat的系统服务。 守护进程提供 C ..."
+description: "系统化整理 `org.freedesktop.login1` 接口，帮助理解 systemd-logind 的会话管理与 D-Bus 交互能力。"
 categories: ["Linux系统", "系统服务"]
 tags: ["Linux", "systemd", "D-Bus", "logind"]
 ---

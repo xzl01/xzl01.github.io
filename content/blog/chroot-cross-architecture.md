@@ -1,7 +1,8 @@
 ---
 title: "64位主机进入ARM/32位rootfs的chroot配置指南"
 date: 2026-03-04
-description: "详解在64位主机上使用chroot进入不同架构rootfs的完整配置流程"
+description: "在 64 位主机上进入 ARM 或 32 位 rootfs 的 chroot 实践，包含必要挂载、QEMU 配置与常见问题处理。"
+categories: ["Linux系统", "开发环境"]
 tags: ["Linux", "chroot", "ARM", "QEMU", "交叉编译"]
 ---
 

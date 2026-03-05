@@ -2,6 +2,7 @@
 title: "Linux 下使用 5G Modem 上网指南"
 date: 2026-03-02
 description: "详细介绍在 Linux 系统上配置 5G 蜂窝网络上网的完整步骤"
+categories: ["Linux系统", "网络连接"]
 tags: ["Linux", "5G", "Modem", "教程"]
 ---
 

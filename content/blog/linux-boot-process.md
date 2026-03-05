@@ -1,7 +1,7 @@
 ---
 title: "Linux 系统引导与启动流程"
 date: 2026-03-04
-description: "Linux操作系统的启动 `BIOS/Bootloader` 由PC机 的BIOS (0xFFFF0是BIOS存储的总线地址）把bootsect从某个固定的地址拿到了内存中的某个固定地址（0x90000），并且进行了一系..."
+description: "按阶段讲解 Linux 从 BIOS/Bootloader 到内核启动的流程，帮助快速建立系统引导的完整心智模型。"
 categories: ["Linux系统", "系统原理"]
 tags: ["Linux", "启动流程", "Bootloader", "内核启动"]
 ---
