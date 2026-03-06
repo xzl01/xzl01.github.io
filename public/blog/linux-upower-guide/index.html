@@ -1,41 +1,247 @@
-<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>UPower 接口与 Linux 电源管理 - HarryLoong's Blog</title><meta name=description content="解读 UPower 的 D-Bus 接口模型与事件机制，帮助你在 Linux 上实现电源状态查询与管理集成。"><script>document.documentElement.classList.add("js")</script><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet href=/css/site.css><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css></head><body class=inner-page><div class="bg-shape bg-shape-a" aria-hidden=true></div><div class="bg-shape bg-shape-b" aria-hidden=true></div><div class=solar-blob aria-hidden=true></div><header class=hero><div class="container hero-inner reveal"><p class=eyebrow>ARTICLE</p><h1>UPower 接口与 Linux 电源管理</h1><p class=subtitle>解读 UPower 的 D-Bus 接口模型与事件机制，帮助你在 Linux 上实现电源状态查询与管理集成。</p></div></header><nav class=top-nav><div class="container nav-inner"><div class=nav-links aria-label=主导航><a href=/>首页</a>
-<a href=/blog/>文章</a>
-<a href=/gallery/>图库</a></div><div class=theme-controls aria-label=主题控制><select id=theme-mode-select class=theme-select aria-label=主题模式><option value=auto>自动</option><option value=manual>手动</option></select>
-<select id=theme-palette-select class=theme-select aria-label=主题配色><option value=sunrise>莫兰迪·日出</option><option value=noon>莫兰迪·中午</option><option value=dusk>莫兰迪·傍晚</option><option value=midnight>莫兰迪·深夜</option><option value=mist>莫兰迪·雾青</option><option value=rose>莫兰迪·灰粉</option></select></div></div></nav><main class="container main-wrap"><section class=single-layout><article class=single-post><div class=post-meta><span>2026-03-04</span>
-<span>·</span>
-<span>4 个标签</span></div><div class="tag-list post-tags"><span class=tag>Linux</span>
-<span class=tag>UPower</span>
-<span class=tag>D-Bus</span>
-<span class=tag>电源管理</span></div><div class=post-content><p>GNU 自由文档许可证1.1 版</p><p>UPower 是枚举电源设备、监听设备事件以及查询历史和统计数据的抽象。<code>org.freedesktop.UPower</code>系统上的任何应用程序或服务都可以通过系统消息总线 访问该 服务。</p><p>UPower <a href=http://lists.freedesktop.org/archives/devkit-devel/2009-December/000567.html title="曾经被称为 DeviceKit-power">曾经被称为 DeviceKit-power</a>。UPower 旨在使大量 HAL 冗余，因为 HAL 已正式 <a href=http://lists.freedesktop.org/archives/hal/2008-May/011560.html title=弃用>弃用</a>。</p><p>UPower 还可用于控制 计算机上 <a href=http://blogs.gnome.org/hughsie/2008/11/06/devicekit-power-latency-control/ title=不同操作的延迟>不同操作的延迟</a>，从而节省大量电量。目前还没有太多使用这个界面，但这是一个经典的鸡和蛋场景，我认为鼓励鸡蛋下鸡很重要。请将任何问题报告给 <a href="https://bugs.freedesktop.org/enter_bug.cgi?product=upower" title=Freedesktop>Freedesktop</a> bugzilla 或发送邮件到 <a href=http://lists.freedesktop.org/mailman/listinfo/devkit-devel title=DeviceKit>DeviceKit</a> 邮件列表进行讨论。</p><h2 id=orgfreedesktopupower>org.freedesktop.UPower</h2><p>org.freedesktop.UPower — UPower 接口</p><h2 id=方法>方法</h2><p><code>EnumerateDevices（out 'ao' devices）</code></p><p><code>GetDisplayDevice（out'o'device）</code></p><p><code>GetCriticalAction (out 's' action)</code></p><h2 id=信号>信号</h2><p><code>DeviceAdded ('o' device)</code></p><p><code>DeviceRemoved ('o' device)</code></p><h2 id=实现的接口>实现的接口</h2><p>实现 <code>org.freedesktop.UPower</code> 的对象也实现了 <code>org.freedesktop.DBus.Introspectable</code>、<code>org.freedesktop.DBus.Properties</code></p><h2 id=属性>属性</h2><p>&lsquo;DaemonVersion&rsquo; 读为 &rsquo;s&rsquo;</p><p>&lsquo;OnBattery&rsquo; 读为 &lsquo;b&rsquo;</p><p>&lsquo;LidIsClosed&rsquo; 读为 &lsquo;b&rsquo;</p><p>“LidIsPresent”读作“b”</p><h2 id=描述>描述</h2><p>UPower服务是通过系统消息总线提供的。要访问该服务，请使用D-Bus系统总线服务上的<code>/org/freedesktop/UPower</code>对象上的<code>org.freedesktop.UPower</code>接口，其名称为<code>org.freedesktop.UPower</code>。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>dbus-send --print-reply <span class=se>\
-</span></span></span><span class=line><span class=cl>            --system <span class=se>\
-</span></span></span><span class=line><span class=cl>            --dest<span class=o>=</span>org.freedesktop.UPower <span class=se>\
-</span></span></span><span class=line><span class=cl>            /org/freedesktop/UPower <span class=se>\
-</span></span></span><span class=line><span class=cl>            org.freedesktop.UPower.EnumerateDevices
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl>method <span class=k>return</span> <span class=nv>sender</span><span class=o>=</span>:1.386 -&gt; <span class=nv>dest</span><span class=o>=</span>:1.451 <span class=nv>reply_serial</span><span class=o>=</span><span class=m>2</span>
-</span></span><span class=line><span class=cl>   array <span class=o>[</span>
-</span></span><span class=line><span class=cl>      object path <span class=s2>&#34;/org/freedesktop/UPower/devices/line_power_AC&#34;</span>
-</span></span><span class=line><span class=cl>      object path <span class=s2>&#34;/org/freedesktop/UPower/devices/battery_BAT0&#34;</span>
-</span></span><span class=line><span class=cl>   <span class=o>]</span>$ dbus-send --print-reply <span class=se>\
-</span></span></span><span class=line><span class=cl>            --system <span class=se>\
-</span></span></span><span class=line><span class=cl>            --dest<span class=o>=</span>org.freedesktop.UPower <span class=se>\
-</span></span></span><span class=line><span class=cl>            /org/freedesktop/UPower <span class=se>\
-</span></span></span><span class=line><span class=cl>            org.freedesktop.UPower.EnumerateDevices
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl>method <span class=k>return</span> <span class=nv>sender</span><span class=o>=</span>:1.386 -&gt; <span class=nv>dest</span><span class=o>=</span>:1.451 <span class=nv>reply_serial</span><span class=o>=</span><span class=m>2</span>
-</span></span><span class=line><span class=cl>   array <span class=o>[</span>
-</span></span><span class=line><span class=cl>      object path <span class=s2>&#34;/org/freedesktop/UPower/devices/line_power_AC&#34;</span>
-</span></span><span class=line><span class=cl>      object path <span class=s2>&#34;/org/freedesktop/UPower/devices/battery_BAT0&#34;</span>
-</span></span><span class=line><span class=cl>   <span class=o>]</span>
-</span></span></code></pre></div><h2 id=细节>细节</h2><h3 id=enumeratedevices->EnumerateDevices ()</h3><p><code>EnumerateDevices(out 'ao' device)</code></p><p>枚举系统上的所有电源对象。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>devices: An array of object paths for devices.
-</span></span></code></pre></div><hr><h3 id=getdisplaydevice->GetDisplayDevice ()</h3><p><code>GetDisplayDevice（out 'o' device）</code></p><p>将对象获取到“显示设备”，这是一个表示要在桌面环境中显示的状态图标的复合设备。您也可以直接访问该对象，因为它的路径保证为 /org/freedesktop/UPower/devices/DisplayDevice。将定义以下标准 org.freedesktop.UPower.Device 属性（仅<code>IsPresent</code>具有特殊含义）：</p><ul><li>**Type：**显示设备的类型，UPS 或电池（下面统称为电池）。请注意，与真实设备相比，此值可以更改。</li><li>**State：**显示设备的电源状态，如充电或放电。</li><li>**Percentage：**设备上剩余的能量。</li><li>**Energy：**电池中当前可用的能量（以 Wh 为单位）。</li><li>**EnergyFull：**电池充满时的能量（以 Wh 为单位）。</li><li>**EnergyRate：**从电池中消耗的能量，以 W 为单位。如果为正，则电池正在放电，如果为负，则正在充电。</li><li>**TimeToEmpty：**直到电池被视为空的秒数。</li><li>**TimeToFull：**直到电池被认为已满的秒数。</li><li>**IsPresent：**是否应显示使用此信息的状态图标。</li><li>**IconName：**代表设备状态的图标名称。</li><li>**WarningLevel：**与整体相同<code>WarningLevel</code></li></ul><table><thead><tr><th><em><code>device</code></em>：</th><th>显示设备的对象路径。</th></tr></thead><tbody></tbody></table><hr><h3 id=getcriticalaction->GetCriticalAction ()</h3><p>GetCriticalAction (out &rsquo;s&rsquo; action)</p><p>当系统的电源严重不足（电池或 UPS 严重不足）时，系统将采取此操作。可能的值为：</p><ul><li>**HybridSleep:**混合睡眠</li><li>**Hibernate:**休眠</li><li>**PowerOff:**关机</li></ul><table><thead><tr><th><em><code>action</code></em>：</th><th>表示已配置且可用的关键操作的字符串。</th></tr></thead><tbody></tbody></table><h2 id=信号详情>信号详情</h2><h3 id=deviceadded-信号>DeviceAdded 信号</h3><p>DeviceAdded (&lsquo;o&rsquo; 设备)</p><p>添加设备时发出。</p><table><thead><tr><th><em><code>device</code></em>：</th><th>添加的设备的对象路径。</th></tr></thead><tbody></tbody></table><hr><h3 id=deviceremoved-信号>DeviceRemoved 信号</h3><p>DeviceRemoved (&lsquo;o&rsquo; 设备)</p><p>移除设备时发出。</p><table><thead><tr><th><em><code>device</code></em>：</th><th>被移除设备的对象路径。</th></tr></thead><tbody></tbody></table><h2 id=属性详情>属性详情</h2><h3 id=daemonversion属性>“DaemonVersion”属性</h3><p><code>'DaemonVersion' read 's'</code></p><p>正在运行的守护进程的版本，例如<code>002</code>.</p><hr><h3 id=onbattery属性>“OnBattery”属性</h3><p><code>'OnBattery' read 'b'</code></p><p>指示系统是否使用电池电源运行。此属性是为了方便而提供的。</p><hr><h3 id=lidisclosed属性>“LidIsClosed”属性</h3><p><code>'LidIsClosed' read 'b'</code></p><p>指示笔记本电脑盖是否关闭，无法看到显示屏。</p><hr><h3 id=lidispresent属性>“LidIsPresent”属性</h3><p><code>'LidIsPresent' read 'b'</code></p><p>如果存在笔记本电脑盖装置。</p><p>org.freedesktop.UPower.Device</p><p>org.freedesktop.UPower.Device — Device interface</p><h2 id=方法-1>方法</h2><pre tabindex=0><code class=language-纯文本 data-lang=纯文本>Refresh()
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPower 接口与 Linux 电源管理 - HarryLoong&#39;s Blog</title>
+    <meta name="description" content="解读 UPower 的 D-Bus 接口模型与事件机制，帮助你在 Linux 上实现电源状态查询与管理集成。">
+    <script>document.documentElement.classList.add('js');</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/site.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+</head>
+<body class="inner-page">
+    <div class="bg-shape bg-shape-a" aria-hidden="true"></div>
+    <div class="bg-shape bg-shape-b" aria-hidden="true"></div>
+    <div class="solar-blob" aria-hidden="true"></div>
+
+    <header class="hero">
+        <div class="container hero-inner reveal">
+            
+            <p class="eyebrow">ARTICLE</p>
+            <h1>UPower 接口与 Linux 电源管理</h1>
+            <p class="subtitle">解读 UPower 的 D-Bus 接口模型与事件机制，帮助你在 Linux 上实现电源状态查询与管理集成。</p>
+            
+        </div>
+    </header>
+
+    <nav class="top-nav">
+        <div class="container nav-inner">
+            <div class="nav-links" aria-label="主导航">
+                <a href="/">首页</a>
+                <a href="/blog/">文章</a>
+                <a href="/gallery/">图库</a>
+            </div>
+            <div class="theme-controls" aria-label="主题控制">
+                <select id="theme-mode-select" class="theme-select" aria-label="主题模式">
+                    <option value="auto">自动</option>
+                    <option value="manual">手动</option>
+                </select>
+                <select id="theme-palette-select" class="theme-select" aria-label="主题配色">
+                    <option value="sunrise">莫兰迪·日出</option>
+                    <option value="noon">莫兰迪·中午</option>
+                    <option value="dusk">莫兰迪·傍晚</option>
+                    <option value="midnight">莫兰迪·深夜</option>
+                    <option value="mist">莫兰迪·雾青</option>
+                    <option value="rose">莫兰迪·灰粉</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container main-wrap">
+        
+<section class="single-layout">
+    <article class="single-post">
+        <header class="post-header">
+            <p class="post-kicker">Article</p>
+            <h1 class="post-title">UPower 接口与 Linux 电源管理</h1>
+            
+            <p class="post-summary">解读 UPower 的 D-Bus 接口模型与事件机制，帮助你在 Linux 上实现电源状态查询与管理集成。</p>
+            
+
+            <div class="post-meta">
+                <span>2026-03-04</span>
+                <span>·</span>
+                <span>6 分钟阅读</span>
+                
+                <span>·</span>
+                <span>Linux系统 / 系统服务</span>
+                
+            </div>
+
+            
+            <div class="tag-list post-tags">
+                
+                <span class="tag">Linux</span>
+                
+                <span class="tag">UPower</span>
+                
+                <span class="tag">D-Bus</span>
+                
+                <span class="tag">电源管理</span>
+                
+            </div>
+            
+        </header>
+
+        <div class="post-divider" aria-hidden="true"></div>
+
+        <div class="post-content">
+            <p>GNU 自由文档许可证1.1 版</p>
+<p>UPower 是枚举电源设备、监听设备事件以及查询历史和统计数据的抽象。<code>org.freedesktop.UPower</code>系统上的任何应用程序或服务都可以通过系统消息总线 访问该 服务。</p>
+<p>UPower <a href="http://lists.freedesktop.org/archives/devkit-devel/2009-December/000567.html" title="曾经被称为 DeviceKit-power">曾经被称为 DeviceKit-power</a>。UPower 旨在使大量 HAL 冗余，因为 HAL 已正式 <a href="http://lists.freedesktop.org/archives/hal/2008-May/011560.html" title="弃用">弃用</a>。</p>
+<p>UPower 还可用于控制 计算机上 <a href="http://blogs.gnome.org/hughsie/2008/11/06/devicekit-power-latency-control/" title="不同操作的延迟">不同操作的延迟</a>，从而节省大量电量。目前还没有太多使用这个界面，但这是一个经典的鸡和蛋场景，我认为鼓励鸡蛋下鸡很重要。请将任何问题报告给 <a href="https://bugs.freedesktop.org/enter_bug.cgi?product=upower" title="Freedesktop">Freedesktop</a> bugzilla 或发送邮件到 <a href="http://lists.freedesktop.org/mailman/listinfo/devkit-devel" title="DeviceKit">DeviceKit</a> 邮件列表进行讨论。</p>
+<h2 id="orgfreedesktopupower">org.freedesktop.UPower</h2>
+<p>org.freedesktop.UPower — UPower 接口</p>
+<h2 id="方法">方法</h2>
+<p><code>EnumerateDevices（out 'ao' devices）</code></p>
+<p><code>GetDisplayDevice（out'o'device）</code> </p>
+<p><code>GetCriticalAction (out 's' action)</code></p>
+<h2 id="信号">信号</h2>
+<p><code>DeviceAdded ('o' device)</code> </p>
+<p><code>DeviceRemoved ('o' device)</code></p>
+<h2 id="实现的接口">实现的接口</h2>
+<p>实现 <code>org.freedesktop.UPower</code> 的对象也实现了 <code>org.freedesktop.DBus.Introspectable</code>、<code>org.freedesktop.DBus.Properties</code></p>
+<h2 id="属性">属性</h2>
+<p>&lsquo;DaemonVersion&rsquo; 读为 &rsquo;s&rsquo; </p>
+<p>&lsquo;OnBattery&rsquo; 读为 &lsquo;b&rsquo; </p>
+<p>&lsquo;LidIsClosed&rsquo; 读为 &lsquo;b&rsquo; </p>
+<p>“LidIsPresent”读作“b”</p>
+<h2 id="描述">描述</h2>
+<p>UPower服务是通过系统消息总线提供的。要访问该服务，请使用D-Bus系统总线服务上的<code>/org/freedesktop/UPower</code>对象上的<code>org.freedesktop.UPower</code>接口，其名称为<code>org.freedesktop.UPower</code>。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dbus-send --print-reply <span class="se">\
+</span></span></span><span class="line"><span class="cl">            --system <span class="se">\
+</span></span></span><span class="line"><span class="cl">            --dest<span class="o">=</span>org.freedesktop.UPower <span class="se">\
+</span></span></span><span class="line"><span class="cl">            /org/freedesktop/UPower <span class="se">\
+</span></span></span><span class="line"><span class="cl">            org.freedesktop.UPower.EnumerateDevices
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">method <span class="k">return</span> <span class="nv">sender</span><span class="o">=</span>:1.386 -&gt; <span class="nv">dest</span><span class="o">=</span>:1.451 <span class="nv">reply_serial</span><span class="o">=</span><span class="m">2</span>
+</span></span><span class="line"><span class="cl">   array <span class="o">[</span>
+</span></span><span class="line"><span class="cl">      object path <span class="s2">&#34;/org/freedesktop/UPower/devices/line_power_AC&#34;</span>
+</span></span><span class="line"><span class="cl">      object path <span class="s2">&#34;/org/freedesktop/UPower/devices/battery_BAT0&#34;</span>
+</span></span><span class="line"><span class="cl">   <span class="o">]</span>$ dbus-send --print-reply <span class="se">\
+</span></span></span><span class="line"><span class="cl">            --system <span class="se">\
+</span></span></span><span class="line"><span class="cl">            --dest<span class="o">=</span>org.freedesktop.UPower <span class="se">\
+</span></span></span><span class="line"><span class="cl">            /org/freedesktop/UPower <span class="se">\
+</span></span></span><span class="line"><span class="cl">            org.freedesktop.UPower.EnumerateDevices
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">method <span class="k">return</span> <span class="nv">sender</span><span class="o">=</span>:1.386 -&gt; <span class="nv">dest</span><span class="o">=</span>:1.451 <span class="nv">reply_serial</span><span class="o">=</span><span class="m">2</span>
+</span></span><span class="line"><span class="cl">   array <span class="o">[</span>
+</span></span><span class="line"><span class="cl">      object path <span class="s2">&#34;/org/freedesktop/UPower/devices/line_power_AC&#34;</span>
+</span></span><span class="line"><span class="cl">      object path <span class="s2">&#34;/org/freedesktop/UPower/devices/battery_BAT0&#34;</span>
+</span></span><span class="line"><span class="cl">   <span class="o">]</span>
+</span></span></code></pre></div><h2 id="细节">细节</h2>
+<h3 id="enumeratedevices-">EnumerateDevices ()</h3>
+<p><code>EnumerateDevices(out 'ao' device)</code></p>
+<p>枚举系统上的所有电源对象。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">devices: An array of object paths for devices.
+</span></span></code></pre></div><hr>
+<h3 id="getdisplaydevice-">GetDisplayDevice ()</h3>
+<p><code>GetDisplayDevice（out 'o' device）</code></p>
+<p>将对象获取到“显示设备”，这是一个表示要在桌面环境中显示的状态图标的复合设备。您也可以直接访问该对象，因为它的路径保证为 /org/freedesktop/UPower/devices/DisplayDevice。将定义以下标准 org.freedesktop.UPower.Device 属性（仅<code>IsPresent</code>具有特殊含义）：</p>
+<ul>
+<li>**Type：**显示设备的类型，UPS 或电池（下面统称为电池）。请注意，与真实设备相比，此值可以更改。</li>
+<li>**State：**显示设备的电源状态，如充电或放电。</li>
+<li>**Percentage：**设备上剩余的能量。</li>
+<li>**Energy：**电池中当前可用的能量（以 Wh 为单位）。</li>
+<li>**EnergyFull：**电池充满时的能量（以 Wh 为单位）。</li>
+<li>**EnergyRate：**从电池中消耗的能量，以 W 为单位。如果为正，则电池正在放电，如果为负，则正在充电。</li>
+<li>**TimeToEmpty：**直到电池被视为空的秒数。</li>
+<li>**TimeToFull：**直到电池被认为已满的秒数。</li>
+<li>**IsPresent：**是否应显示使用此信息的状态图标。</li>
+<li>**IconName：**代表设备状态的图标名称。</li>
+<li>**WarningLevel：**与整体相同<code>WarningLevel</code></li>
+</ul>
+<table>
+  <thead>
+      <tr>
+          <th><em><code>device</code></em>：</th>
+          <th>显示设备的对象路径。</th>
+      </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+<hr>
+<h3 id="getcriticalaction-">GetCriticalAction ()</h3>
+<p>GetCriticalAction (out &rsquo;s&rsquo; action)</p>
+<p>当系统的电源严重不足（电池或 UPS 严重不足）时，系统将采取此操作。可能的值为：</p>
+<ul>
+<li>**HybridSleep:**混合睡眠</li>
+<li>**Hibernate:**休眠</li>
+<li>**PowerOff:**关机</li>
+</ul>
+<table>
+  <thead>
+      <tr>
+          <th><em><code>action</code></em>：</th>
+          <th>表示已配置且可用的关键操作的字符串。</th>
+      </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+<h2 id="信号详情">信号详情</h2>
+<h3 id="deviceadded-信号">DeviceAdded 信号</h3>
+<p>DeviceAdded (&lsquo;o&rsquo; 设备)</p>
+<p>添加设备时发出。</p>
+<table>
+  <thead>
+      <tr>
+          <th><em><code>device</code></em>：</th>
+          <th>添加的设备的对象路径。</th>
+      </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+<hr>
+<h3 id="deviceremoved-信号">DeviceRemoved 信号</h3>
+<p>DeviceRemoved (&lsquo;o&rsquo; 设备)</p>
+<p>移除设备时发出。</p>
+<table>
+  <thead>
+      <tr>
+          <th><em><code>device</code></em>：</th>
+          <th>被移除设备的对象路径。</th>
+      </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+<h2 id="属性详情">属性详情</h2>
+<h3 id="daemonversion属性">“DaemonVersion”属性</h3>
+<p><code>'DaemonVersion'  read      's'</code></p>
+<p>正在运行的守护进程的版本，例如<code>002</code>.</p>
+<hr>
+<h3 id="onbattery属性">“OnBattery”属性</h3>
+<p><code>'OnBattery'  read      'b'</code></p>
+<p>指示系统是否使用电池电源运行。此属性是为了方便而提供的。</p>
+<hr>
+<h3 id="lidisclosed属性">“LidIsClosed”属性</h3>
+<p><code>'LidIsClosed'  read      'b'</code></p>
+<p>指示笔记本电脑盖是否关闭，无法看到显示屏。</p>
+<hr>
+<h3 id="lidispresent属性">“LidIsPresent”属性</h3>
+<p><code>'LidIsPresent'  read      'b'</code></p>
+<p>如果存在笔记本电脑盖装置。</p>
+<p>org.freedesktop.UPower.Device</p>
+<p>org.freedesktop.UPower.Device — Device interface</p>
+<h2 id="方法-1">方法</h2>
+<pre tabindex="0"><code class="language-纯文本" data-lang="纯文本">Refresh()
 GetHistory (in &#39;s&#39; type,
                in &#39;u&#39; timespan,
                in &#39;u&#39; resolution,
                out &#39;a(udu)&#39; data)
 GetStatistics (in &#39;s&#39; type,
                out &#39;a(dd)&#39; data)
-</code></pre><h2 id=实现的接口-1>实现的接口</h2><p>实现 org.freedesktop.UPower.Device 的对象也实现了 org.freedesktop.DBus.Introspectable、org.freedesktop.DBus.Properties</p><h2 id=特性>特性</h2><pre tabindex=0><code class=language-纯文本 data-lang=纯文本>&#39;NativePath&#39;       read      &#39;s&#39;
+</code></pre><h2 id="实现的接口-1">实现的接口</h2>
+<p>实现 org.freedesktop.UPower.Device 的对象也实现了 org.freedesktop.DBus.Introspectable、org.freedesktop.DBus.Properties</p>
+<h2 id="特性">特性</h2>
+<pre tabindex="0"><code class="language-纯文本" data-lang="纯文本">&#39;NativePath&#39;       read      &#39;s&#39;
 &#39;Vendor&#39;           read      &#39;s&#39;
 &#39;Model&#39;            read      &#39;s&#39;
 &#39;Serial&#39;           read      &#39;s&#39;
@@ -65,146 +271,623 @@ GetStatistics (in &#39;s&#39; type,
 &#39;WarningLevel&#39;     read      &#39;u&#39;
 &#39;BatteryLevel&#39;     read      &#39;u&#39;
 &#39;IconName&#39;         read      &#39;s&#39;
-</code></pre><h2 id=描述-1>描述</h2><p>实现此接口的对象通常是通过使用<code>EnumerateDevices</code>方法在D-Bus系统总线服务上的<code>/org/freedesktop/UPower</code>对象上的<code>org.freedesktop.UPower</code>接口发现的。</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>$ dbus-send --print-reply <span class=se>\
-</span></span></span><span class=line><span class=cl>            --system <span class=se>\
-</span></span></span><span class=line><span class=cl>            --dest<span class=o>=</span>org.freedesktop.UPower <span class=se>\
-</span></span></span><span class=line><span class=cl>            /org/freedesktop/UPower/devices/battery_BAT0 <span class=se>\
-</span></span></span><span class=line><span class=cl>            org.freedesktop.DBus.Properties.GetAll <span class=se>\
-</span></span></span><span class=line><span class=cl>            string:org.freedesktop.UPower.Device
-</span></span><span class=line><span class=cl>
-</span></span><span class=line><span class=cl>method <span class=k>return</span> <span class=nv>sender</span><span class=o>=</span>:1.386 -&gt; <span class=nv>dest</span><span class=o>=</span>:1.477 <span class=nv>reply_serial</span><span class=o>=</span><span class=m>2</span>
-</span></span><span class=line><span class=cl>   array <span class=o>[</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;native-path&#34;</span>
-</span></span><span class=line><span class=cl>         variant             string <span class=s2>&#34;/sys/devices/LNXSYSTM:00/device:00/PNP0A08:00/device:01/PNP0C09:00/PNP0C0A:00/power_supply/BAT0&#34;</span>
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;vendor&#34;</span>
-</span></span><span class=line><span class=cl>         variant             string <span class=s2>&#34;SONY&#34;</span>
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;model&#34;</span>
-</span></span><span class=line><span class=cl>         variant             string <span class=s2>&#34;42T4568&#34;</span>
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;serial&#34;</span>
-</span></span><span class=line><span class=cl>         variant             string <span class=s2>&#34;4179&#34;</span>
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;update-time&#34;</span>
-</span></span><span class=line><span class=cl>         variant             uint64 <span class=m>1226417875</span>
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;type&#34;</span>
-</span></span><span class=line><span class=cl>         variant             uint <span class=m>2</span>
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;power-supply&#34;</span>
-</span></span><span class=line><span class=cl>         variant             boolean <span class=nb>true</span>
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;has-history&#34;</span>
-</span></span><span class=line><span class=cl>         variant             boolean <span class=nb>true</span>
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;has-statistics&#34;</span>
-</span></span><span class=line><span class=cl>         variant             boolean <span class=nb>true</span>
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;online&#34;</span>
-</span></span><span class=line><span class=cl>         variant             boolean <span class=nb>false</span>
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;energy&#34;</span>
-</span></span><span class=line><span class=cl>         variant             double 72.85
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;energy-empty&#34;</span>
-</span></span><span class=line><span class=cl>         variant             double <span class=m>0</span>
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;energy-full&#34;</span>
-</span></span><span class=line><span class=cl>         variant             double 74.55
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;energy-full-design&#34;</span>
-</span></span><span class=line><span class=cl>         variant             double 74.88
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;energy-rate&#34;</span>
-</span></span><span class=line><span class=cl>         variant             double <span class=m>0</span>
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;voltage&#34;</span>
-</span></span><span class=line><span class=cl>         variant             double 16.415
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;time-to-empty&#34;</span>
-</span></span><span class=line><span class=cl>         variant             int64 <span class=m>0</span>
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;time-to-full&#34;</span>
-</span></span><span class=line><span class=cl>         variant             int64 <span class=m>0</span>
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;percentage&#34;</span>
-</span></span><span class=line><span class=cl>         variant             double 97.7197
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;is-present&#34;</span>
-</span></span><span class=line><span class=cl>         variant             boolean <span class=nb>true</span>
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;state&#34;</span>
-</span></span><span class=line><span class=cl>         variant             uint <span class=m>3</span>
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;is-rechargeable&#34;</span>
-</span></span><span class=line><span class=cl>         variant             boolean <span class=nb>true</span>
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;capacity&#34;</span>
-</span></span><span class=line><span class=cl>         variant             double <span class=m>100</span>
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>      dict entry<span class=o>(</span>
-</span></span><span class=line><span class=cl>         string <span class=s2>&#34;technology&#34;</span>
-</span></span><span class=line><span class=cl>         variant             uint <span class=m>1</span>
-</span></span><span class=line><span class=cl>      <span class=o>)</span>
-</span></span><span class=line><span class=cl>   <span class=o>]</span>
-</span></span></code></pre></div><p>除非另有说明，否则此接口上的属性中的空字符串或值0表示未设置。</p><h2 id=细节-1>细节</h2><h3 id=refresh->Refresh ()</h3><p>Refresh ()
-刷新从电源收集的数据。</p><h4 id=errors>Errors</h4><table><thead><tr><th><em><code>org.freedesktop.UPower.Device.GeneralError</code></em>:</th><th>if an error occured while refreshing</th></tr></thead><tbody></tbody></table><h4 id=permissionsxa>Permissions</h4><p>调用者将需要确保守护程序是在调试模式下启动的</p><hr><h3 id=gethistory-----------------deepin不支持>GetHistory () //deepin不支持</h3><p>GetHistory (in &rsquo;s&rsquo; type,</p><p>in &lsquo;u&rsquo; timespan,</p><p>in &lsquo;u&rsquo; resolution,</p><p>out &lsquo;a(udu)&rsquo; data)
-获取在重新引导期间持续存在的电源设备的历史记录。</p><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td><em><code>type</code></em>:</td><td>history的类型。有效类型是<code>rateor</code>或者 <code>charge</code>。</td></tr><tr><td><em><code>timespan</code></em>:</td><td>以秒为单位返回的数据量，或者全部为 0</td></tr><tr><td><em><code>resolution</code></em>:</td><td>要返回的近似点数。更高的分辨率更准确，但以牺牲绘图速度为代价</td></tr><tr><td><em><code>data</code></em>:</td><td>电源设备的历史数据（如果设备支持历史）。数据从最早的时间到最新的数据点进行排序。每个元素包含以下成员：
-<strong>* time:</strong> 以秒为单位的时间值，从 <code>gettimeofday()</code> 方法获取
-* <strong>value:</strong> 数据值, 比如以W为单位的增长速率或者以百分比为单位的充电百分比
-* <strong>state:</strong> 设备的状态，例如<code>charging</code>或<code> discharging</code>。</td></tr></tbody></table><hr><h3 id=getstatistics---------deepin不支持>GetStatistics () //deepin不支持</h3><p><code>GetStatistics (in 's' type, out 'a(dd)' data)</code>
-获取功率设备的统计信息，这些统计信息可能会在会话中的图形界面上显示。</p><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td><em><code>type</code></em>:</td><td>统计模式。有效类型是 <code>charging</code> 或者 <code>discharging</code>.</td></tr><tr><td><em><code>data</code></em>:</td><td>电源设备的统计数据。每个元素包含以下成员：
-* <strong>value:</strong> 百分比的值，通常以秒为单位
-* <strong>accuracy:</strong> 预测的准确性，以百分比表示。</td></tr></tbody></table><h2 id=属性详情-1>属性详情</h2><h3 id=the-nativepath-property>The &ldquo;NativePath&rdquo; property</h3><p>&lsquo;NativePath&rsquo; read &rsquo;s&rsquo;</p><p>操作系统特定的电源本机路径。在 Linux 上，这是 sysfs 路径，例如<code>/sys/devices/LNXSYSTM:00/device:00/PNP0C0A:00/power_supply/BAT0</code>. 如果设备由用户空间驱动程序驱动，则为空白。</p><hr><h3 id=the-vendor-property>The &ldquo;Vendor&rdquo; property</h3><p>&lsquo;Vendor&rsquo; read &rsquo;s&rsquo;
-电池供应商的名称。</p><hr><h3 id=the-model-property>The &ldquo;Model&rdquo; property</h3><p>&lsquo;Model&rsquo; read &rsquo;s&rsquo;
-这种电池型号的名称。</p><hr><h3 id=the-serial-property>The &ldquo;Serial&rdquo; property</h3><p>&lsquo;Serial&rsquo; read &rsquo;s&rsquo;</p><p>电池的唯一序列号。</p><hr><h3 id=the-updatetime-property>The &ldquo;UpdateTime&rdquo; property</h3><p>&lsquo;UpdateTime&rsquo; read &rsquo;t&rsquo;
-从电源读取数据的时间点 (从世界协调时1970年1月1日开始的0:00秒)。（本质还是unix时间戳）</p><hr><h3 id=the-type-property>The &ldquo;Type&rdquo; property</h3><p>&lsquo;Type&rsquo; read &lsquo;u&rsquo;</p><p>电源类型</p><ul><li><strong>0:</strong> Unknown</li><li><strong>1:</strong> 线路电源</li><li><strong>2:</strong> 电池</li><li><strong>3:</strong> Ups不间断电源</li><li><strong>4:</strong> 监控</li><li><strong>5:</strong> 鼠标</li><li><strong>6:</strong> 键盘</li><li><strong>7:</strong> 掌上电脑</li><li><strong>8:</strong> 手机</li></ul><p><code>power-supply</code> 如果该值设置为“电池”，则在将其视为笔记本电脑电池之前 ，您需要验证该属性的值是否为“真”。否则，它很可能是未知类型设备的电池。</p><hr><h3 id=the-powersupply-property>The &ldquo;PowerSupply&rdquo; property</h3><p>&lsquo;PowerSupply&rsquo; read &lsquo;b&rsquo;</p><p>如果电源设备用于为系统供电。对于笔记本电脑电池和 UPS 设备，这将设置为 TRUE，但对于无线鼠标或掌上电脑设置为 FALSE。</p><hr><h3 id=the-hashistory-property>The &ldquo;HasHistory&rdquo; property</h3><p>&lsquo;HasHistory&rsquo; read &lsquo;b&rsquo;
-如果电源设备有历史记录。</p><hr><h3 id=the-hasstatistics-property>The &ldquo;HasStatistics&rdquo; property</h3><p>&lsquo;HasStatistics&rsquo; read &lsquo;b&rsquo;
-如果电源设备具有统计信息。</p><hr><h3 id=the-online-property>The &ldquo;Online&rdquo; property</h3><p>&lsquo;Online&rsquo; read &lsquo;b&rsquo;
-当前是否通过线路电源提供电源。仅当属性类型具有值 “line-power” 时，此属性才有效。</p><hr><h3 id=the-energy-property>The &ldquo;Energy&rdquo; property</h3><p>&lsquo;Energy&rsquo; read &rsquo;d&rsquo;e.
-电源中当前可用的能量 (以Wh为单位)。</p><p>This property is only valid if the property <code>type</code> has the value &ldquo;battery&rdquo;.
-仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p><hr><h3 id=the-energyempty-property>The &ldquo;EnergyEmpty&rdquo; property</h3><p>&lsquo;EnergyEmpty&rsquo; read &rsquo;d&rsquo;
-当电源被认为是空的时，电源中的能量 (以Wh为单位)。</p><p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p><hr><h3 id=the-energyfull-property>The &ldquo;EnergyFull&rdquo; property</h3><p>&lsquo;EnergyFull&rsquo; read &rsquo;d&rsquo;
+</code></pre><h2 id="描述-1">描述</h2>
+<p>实现此接口的对象通常是通过使用<code>EnumerateDevices</code>方法在D-Bus系统总线服务上的<code>/org/freedesktop/UPower</code>对象上的<code>org.freedesktop.UPower</code>接口发现的。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">$ dbus-send --print-reply <span class="se">\
+</span></span></span><span class="line"><span class="cl">            --system <span class="se">\
+</span></span></span><span class="line"><span class="cl">            --dest<span class="o">=</span>org.freedesktop.UPower <span class="se">\
+</span></span></span><span class="line"><span class="cl">            /org/freedesktop/UPower/devices/battery_BAT0 <span class="se">\
+</span></span></span><span class="line"><span class="cl">            org.freedesktop.DBus.Properties.GetAll <span class="se">\
+</span></span></span><span class="line"><span class="cl">            string:org.freedesktop.UPower.Device
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">method <span class="k">return</span> <span class="nv">sender</span><span class="o">=</span>:1.386 -&gt; <span class="nv">dest</span><span class="o">=</span>:1.477 <span class="nv">reply_serial</span><span class="o">=</span><span class="m">2</span>
+</span></span><span class="line"><span class="cl">   array <span class="o">[</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;native-path&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             string <span class="s2">&#34;/sys/devices/LNXSYSTM:00/device:00/PNP0A08:00/device:01/PNP0C09:00/PNP0C0A:00/power_supply/BAT0&#34;</span>
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;vendor&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             string <span class="s2">&#34;SONY&#34;</span>
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;model&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             string <span class="s2">&#34;42T4568&#34;</span>
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;serial&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             string <span class="s2">&#34;4179&#34;</span>
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;update-time&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             uint64 <span class="m">1226417875</span>
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;type&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             uint <span class="m">2</span>
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;power-supply&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             boolean <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;has-history&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             boolean <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;has-statistics&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             boolean <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;online&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             boolean <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;energy&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             double 72.85
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;energy-empty&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             double <span class="m">0</span>
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;energy-full&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             double 74.55
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;energy-full-design&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             double 74.88
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;energy-rate&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             double <span class="m">0</span>
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;voltage&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             double 16.415
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;time-to-empty&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             int64 <span class="m">0</span>
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;time-to-full&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             int64 <span class="m">0</span>
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;percentage&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             double 97.7197
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;is-present&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             boolean <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;state&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             uint <span class="m">3</span>
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;is-rechargeable&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             boolean <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;capacity&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             double <span class="m">100</span>
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">      dict entry<span class="o">(</span>
+</span></span><span class="line"><span class="cl">         string <span class="s2">&#34;technology&#34;</span>
+</span></span><span class="line"><span class="cl">         variant             uint <span class="m">1</span>
+</span></span><span class="line"><span class="cl">      <span class="o">)</span>
+</span></span><span class="line"><span class="cl">   <span class="o">]</span>
+</span></span></code></pre></div><p>除非另有说明，否则此接口上的属性中的空字符串或值0表示未设置。</p>
+<h2 id="细节-1">细节</h2>
+<h3 id="refresh-">Refresh ()</h3>
+<p>Refresh ()
+刷新从电源收集的数据。</p>
+<h4 id="errors">Errors</h4>
+<table>
+  <thead>
+      <tr>
+          <th><em><code>org.freedesktop.UPower.Device.GeneralError</code></em>:</th>
+          <th>if an error occured while refreshing</th>
+      </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+<h4 id="permissionsxa">Permissions
+</h4>
+<p>调用者将需要确保守护程序是在调试模式下启动的</p>
+<hr>
+<h3 id="gethistory-----------------deepin不支持">GetHistory ()                //deepin不支持</h3>
+<p>GetHistory (in  &rsquo;s&rsquo;      type,</p>
+<p>in  &lsquo;u&rsquo;      timespan,</p>
+<p>in  &lsquo;u&rsquo;      resolution,</p>
+<p>out &lsquo;a(udu)&rsquo; data)
+获取在重新引导期间持续存在的电源设备的历史记录。</p>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><em><code>type</code></em>:</td>
+          <td>history的类型。有效类型是<code>rateor</code>或者 <code>charge</code>。</td>
+      </tr>
+      <tr>
+          <td><em><code>timespan</code></em>:</td>
+          <td>以秒为单位返回的数据量，或者全部为 0</td>
+      </tr>
+      <tr>
+          <td><em><code>resolution</code></em>:</td>
+          <td>要返回的近似点数。更高的分辨率更准确，但以牺牲绘图速度为代价</td>
+      </tr>
+      <tr>
+          <td><em><code>data</code></em>:</td>
+          <td>电源设备的历史数据（如果设备支持历史）。数据从最早的时间到最新的数据点进行排序。每个元素包含以下成员：
+
+<strong>*   time:</strong> 以秒为单位的时间值，从 <code>gettimeofday()</code> 方法获取
+*   <strong>value:</strong> 数据值, 比如以W为单位的增长速率或者以百分比为单位的充电百分比
+*   <strong>state:</strong> 设备的状态，例如<code>charging</code>或<code> discharging</code>。</td>
+      </tr>
+  </tbody>
+</table>
+<hr>
+<h3 id="getstatistics---------deepin不支持">GetStatistics ()        //deepin不支持</h3>
+<p><code>GetStatistics (in  's'   type, out 'a(dd)' data)</code>
+获取功率设备的统计信息，这些统计信息可能会在会话中的图形界面上显示。</p>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th></th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><em><code>type</code></em>:</td>
+          <td>统计模式。有效类型是 <code>charging</code> 或者 <code>discharging</code>.</td>
+      </tr>
+      <tr>
+          <td><em><code>data</code></em>:</td>
+          <td>电源设备的统计数据。每个元素包含以下成员：
+
+*   <strong>value:</strong> 百分比的值，通常以秒为单位
+*   <strong>accuracy:</strong> 预测的准确性，以百分比表示。</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="属性详情-1">属性详情</h2>
+<h3 id="the-nativepath-property">The &ldquo;NativePath&rdquo; property</h3>
+<p>&lsquo;NativePath&rsquo;  read      &rsquo;s&rsquo;</p>
+<p>操作系统特定的电源本机路径。在 Linux 上，这是 sysfs 路径，例如<code>/sys/devices/LNXSYSTM:00/device:00/PNP0C0A:00/power_supply/BAT0</code>. 如果设备由用户空间驱动程序驱动，则为空白。</p>
+<hr>
+<h3 id="the-vendor-property">The &ldquo;Vendor&rdquo; property</h3>
+<p>&lsquo;Vendor&rsquo;  read      &rsquo;s&rsquo;
+电池供应商的名称。</p>
+<hr>
+<h3 id="the-model-property">The &ldquo;Model&rdquo; property</h3>
+<p>&lsquo;Model&rsquo;  read      &rsquo;s&rsquo;
+这种电池型号的名称。</p>
+<hr>
+<h3 id="the-serial-property">The &ldquo;Serial&rdquo; property</h3>
+<p>&lsquo;Serial&rsquo;  read      &rsquo;s&rsquo;</p>
+<p>电池的唯一序列号。</p>
+<hr>
+<h3 id="the-updatetime-property">The &ldquo;UpdateTime&rdquo; property</h3>
+<p>&lsquo;UpdateTime&rsquo;  read      &rsquo;t&rsquo;
+从电源读取数据的时间点 (从世界协调时1970年1月1日开始的0:00秒)。（本质还是unix时间戳）</p>
+<hr>
+<h3 id="the-type-property">The &ldquo;Type&rdquo; property</h3>
+<p>&lsquo;Type&rsquo;  read      &lsquo;u&rsquo;</p>
+<p>电源类型</p>
+<ul>
+<li><strong>0:</strong> Unknown</li>
+<li><strong>1:</strong> 线路电源</li>
+<li><strong>2:</strong> 电池</li>
+<li><strong>3:</strong> Ups不间断电源</li>
+<li><strong>4:</strong> 监控</li>
+<li><strong>5:</strong> 鼠标</li>
+<li><strong>6:</strong> 键盘</li>
+<li><strong>7:</strong> 掌上电脑</li>
+<li><strong>8:</strong> 手机</li>
+</ul>
+<p><code>power-supply</code> 如果该值设置为“电池”，则在将其视为笔记本电脑电池之前 ，您需要验证该属性的值是否为“真”。否则，它很可能是未知类型设备的电池。</p>
+<hr>
+<h3 id="the-powersupply-property">The &ldquo;PowerSupply&rdquo; property</h3>
+<p>&lsquo;PowerSupply&rsquo;  read      &lsquo;b&rsquo;</p>
+<p>如果电源设备用于为系统供电。对于笔记本电脑电池和 UPS 设备，这将设置为 TRUE，但对于无线鼠标或掌上电脑设置为 FALSE。</p>
+<hr>
+<h3 id="the-hashistory-property">The &ldquo;HasHistory&rdquo; property</h3>
+<p>&lsquo;HasHistory&rsquo;  read      &lsquo;b&rsquo;
+如果电源设备有历史记录。</p>
+<hr>
+<h3 id="the-hasstatistics-property">The &ldquo;HasStatistics&rdquo; property</h3>
+<p>&lsquo;HasStatistics&rsquo;  read      &lsquo;b&rsquo;
+如果电源设备具有统计信息。</p>
+<hr>
+<h3 id="the-online-property">The &ldquo;Online&rdquo; property</h3>
+<p>&lsquo;Online&rsquo;  read      &lsquo;b&rsquo;
+当前是否通过线路电源提供电源。仅当属性类型具有值 “line-power” 时，此属性才有效。</p>
+<hr>
+<h3 id="the-energy-property">The &ldquo;Energy&rdquo; property</h3>
+<p>&lsquo;Energy&rsquo;  read      &rsquo;d&rsquo;e.
+电源中当前可用的能量 (以Wh为单位)。</p>
+<p>This property is only valid if the property <code>type</code> has the value &ldquo;battery&rdquo;.
+仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p>
+<hr>
+<h3 id="the-energyempty-property">The &ldquo;EnergyEmpty&rdquo; property</h3>
+<p>&lsquo;EnergyEmpty&rsquo;  read      &rsquo;d&rsquo;
+当电源被认为是空的时，电源中的能量 (以Wh为单位)。</p>
+<p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p>
+<hr>
+<h3 id="the-energyfull-property">The &ldquo;EnergyFull&rdquo; property</h3>
+<p>&lsquo;EnergyFull&rsquo;  read      &rsquo;d&rsquo;
 当电源被认为充满时，电源中的能量 (以Wh为单位)。
-仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效。</p><hr><h3 id=the-energyfulldesign-property>The &ldquo;EnergyFullDesign&rdquo; property</h3><p>&lsquo;EnergyFullDesign&rsquo; read &rsquo;d&rsquo;
-电池设计的最大容量，以Wh作为单位。</p><p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效。</p><hr><h3 id=the-energyrate-property>The &ldquo;EnergyRate&rdquo; property</h3><p>&lsquo;EnergyRate&rsquo; read &rsquo;d&rsquo;
-电源消耗的能量，以W为单位。如果是正数，电源正在放电，如果是负数，电源正在充电。</p><p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p><hr><h3 id=the-voltage-property>The &ldquo;Voltage&rdquo; property</h3><p>&lsquo;Voltage&rsquo; read &rsquo;d&rsquo;</p><p>Voltage in the Cell or being recorded by the meter.
-电池中的电压或被仪表记录的值。</p><hr><h3 id=the-chargecycles-property>The &ldquo;ChargeCycles&rdquo; property</h3><p>&lsquo;ChargeCycles&rsquo; read &lsquo;i&rsquo;
-TCO认证定义的充电周期数，如果该值未知或不适用，则为-1。</p><hr><h3 id=the-luminosity-property>The &ldquo;Luminosity&rdquo; property</h3><p>&lsquo;Luminosity&rsquo; read &rsquo;d&rsquo;
-仪表记录的光度（我也不能理解光度是什么意思，大概也许可能是屏幕亮度或者环境亮度？使用d-feet软件也无法获取其值）。</p><hr><h3 id=the-timetoempty-property>The &ldquo;TimeToEmpty&rdquo; property</h3><p>&lsquo;TimeToEmpty&rsquo; read &lsquo;x&rsquo;
-直到电源被认为是空的秒数。如果未知，则设置为0。</p><p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p><hr><h3 id=the-timetofull-property>The &ldquo;TimeToFull&rdquo; property</h3><p>&lsquo;TimeToFull&rsquo; read &lsquo;x&rsquo;
-电池充电达到被认为充满所需的秒数。如果未知，则设置为0。</p><p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p><hr><h3 id=the-percentage-property>The &ldquo;Percentage&rdquo; property</h3><p>&lsquo;Percentage&rsquo; read &rsquo;d&rsquo;
-功率源中剩余的能量表示为0和100之间的百分比。通常这与 (<code>energy</code> - <code>energy-empty</code>) / (<code>energy-full</code> - <code>energy-empty</code>)相同。但是，某些原始电源只能报告百分比，在这种情况下，在设置此属性时，将取消设置energy-* 属性。</p><p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效
-如果<code>battery level</code>被设置为无以外的东西，百分比将是一个近似值。百分比的保留是出于兼容性的考虑。</p><hr><h3 id=the-temperature-property>The &ldquo;Temperature&rdquo; property</h3><p>&lsquo;Temperature&rsquo; read &rsquo;d&rsquo;
-设备的温度，以摄氏度为单位。</p><p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p><hr><h3 id=the-ispresent-property>The &ldquo;IsPresent&rdquo; property</h3><p>&lsquo;IsPresent&rsquo; read &lsquo;b&rsquo;
-如果电源存在于托架中。这个字段是必须的，因为某些电池是可热拆卸（热插拔）的，例如昂贵的UPS和大多数笔记本电脑电池。</p><p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p><hr><h3 id=the-state-property>The &ldquo;State&rdquo; property</h3><p>&lsquo;State&rsquo; read &lsquo;u&rsquo;</p><p>电池电量状态</p><ul><li><strong>0:</strong> 未知</li><li><strong>1:</strong> 充电</li><li><strong>2:</strong> 未充电</li><li><strong>3:</strong> 空</li><li><strong>4:</strong> 充满电</li><li><strong>5:</strong> 待充电</li><li><strong>6:</strong> 待放电</li></ul><p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p><hr><h3 id=the-isrechargeable-property>The &ldquo;IsRechargeable&rdquo; property</h3><p>&lsquo;IsRechargeable&rsquo; read &lsquo;b&rsquo;
-如果电源是可充电的。</p><p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p><hr><h3 id=the-capacity-property>The &ldquo;Capacity&rdquo; property</h3><p>&lsquo;Capacity&rsquo; read &rsquo;d&rsquo;
-电源的容量表示为0和100之间的百分比。电池的容量会随着使用的增长而减少。小于75% 的容量值通常表示您应该更新电池。通常，此值与 (<code>full-design</code> / <code>full</code>) * 100相同。但是，某些原始电源无法报告容量，在这种情况下，容量属性将被取消。</p><p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p><hr><h3 id=the-technology-property>The &ldquo;Technology&rdquo; property</h3><p>&lsquo;Technology&rsquo; read &lsquo;u&rsquo;</p><p>电池使用的技术</p><ul><li><strong>0:</strong> 未知</li><li><strong>1:</strong> 锂离子</li><li><strong>2:</strong> 锂聚合物电池</li><li><strong>3:</strong> 磷酸铁锂电池</li><li><strong>4:</strong> 铅酸电池</li><li><strong>5:</strong> 镍铬电池</li><li><strong>6:</strong> 镍氢电池</li></ul><p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p><hr><h3 id=the-warninglevel-property>The &ldquo;WarningLevel&rdquo; property</h3><p>&lsquo;WarningLevel&rsquo; read &lsquo;u&rsquo;</p><p>电池警告级别:</p><ul><li><strong>0:</strong> 未知</li><li><strong>1:</strong> 无</li><li><strong>2:</strong> 放电（仅适用于UPS不间断电源）</li><li><strong>3:</strong> 低</li><li><strong>4:</strong> 临界</li><li><strong>5:</strong> Action</li></ul><hr><h3 id=the-batterylevel-property>The &ldquo;BatteryLevel&rdquo; property</h3><p>&lsquo;BatteryLevel&rsquo; read &lsquo;u&rsquo;
-不报告百分比而是报告粗略电池电量的设备的电池电量。如果该值为None，则该设备不支持粗略的电池报告，应改用百分比。</p><ul><li>t</li><li><strong>0:</strong> 未知</li><li><strong>1:</strong> 无（电池不使用粗略级别的电池报告）</li><li><strong>3:</strong> 低</li><li><strong>4:</strong> 临界</li><li><strong>6:</strong> 正常</li><li><strong>7:</strong> 高</li><li><strong>8:</strong> 满</li></ul><hr><h3 id=the-iconname-property>The &ldquo;IconName&rdquo; property</h3><p>&lsquo;IconName&rsquo; read &rsquo;s&rsquo;
-图标名称，遵循图标命名规范请注意，相对于剩余或感知到的剩余电量，图标在呈现方面可能与最终用户的期望不匹配。建议前端首先使用BatteryLevel属性 (如果可用)，然后使用百分比，以向用户呈现更真实的电池电量。</p><p>org.freedesktop.UPower.KbdBacklight</p><p>org.freedesktop.UPower.KbdBacklight — 键盘背光控制接口</p><blockquote><p>一些不受支持的厂商键盘，即使存在背光也没有这个接口</p></blockquote><h2 id=方法-2>方法</h2><p>GetMaxBrightness (out &lsquo;i&rsquo; value)
-GetBrightness (out &lsquo;i&rsquo; value)
-SetBrightness (in &lsquo;i&rsquo; value)</p><h2 id=信号-1>信号</h2><p>BrightnessChanged (&lsquo;i&rsquo; value)</p><p>BrightnessChangedWithSource (&lsquo;i&rsquo; value,</p><p>&rsquo;s&rsquo; source)</p><h2 id=已实现的接口>已实现的接口</h2><p>实现 <code>org.freedesktop.UPower.KbdBacklight </code>的对象也实现了 <code>org.freedesktop.DBus.Introspectable</code>、<code>org.freedesktop.DBus.Properties</code></p><h2 id=描述-2>描述</h2><p><code>org.freedesktop.UPower.KbdBacklight</code> 是 UPower 实现的 DBus 接口。它允许控制键盘背光（如果存在）。</p><h2 id=细节-2>细节</h2><h3 id=getmaxbrightness->GetMaxBrightness ()</h3><p>GetMaxBrightness (out &lsquo;i&rsquo; value)</p><p>获取键盘背光的最大亮度级别。</p><table><thead><tr><th><em><code>value</code></em>:</th><th>键盘背光亮度的最大值。</th></tr></thead><tbody></tbody></table><h4 id=errors-1>Errors</h4><table><thead><tr><th><em><code>org.freedesktop.UPower.GeneralError</code></em>:</th><th>如果在获得最大亮度时发生错误</th></tr></thead><tbody></tbody></table><hr><h3 id=getbrightness->GetBrightness ()</h3><p>GetBrightness (out &lsquo;i&rsquo; value)</p><p>获取键盘背光的亮度级别。</p><table><thead><tr><th><em><code>value</code></em>:</th><th>键盘背光的亮度级别。</th></tr></thead><tbody></tbody></table><h4 id=errors-2>Errors</h4><table><thead><tr><th><em><code>org.freedesktop.UPower.GeneralError</code></em>:</th><th>如果在设置亮度时发生错误</th></tr></thead><tbody></tbody></table><hr><h3 id=setbrightness->SetBrightness ()</h3><p>SetBrightness (in &lsquo;i&rsquo; value)</p><p>设置键盘背光的亮度级别。</p><table><thead><tr><th><em><code>value</code></em>:</th><th>键盘背光的新亮度值</th></tr></thead><tbody></tbody></table><h4 id=errors-3>Errors</h4><table><thead><tr><th><em><code>org.freedesktop.UPower.GeneralError</code></em>:</th><th>如果在设置亮度时发生错误</th></tr></thead><tbody></tbody></table><h2 id=signal-details>Signal Details</h2><h3 id=the-brightnesschanged-signal>The BrightnessChanged signal</h3><p>BrightnessChanged (&lsquo;i&rsquo; value)</p><p>键盘背光亮度级别已更改。</p><table><thead><tr><th><em><code>value</code></em>:</th><th>键盘背光的新亮度值</th></tr></thead><tbody></tbody></table><hr><h3 id=the-brightnesschangedwithsource-signal>The BrightnessChangedWithSource signal</h3><p>BrightnessChangedWithSource (&lsquo;i&rsquo; value,</p><p>&rsquo;s&rsquo; source)</p><p>键盘背光亮度级别已更改，包括有关更改来源的信息</p><table><thead><tr><th><em><code>value</code></em>:</th><th>键盘背光的新亮度值。</th></tr></thead><tbody><tr><td><em><code>source</code></em>:</td><td>键盘背光亮度变化的来源，如果调用了 SetBrightness，则为“外部”，如果硬件本身更改了键盘亮度（自动或通过按下固件处理的热键），则为“内部”。</td></tr></tbody></table></div></article><aside class=post-toc><div class=post-toc-inner><p class=post-toc-title>目录</p><nav id=TableOfContents><ul><li><a href=#orgfreedesktopupower>org.freedesktop.UPower</a></li><li><a href=#方法>方法</a></li><li><a href=#信号>信号</a></li><li><a href=#实现的接口>实现的接口</a></li><li><a href=#属性>属性</a></li><li><a href=#描述>描述</a></li><li><a href=#细节>细节</a><ul><li><a href=#enumeratedevices->EnumerateDevices ()</a></li><li><a href=#getdisplaydevice->GetDisplayDevice ()</a></li><li><a href=#getcriticalaction->GetCriticalAction ()</a></li></ul></li><li><a href=#信号详情>信号详情</a><ul><li><a href=#deviceadded-信号>DeviceAdded 信号</a></li><li><a href=#deviceremoved-信号>DeviceRemoved 信号</a></li></ul></li><li><a href=#属性详情>属性详情</a><ul><li><a href=#daemonversion属性>“DaemonVersion”属性</a></li><li><a href=#onbattery属性>“OnBattery”属性</a></li><li><a href=#lidisclosed属性>“LidIsClosed”属性</a></li><li><a href=#lidispresent属性>“LidIsPresent”属性</a></li></ul></li><li><a href=#方法-1>方法</a></li><li><a href=#实现的接口-1>实现的接口</a></li><li><a href=#特性>特性</a></li><li><a href=#描述-1>描述</a></li><li><a href=#细节-1>细节</a><ul><li><a href=#refresh->Refresh ()</a></li><li><a href=#gethistory-----------------deepin不支持>GetHistory () //deepin不支持</a></li><li><a href=#getstatistics---------deepin不支持>GetStatistics () //deepin不支持</a></li></ul></li><li><a href=#属性详情-1>属性详情</a><ul><li><a href=#the-nativepath-property>The &ldquo;NativePath&rdquo; property</a></li><li><a href=#the-vendor-property>The &ldquo;Vendor&rdquo; property</a></li><li><a href=#the-model-property>The &ldquo;Model&rdquo; property</a></li><li><a href=#the-serial-property>The &ldquo;Serial&rdquo; property</a></li><li><a href=#the-updatetime-property>The &ldquo;UpdateTime&rdquo; property</a></li><li><a href=#the-type-property>The &ldquo;Type&rdquo; property</a></li><li><a href=#the-powersupply-property>The &ldquo;PowerSupply&rdquo; property</a></li><li><a href=#the-hashistory-property>The &ldquo;HasHistory&rdquo; property</a></li><li><a href=#the-hasstatistics-property>The &ldquo;HasStatistics&rdquo; property</a></li><li><a href=#the-online-property>The &ldquo;Online&rdquo; property</a></li><li><a href=#the-energy-property>The &ldquo;Energy&rdquo; property</a></li><li><a href=#the-energyempty-property>The &ldquo;EnergyEmpty&rdquo; property</a></li><li><a href=#the-energyfull-property>The &ldquo;EnergyFull&rdquo; property</a></li><li><a href=#the-energyfulldesign-property>The &ldquo;EnergyFullDesign&rdquo; property</a></li><li><a href=#the-energyrate-property>The &ldquo;EnergyRate&rdquo; property</a></li><li><a href=#the-voltage-property>The &ldquo;Voltage&rdquo; property</a></li><li><a href=#the-chargecycles-property>The &ldquo;ChargeCycles&rdquo; property</a></li><li><a href=#the-luminosity-property>The &ldquo;Luminosity&rdquo; property</a></li><li><a href=#the-timetoempty-property>The &ldquo;TimeToEmpty&rdquo; property</a></li><li><a href=#the-timetofull-property>The &ldquo;TimeToFull&rdquo; property</a></li><li><a href=#the-percentage-property>The &ldquo;Percentage&rdquo; property</a></li><li><a href=#the-temperature-property>The &ldquo;Temperature&rdquo; property</a></li><li><a href=#the-ispresent-property>The &ldquo;IsPresent&rdquo; property</a></li><li><a href=#the-state-property>The &ldquo;State&rdquo; property</a></li><li><a href=#the-isrechargeable-property>The &ldquo;IsRechargeable&rdquo; property</a></li><li><a href=#the-capacity-property>The &ldquo;Capacity&rdquo; property</a></li><li><a href=#the-technology-property>The &ldquo;Technology&rdquo; property</a></li><li><a href=#the-warninglevel-property>The &ldquo;WarningLevel&rdquo; property</a></li><li><a href=#the-batterylevel-property>The &ldquo;BatteryLevel&rdquo; property</a></li><li><a href=#the-iconname-property>The &ldquo;IconName&rdquo; property</a></li></ul></li><li><a href=#方法-2>方法</a></li><li><a href=#信号-1>信号</a></li><li><a href=#已实现的接口>已实现的接口</a></li><li><a href=#描述-2>描述</a></li><li><a href=#细节-2>细节</a><ul><li><a href=#getmaxbrightness->GetMaxBrightness ()</a></li><li><a href=#getbrightness->GetBrightness ()</a></li><li><a href=#setbrightness->SetBrightness ()</a></li></ul></li><li><a href=#signal-details>Signal Details</a><ul><li><a href=#the-brightnesschanged-signal>The BrightnessChanged signal</a></li><li><a href=#the-brightnesschangedwithsource-signal>The BrightnessChangedWithSource signal</a></li></ul></li></ul></nav></div></aside></section></main><footer class=site-footer><a class=footer-github href=https://github.com/xzl01 target=_blank rel="noopener noreferrer" aria-label=GitHub><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5A11.5 11.5.0 00.5 12.27a11.8 11.8.0 007.86 11.3c.58.11.8-.26.8-.57v-2.02c-3.2.72-3.88-1.58-3.88-1.58-.53-1.38-1.3-1.75-1.3-1.75-1.06-.75.08-.74.08-.74 1.18.09 1.79 1.25 1.79 1.25 1.05 1.86 2.75 1.32 3.42 1 .11-.78.41-1.32.74-1.62-2.55-.3-5.24-1.31-5.24-5.85.0-1.29.45-2.35 1.2-3.18-.12-.3-.52-1.52.11-3.17.0.0.98-.32 3.2 1.21a10.86 10.86.0 015.83.0c2.22-1.53 3.2-1.21 3.2-1.21.63 1.65.23 2.87.11 3.17.75.83 1.2 1.89 1.2 3.18.0 4.56-2.69 5.55-5.25 5.84.42.37.79 1.09.79 2.2V23c0 .31.21.68.8.57a11.8 11.8.0 007.85-11.3A11.5 11.5.0 0012 .5z"/></svg></a><p>&copy; 2026 HarryLoong</p></footer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js></script><script src=/js/site.js></script></body></html>
+仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效。</p>
+<hr>
+<h3 id="the-energyfulldesign-property">The &ldquo;EnergyFullDesign&rdquo; property</h3>
+<p>&lsquo;EnergyFullDesign&rsquo;  read      &rsquo;d&rsquo;
+电池设计的最大容量，以Wh作为单位。</p>
+<p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效。</p>
+<hr>
+<h3 id="the-energyrate-property">The &ldquo;EnergyRate&rdquo; property</h3>
+<p>&lsquo;EnergyRate&rsquo;  read      &rsquo;d&rsquo;
+电源消耗的能量，以W为单位。如果是正数，电源正在放电，如果是负数，电源正在充电。</p>
+<p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p>
+<hr>
+<h3 id="the-voltage-property">The &ldquo;Voltage&rdquo; property</h3>
+<p>&lsquo;Voltage&rsquo;  read      &rsquo;d&rsquo;</p>
+<p>Voltage in the Cell or being recorded by the meter.
+电池中的电压或被仪表记录的值。</p>
+<hr>
+<h3 id="the-chargecycles-property">The &ldquo;ChargeCycles&rdquo; property</h3>
+<p>&lsquo;ChargeCycles&rsquo;  read      &lsquo;i&rsquo;
+TCO认证定义的充电周期数，如果该值未知或不适用，则为-1。</p>
+<hr>
+<h3 id="the-luminosity-property">The &ldquo;Luminosity&rdquo; property</h3>
+<p>&lsquo;Luminosity&rsquo;  read      &rsquo;d&rsquo;
+仪表记录的光度（我也不能理解光度是什么意思，大概也许可能是屏幕亮度或者环境亮度？使用d-feet软件也无法获取其值）。</p>
+<hr>
+<h3 id="the-timetoempty-property">The &ldquo;TimeToEmpty&rdquo; property</h3>
+<p>&lsquo;TimeToEmpty&rsquo;  read      &lsquo;x&rsquo;
+直到电源被认为是空的秒数。如果未知，则设置为0。</p>
+<p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p>
+<hr>
+<h3 id="the-timetofull-property">The &ldquo;TimeToFull&rdquo; property</h3>
+<p>&lsquo;TimeToFull&rsquo;  read      &lsquo;x&rsquo;
+电池充电达到被认为充满所需的秒数。如果未知，则设置为0。</p>
+<p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p>
+<hr>
+<h3 id="the-percentage-property">The &ldquo;Percentage&rdquo; property</h3>
+<p>&lsquo;Percentage&rsquo;  read      &rsquo;d&rsquo;
+功率源中剩余的能量表示为0和100之间的百分比。通常这与 (<code>energy</code> - <code>energy-empty</code>) / (<code>energy-full</code> - <code>energy-empty</code>)相同。但是，某些原始电源只能报告百分比，在这种情况下，在设置此属性时，将取消设置energy-* 属性。</p>
+<p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效
+如果<code>battery level</code>被设置为无以外的东西，百分比将是一个近似值。百分比的保留是出于兼容性的考虑。</p>
+<hr>
+<h3 id="the-temperature-property">The &ldquo;Temperature&rdquo; property</h3>
+<p>&lsquo;Temperature&rsquo;  read      &rsquo;d&rsquo;
+设备的温度，以摄氏度为单位。</p>
+<p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p>
+<hr>
+<h3 id="the-ispresent-property">The &ldquo;IsPresent&rdquo; property</h3>
+<p>&lsquo;IsPresent&rsquo;  read      &lsquo;b&rsquo;
+如果电源存在于托架中。这个字段是必须的，因为某些电池是可热拆卸（热插拔）的，例如昂贵的UPS和大多数笔记本电脑电池。</p>
+<p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p>
+<hr>
+<h3 id="the-state-property">The &ldquo;State&rdquo; property</h3>
+<p>&lsquo;State&rsquo;  read      &lsquo;u&rsquo;</p>
+<p>电池电量状态</p>
+<ul>
+<li><strong>0:</strong> 未知</li>
+<li><strong>1:</strong> 充电</li>
+<li><strong>2:</strong> 未充电</li>
+<li><strong>3:</strong> 空</li>
+<li><strong>4:</strong> 充满电</li>
+<li><strong>5:</strong> 待充电</li>
+<li><strong>6:</strong> 待放电</li>
+</ul>
+<p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p>
+<hr>
+<h3 id="the-isrechargeable-property">The &ldquo;IsRechargeable&rdquo; property</h3>
+<p>&lsquo;IsRechargeable&rsquo;  read      &lsquo;b&rsquo;
+如果电源是可充电的。</p>
+<p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p>
+<hr>
+<h3 id="the-capacity-property">The &ldquo;Capacity&rdquo; property</h3>
+<p>&lsquo;Capacity&rsquo;  read      &rsquo;d&rsquo;
+电源的容量表示为0和100之间的百分比。电池的容量会随着使用的增长而减少。小于75% 的容量值通常表示您应该更新电池。通常，此值与 (<code>full-design</code> / <code>full</code>) * 100相同。但是，某些原始电源无法报告容量，在这种情况下，容量属性将被取消。</p>
+<p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p>
+<hr>
+<h3 id="the-technology-property">The &ldquo;Technology&rdquo; property</h3>
+<p>&lsquo;Technology&rsquo;  read      &lsquo;u&rsquo;</p>
+<p>电池使用的技术</p>
+<ul>
+<li><strong>0:</strong> 未知</li>
+<li><strong>1:</strong> 锂离子</li>
+<li><strong>2:</strong> 锂聚合物电池</li>
+<li><strong>3:</strong> 磷酸铁锂电池</li>
+<li><strong>4:</strong> 铅酸电池</li>
+<li><strong>5:</strong> 镍铬电池</li>
+<li><strong>6:</strong> 镍氢电池</li>
+</ul>
+<p>仅当<code>type</code>属性类型具有值 “battery” 时，此属性才有效</p>
+<hr>
+<h3 id="the-warninglevel-property">The &ldquo;WarningLevel&rdquo; property</h3>
+<p>&lsquo;WarningLevel&rsquo;  read      &lsquo;u&rsquo;</p>
+<p>电池警告级别:</p>
+<ul>
+<li><strong>0:</strong> 未知</li>
+<li><strong>1:</strong> 无</li>
+<li><strong>2:</strong> 放电（仅适用于UPS不间断电源）</li>
+<li><strong>3:</strong> 低</li>
+<li><strong>4:</strong> 临界</li>
+<li><strong>5:</strong> Action</li>
+</ul>
+<hr>
+<h3 id="the-batterylevel-property">The &ldquo;BatteryLevel&rdquo; property</h3>
+<p>&lsquo;BatteryLevel&rsquo;  read      &lsquo;u&rsquo;
+不报告百分比而是报告粗略电池电量的设备的电池电量。如果该值为None，则该设备不支持粗略的电池报告，应改用百分比。</p>
+<ul>
+<li>t</li>
+<li><strong>0:</strong> 未知</li>
+<li><strong>1:</strong> 无（电池不使用粗略级别的电池报告）</li>
+<li><strong>3:</strong> 低</li>
+<li><strong>4:</strong> 临界</li>
+<li><strong>6:</strong> 正常</li>
+<li><strong>7:</strong> 高</li>
+<li><strong>8:</strong> 满</li>
+</ul>
+<hr>
+<h3 id="the-iconname-property">The &ldquo;IconName&rdquo; property</h3>
+<p>&lsquo;IconName&rsquo;  read      &rsquo;s&rsquo;
+图标名称，遵循图标命名规范请注意，相对于剩余或感知到的剩余电量，图标在呈现方面可能与最终用户的期望不匹配。建议前端首先使用BatteryLevel属性 (如果可用)，然后使用百分比，以向用户呈现更真实的电池电量。</p>
+<p>org.freedesktop.UPower.KbdBacklight</p>
+<p>org.freedesktop.UPower.KbdBacklight — 键盘背光控制接口</p>
+<blockquote>
+<p>一些不受支持的厂商键盘，即使存在背光也没有这个接口</p>
+</blockquote>
+<h2 id="方法-2">方法</h2>
+<p>GetMaxBrightness (out &lsquo;i&rsquo; value)
+GetBrightness    (out &lsquo;i&rsquo; value)
+SetBrightness    (in  &lsquo;i&rsquo; value)</p>
+<h2 id="信号-1">信号</h2>
+<p>BrightnessChanged           (&lsquo;i&rsquo; value)</p>
+<p>BrightnessChangedWithSource (&lsquo;i&rsquo; value,</p>
+<p>&rsquo;s&rsquo; source)</p>
+<h2 id="已实现的接口">已实现的接口</h2>
+<p>实现 <code>org.freedesktop.UPower.KbdBacklight </code>的对象也实现了 <code>org.freedesktop.DBus.Introspectable</code>、<code>org.freedesktop.DBus.Properties</code></p>
+<h2 id="描述-2">描述</h2>
+<p><code>org.freedesktop.UPower.KbdBacklight</code> 是 UPower 实现的 DBus 接口。它允许控制键盘背光（如果存在）。</p>
+<h2 id="细节-2">细节</h2>
+<h3 id="getmaxbrightness-">GetMaxBrightness ()</h3>
+<p>GetMaxBrightness (out &lsquo;i&rsquo; value)</p>
+<p>获取键盘背光的最大亮度级别。</p>
+<table>
+  <thead>
+      <tr>
+          <th><em><code>value</code></em>:</th>
+          <th>键盘背光亮度的最大值。</th>
+      </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+<h4 id="errors-1">Errors</h4>
+<table>
+  <thead>
+      <tr>
+          <th><em><code>org.freedesktop.UPower.GeneralError</code></em>:</th>
+          <th>如果在获得最大亮度时发生错误</th>
+      </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+<hr>
+<h3 id="getbrightness-">GetBrightness ()</h3>
+<p>GetBrightness (out &lsquo;i&rsquo; value)</p>
+<p>获取键盘背光的亮度级别。</p>
+<table>
+  <thead>
+      <tr>
+          <th><em><code>value</code></em>:</th>
+          <th>键盘背光的亮度级别。</th>
+      </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+<h4 id="errors-2">Errors</h4>
+<table>
+  <thead>
+      <tr>
+          <th><em><code>org.freedesktop.UPower.GeneralError</code></em>:</th>
+          <th>如果在设置亮度时发生错误</th>
+      </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+<hr>
+<h3 id="setbrightness-">SetBrightness ()</h3>
+<p>SetBrightness (in  &lsquo;i&rsquo; value)</p>
+<p>设置键盘背光的亮度级别。</p>
+<table>
+  <thead>
+      <tr>
+          <th><em><code>value</code></em>:</th>
+          <th>键盘背光的新亮度值</th>
+      </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+<h4 id="errors-3">Errors</h4>
+<table>
+  <thead>
+      <tr>
+          <th><em><code>org.freedesktop.UPower.GeneralError</code></em>:</th>
+          <th>如果在设置亮度时发生错误</th>
+      </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+<h2 id="signal-details">Signal Details</h2>
+<h3 id="the-brightnesschanged-signal">The BrightnessChanged signal</h3>
+<p>BrightnessChanged (&lsquo;i&rsquo; value)</p>
+<p>键盘背光亮度级别已更改。</p>
+<table>
+  <thead>
+      <tr>
+          <th><em><code>value</code></em>:</th>
+          <th>键盘背光的新亮度值</th>
+      </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+<hr>
+<h3 id="the-brightnesschangedwithsource-signal">The BrightnessChangedWithSource signal</h3>
+<p>BrightnessChangedWithSource (&lsquo;i&rsquo; value,</p>
+<p>&rsquo;s&rsquo; source)</p>
+<p>键盘背光亮度级别已更改，包括有关更改来源的信息</p>
+<table>
+  <thead>
+      <tr>
+          <th><em><code>value</code></em>:</th>
+          <th>键盘背光的新亮度值。</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><em><code>source</code></em>:</td>
+          <td>键盘背光亮度变化的来源，如果调用了 SetBrightness，则为“外部”，如果硬件本身更改了键盘亮度（自动或通过按下固件处理的热键），则为“内部”。</td>
+      </tr>
+  </tbody>
+</table>
+
+        </div>
+    </article>
+
+    
+    <aside class="post-toc">
+        <div class="post-toc-inner">
+            <p class="post-toc-title">目录</p>
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#orgfreedesktopupower">org.freedesktop.UPower</a></li>
+    <li><a href="#方法">方法</a></li>
+    <li><a href="#信号">信号</a></li>
+    <li><a href="#实现的接口">实现的接口</a></li>
+    <li><a href="#属性">属性</a></li>
+    <li><a href="#描述">描述</a></li>
+    <li><a href="#细节">细节</a>
+      <ul>
+        <li><a href="#enumeratedevices-">EnumerateDevices ()</a></li>
+        <li><a href="#getdisplaydevice-">GetDisplayDevice ()</a></li>
+        <li><a href="#getcriticalaction-">GetCriticalAction ()</a></li>
+      </ul>
+    </li>
+    <li><a href="#信号详情">信号详情</a>
+      <ul>
+        <li><a href="#deviceadded-信号">DeviceAdded 信号</a></li>
+        <li><a href="#deviceremoved-信号">DeviceRemoved 信号</a></li>
+      </ul>
+    </li>
+    <li><a href="#属性详情">属性详情</a>
+      <ul>
+        <li><a href="#daemonversion属性">“DaemonVersion”属性</a></li>
+        <li><a href="#onbattery属性">“OnBattery”属性</a></li>
+        <li><a href="#lidisclosed属性">“LidIsClosed”属性</a></li>
+        <li><a href="#lidispresent属性">“LidIsPresent”属性</a></li>
+      </ul>
+    </li>
+    <li><a href="#方法-1">方法</a></li>
+    <li><a href="#实现的接口-1">实现的接口</a></li>
+    <li><a href="#特性">特性</a></li>
+    <li><a href="#描述-1">描述</a></li>
+    <li><a href="#细节-1">细节</a>
+      <ul>
+        <li><a href="#refresh-">Refresh ()</a></li>
+        <li><a href="#gethistory-----------------deepin不支持">GetHistory ()                //deepin不支持</a></li>
+        <li><a href="#getstatistics---------deepin不支持">GetStatistics ()        //deepin不支持</a></li>
+      </ul>
+    </li>
+    <li><a href="#属性详情-1">属性详情</a>
+      <ul>
+        <li><a href="#the-nativepath-property">The &ldquo;NativePath&rdquo; property</a></li>
+        <li><a href="#the-vendor-property">The &ldquo;Vendor&rdquo; property</a></li>
+        <li><a href="#the-model-property">The &ldquo;Model&rdquo; property</a></li>
+        <li><a href="#the-serial-property">The &ldquo;Serial&rdquo; property</a></li>
+        <li><a href="#the-updatetime-property">The &ldquo;UpdateTime&rdquo; property</a></li>
+        <li><a href="#the-type-property">The &ldquo;Type&rdquo; property</a></li>
+        <li><a href="#the-powersupply-property">The &ldquo;PowerSupply&rdquo; property</a></li>
+        <li><a href="#the-hashistory-property">The &ldquo;HasHistory&rdquo; property</a></li>
+        <li><a href="#the-hasstatistics-property">The &ldquo;HasStatistics&rdquo; property</a></li>
+        <li><a href="#the-online-property">The &ldquo;Online&rdquo; property</a></li>
+        <li><a href="#the-energy-property">The &ldquo;Energy&rdquo; property</a></li>
+        <li><a href="#the-energyempty-property">The &ldquo;EnergyEmpty&rdquo; property</a></li>
+        <li><a href="#the-energyfull-property">The &ldquo;EnergyFull&rdquo; property</a></li>
+        <li><a href="#the-energyfulldesign-property">The &ldquo;EnergyFullDesign&rdquo; property</a></li>
+        <li><a href="#the-energyrate-property">The &ldquo;EnergyRate&rdquo; property</a></li>
+        <li><a href="#the-voltage-property">The &ldquo;Voltage&rdquo; property</a></li>
+        <li><a href="#the-chargecycles-property">The &ldquo;ChargeCycles&rdquo; property</a></li>
+        <li><a href="#the-luminosity-property">The &ldquo;Luminosity&rdquo; property</a></li>
+        <li><a href="#the-timetoempty-property">The &ldquo;TimeToEmpty&rdquo; property</a></li>
+        <li><a href="#the-timetofull-property">The &ldquo;TimeToFull&rdquo; property</a></li>
+        <li><a href="#the-percentage-property">The &ldquo;Percentage&rdquo; property</a></li>
+        <li><a href="#the-temperature-property">The &ldquo;Temperature&rdquo; property</a></li>
+        <li><a href="#the-ispresent-property">The &ldquo;IsPresent&rdquo; property</a></li>
+        <li><a href="#the-state-property">The &ldquo;State&rdquo; property</a></li>
+        <li><a href="#the-isrechargeable-property">The &ldquo;IsRechargeable&rdquo; property</a></li>
+        <li><a href="#the-capacity-property">The &ldquo;Capacity&rdquo; property</a></li>
+        <li><a href="#the-technology-property">The &ldquo;Technology&rdquo; property</a></li>
+        <li><a href="#the-warninglevel-property">The &ldquo;WarningLevel&rdquo; property</a></li>
+        <li><a href="#the-batterylevel-property">The &ldquo;BatteryLevel&rdquo; property</a></li>
+        <li><a href="#the-iconname-property">The &ldquo;IconName&rdquo; property</a></li>
+      </ul>
+    </li>
+    <li><a href="#方法-2">方法</a></li>
+    <li><a href="#信号-1">信号</a></li>
+    <li><a href="#已实现的接口">已实现的接口</a></li>
+    <li><a href="#描述-2">描述</a></li>
+    <li><a href="#细节-2">细节</a>
+      <ul>
+        <li><a href="#getmaxbrightness-">GetMaxBrightness ()</a></li>
+        <li><a href="#getbrightness-">GetBrightness ()</a></li>
+        <li><a href="#setbrightness-">SetBrightness ()</a></li>
+      </ul>
+    </li>
+    <li><a href="#signal-details">Signal Details</a>
+      <ul>
+        <li><a href="#the-brightnesschanged-signal">The BrightnessChanged signal</a></li>
+        <li><a href="#the-brightnesschangedwithsource-signal">The BrightnessChangedWithSource signal</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </aside>
+    
+</section>
+
+    </main>
+
+    <footer class="site-footer">
+        <a class="footer-github" href="https://github.com/xzl01" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 .5A11.5 11.5 0 0 0 .5 12.27a11.8 11.8 0 0 0 7.86 11.3c.58.11.8-.26.8-.57v-2.02c-3.2.72-3.88-1.58-3.88-1.58-.53-1.38-1.3-1.75-1.3-1.75-1.06-.75.08-.74.08-.74 1.18.09 1.79 1.25 1.79 1.25 1.05 1.86 2.75 1.32 3.42 1 .11-.78.41-1.32.74-1.62-2.55-.3-5.24-1.31-5.24-5.85 0-1.29.45-2.35 1.2-3.18-.12-.3-.52-1.52.11-3.17 0 0 .98-.32 3.2 1.21a10.86 10.86 0 0 1 5.83 0c2.22-1.53 3.2-1.21 3.2-1.21.63 1.65.23 2.87.11 3.17.75.83 1.2 1.89 1.2 3.18 0 4.56-2.69 5.55-5.25 5.84.42.37.79 1.09.79 2.2V23c0 .31.21.68.8.57a11.8 11.8 0 0 0 7.85-11.3A11.5 11.5 0 0 0 12 .5Z"/>
+            </svg>
+        </a>
+        <p>&copy; 2026 HarryLoong</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="/js/site.js"></script>
+</body>
+</html>

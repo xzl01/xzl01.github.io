@@ -1,21 +1,33 @@
 {{ define "main" }}
 <section class="single-layout">
     <article class="single-post">
-        <div class="post-meta">
-            <span>{{ .Date.Format "2006-01-02" }}</span>
-            {{ if .Params.tags }}
-            <span>·</span>
-            <span>{{ len .Params.tags }} 个标签</span>
+        <header class="post-header">
+            <p class="post-kicker">Article</p>
+            <h1 class="post-title">{{ .Title }}</h1>
+            {{ with .Description }}
+            <p class="post-summary">{{ . }}</p>
             {{ end }}
-        </div>
 
-        {{ with .Params.tags }}
-        <div class="tag-list post-tags">
-            {{ range . }}
-            <span class="tag">{{ . }}</span>
+            <div class="post-meta">
+                <span>{{ .Date.Format "2006-01-02" }}</span>
+                <span>·</span>
+                <span>{{ .ReadingTime }} 分钟阅读</span>
+                {{ with .Params.categories }}
+                <span>·</span>
+                <span>{{ delimit . " / " }}</span>
+                {{ end }}
+            </div>
+
+            {{ with .Params.tags }}
+            <div class="tag-list post-tags">
+                {{ range . }}
+                <span class="tag">{{ . }}</span>
+                {{ end }}
+            </div>
             {{ end }}
-        </div>
-        {{ end }}
+        </header>
+
+        <div class="post-divider" aria-hidden="true"></div>
 
         <div class="post-content">
             {{ .Content }}

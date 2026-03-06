@@ -1,36 +1,19 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Modem on HarryLoong's Blog</title><link>https://xzl01.github.io/tags/modem/</link><description>Recent content in Modem on HarryLoong's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Mon, 02 Mar 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://xzl01.github.io/tags/modem/index.xml" rel="self" type="application/rss+xml"/><item><title>Linux 下使用 5G Modem 上网指南</title><link>https://xzl01.github.io/blog/linux-5g-modem/</link><pubDate>Mon, 02 Mar 2026 00:00:00 +0000</pubDate><guid>https://xzl01.github.io/blog/linux-5g-modem/</guid><description>&lt;h2 id="简介"&gt;简介&lt;/h2&gt;
-&lt;p&gt;本教程将详细介绍在 Linux 系统中使用 ModemManager 连接 5G 网络的完整步骤。&lt;/p&gt;
-&lt;h2 id="环境说明"&gt;环境说明&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;操作系统&lt;/strong&gt;: Deepin Linux / Debian / Ubuntu&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;硬件&lt;/strong&gt;: 5G WWAN 模块&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;软件&lt;/strong&gt;: ModemManager, NetworkManager&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id="第一步安装-modemmanager"&gt;第一步：安装 ModemManager&lt;/h2&gt;
-&lt;p&gt;ModemManager 是一个由 freedesktop 托管的项目，旨在 Linux 设备上运行调制解调器以获得蜂窝无线网络连接能力。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 安装 ModemManager&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo apt install modemmanager
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="检查内核驱动"&gt;检查内核驱动&lt;/h3&gt;
-&lt;p&gt;确保内核模块已正确加载 WWAN 驱动：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;lspci -vvv
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id="第二步使用-mmcli-连接-5g-网络"&gt;第二步：使用 mmcli 连接 5G 网络&lt;/h2&gt;
-&lt;h3 id="1-查看-wwan-卡信息"&gt;1. 查看 WWAN 卡信息&lt;/h3&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;mmcli -L
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;返回信息包含三个内容：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;DBus 地址&lt;/li&gt;
-&lt;li&gt;设备类型&lt;/li&gt;
-&lt;li&gt;设备 ID&lt;/li&gt;
-&lt;/ul&gt;
-&lt;blockquote&gt;
-&lt;p&gt;💡 DBus 地址的最后一位为设备编号&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;h3 id="2-查看设备详情"&gt;2. 查看设备详情&lt;/h3&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;mmcli --modem&lt;span class="o"&gt;=&lt;/span&gt;&amp;lt;设备编号&amp;gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="3-解锁-sim-卡如有-pin-锁"&gt;3. 解锁 SIM 卡（如有 PIN 锁）&lt;/h3&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;mmcli --modem&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt; --sim&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;0&lt;/span&gt; --pin&lt;span class="o"&gt;=&lt;/span&gt;你的PIN码
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="4-启动设备"&gt;4. 启动设备&lt;/h3&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;mmcli --modem&lt;span class="o"&gt;=&lt;/span&gt;&amp;lt;设备编号&amp;gt; --enable
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="5-连接网络"&gt;5. 连接网络&lt;/h3&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;mmcli -m &amp;lt;设备编号&amp;gt; --simple-connect&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;apn=你的APN,ip-type=ipv4v6&amp;#39;&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;（中国电信）：&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Modem on HarryLoong&#39;s Blog</title>
+    <link>http://localhost:1313/tags/modem/</link>
+    <description>Recent content in Modem on HarryLoong&#39;s Blog</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 02 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/modem/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Linux 下使用 5G Modem 上网指南</title>
+      <link>http://localhost:1313/blog/linux-5g-modem/</link>
+      <pubDate>Mon, 02 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/linux-5g-modem/</guid>
+      <description>&lt;h2 id=&#34;简介&#34;&gt;简介&lt;/h2&gt;&#xA;&lt;p&gt;本教程将详细介绍在 Linux 系统中使用 ModemManager 连接 5G 网络的完整步骤。&lt;/p&gt;&#xA;&lt;h2 id=&#34;环境说明&#34;&gt;环境说明&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;strong&gt;操作系统&lt;/strong&gt;: Deepin Linux / Debian / Ubuntu&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;硬件&lt;/strong&gt;: 5G WWAN 模块&lt;/li&gt;&#xA;&lt;li&gt;&lt;strong&gt;软件&lt;/strong&gt;: ModemManager, NetworkManager&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;第一步安装-modemmanager&#34;&gt;第一步：安装 ModemManager&lt;/h2&gt;&#xA;&lt;p&gt;ModemManager 是一个由 freedesktop 托管的项目，旨在 Linux 设备上运行调制解调器以获得蜂窝无线网络连接能力。&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 安装 ModemManager&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo apt install modemmanager&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;检查内核驱动&#34;&gt;检查内核驱动&lt;/h3&gt;&#xA;&lt;p&gt;确保内核模块已正确加载 WWAN 驱动：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;lspci -vvv&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;第二步使用-mmcli-连接-5g-网络&#34;&gt;第二步：使用 mmcli 连接 5G 网络&lt;/h2&gt;&#xA;&lt;h3 id=&#34;1-查看-wwan-卡信息&#34;&gt;1. 查看 WWAN 卡信息&lt;/h3&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;mmcli -L&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;返回信息包含三个内容：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;DBus 地址&lt;/li&gt;&#xA;&lt;li&gt;设备类型&lt;/li&gt;&#xA;&lt;li&gt;设备 ID&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;💡 DBus 地址的最后一位为设备编号&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;h3 id=&#34;2-查看设备详情&#34;&gt;2. 查看设备详情&lt;/h3&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;mmcli --modem&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&amp;lt;设备编号&amp;gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;3-解锁-sim-卡如有-pin-锁&#34;&gt;3. 解锁 SIM 卡（如有 PIN 锁）&lt;/h3&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;mmcli --modem&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;0&lt;/span&gt; --sim&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;0&lt;/span&gt; --pin&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;你的PIN码&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;4-启动设备&#34;&gt;4. 启动设备&lt;/h3&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;mmcli --modem&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&amp;lt;设备编号&amp;gt; --enable&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;5-连接网络&#34;&gt;5. 连接网络&lt;/h3&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;mmcli -m &amp;lt;设备编号&amp;gt; --simple-connect&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;apn=你的APN,ip-type=ipv4v6&amp;#39;&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;示例&lt;/strong&gt;（中国电信）：&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

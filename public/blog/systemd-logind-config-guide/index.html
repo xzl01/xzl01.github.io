@@ -1,12 +1,212 @@
-<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>systemd-logind 配置文件指南 - HarryLoong's Blog</title><meta name=description content="聚焦 logind.conf 关键项，说明 systemd-logind 的会话、电源键与用户行为控制配置方法。"><script>document.documentElement.classList.add("js")</script><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet href=/css/site.css><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css></head><body class=inner-page><div class="bg-shape bg-shape-a" aria-hidden=true></div><div class="bg-shape bg-shape-b" aria-hidden=true></div><div class=solar-blob aria-hidden=true></div><header class=hero><div class="container hero-inner reveal"><p class=eyebrow>ARTICLE</p><h1>systemd-logind 配置文件指南</h1><p class=subtitle>聚焦 logind.conf 关键项，说明 systemd-logind 的会话、电源键与用户行为控制配置方法。</p></div></header><nav class=top-nav><div class="container nav-inner"><div class=nav-links aria-label=主导航><a href=/>首页</a>
-<a href=/blog/>文章</a>
-<a href=/gallery/>图库</a></div><div class=theme-controls aria-label=主题控制><select id=theme-mode-select class=theme-select aria-label=主题模式><option value=auto>自动</option><option value=manual>手动</option></select>
-<select id=theme-palette-select class=theme-select aria-label=主题配色><option value=sunrise>莫兰迪·日出</option><option value=noon>莫兰迪·中午</option><option value=dusk>莫兰迪·傍晚</option><option value=midnight>莫兰迪·深夜</option><option value=mist>莫兰迪·雾青</option><option value=rose>莫兰迪·灰粉</option></select></div></div></nav><main class="container main-wrap"><section class=single-layout><article class=single-post><div class=post-meta><span>2026-03-04</span>
-<span>·</span>
-<span>4 个标签</span></div><div class="tag-list post-tags"><span class=tag>Linux</span>
-<span class=tag>systemd</span>
-<span class=tag>logind</span>
-<span class=tag>配置</span></div><div class=post-content><h2 id=名称>名称</h2><p>logind.conf, logind.conf.d — Login manager configuration files</p><h2 id=简介>简介</h2><p><code>etc/systemd/logind.conf</code></p><p><code>/etc/systemd/logind.conf.d/*.conf</code></p><p><code>/run/systemd/logind.conf.d/*.conf</code></p><p><code>/usr/lib/systemd/logind.conf.d/*.conf</code></p><h2 id=描述>描述</h2><p>这些文件配置了 systemd 登录管理器 systemd-logind.service(8) 的各种参数。语法的一般描述见 systemd.syntax(7)。</p><h2 id=配置目录和优先级>配置目录和优先级</h2><p>默认配置是在编译过程中设置的，所以只有在需要更改这些默认值时才需要配置。最初，<code>/etc/systemd/</code>中的主配置文件包含已注释的条目，显示为默认值，这些默认值作为管理员的配置指南。可以通过编辑该文件或创建drop-ins来进行本地重写，如下所述。建议使用drop-ins进行本地配置，而不是修改主配置文件（drop-ins指的是对下面的conf文件进行删除和插入，而不去影响主要的文件）。</p><p>除了 &ldquo;mian &ldquo;配置文件外，还可从<code>/usr/lib/systemd/*.conf.d/</code><em>、</em><code>/usr/local/lib/systemd/*.conf.d/</code>和<code>/etc/systemd/*.conf.d/</code>读取插入式配置片段。这些结尾为d的文件夹具有更高的优先权，并凌驾于主配置文件之上。<em>在</em><code>*.conf.d/</code>配置子目录中的文件，无论在哪个子目录中，都会按文件名以词法顺序排序。当多个文件指定相同的选项时，对于只接受一个值的选项，<strong>最后排序的文件中的条目优先</strong>，而对于接受一个值列表的选项，条目按照文件排序进行添加。</p><p>当软件包需要用户定制配置时，它们可以在<code>/usr/</code>下安装drop-ins。<code>/etc/</code>中的文件是为本地管理员（root用户）保留的，他可以使用这个逻辑来覆盖供应商软件包所安装的配置文件。Drop-ins必须用来覆盖软件包的drop-ins，因为主配置文件的优先级较低。建议在这些子目录中的所有文件名前加一个两位数的数字和一个破折号前缀，以简化文件的排序。</p><p>要禁用供应商提供的配置文件，推荐的方法是在/etc/的配置目录中放置一个指向/dev/null的符号链接，其文件名与供应商的配置文件相同。</p><h2 id=选项>选项</h2><p>所有的选项都是在[Login]部分配置的。</p><ul><li><p><code>NAutoVTs=</code> 取一个正整数。配置默认分配多少个虚拟终端（VT），当切换到之前未使用的虚拟终端时，&ldquo;autovt &ldquo;服务会自动生成。这些服务是由模板单元autovt@.service为各自的VT TTY名称实例化的，例如，autovt@tty4.service。默认情况下，autovt@.service被链接到getty@.service。换句话说，当用户切换到未使用的虚拟终端时，登录提示会动态地启动。因此，这个参数控制了VT上有多少个登录 &ldquo;gettys &ldquo;可用。如果一个VT已经被其他子系统使用（例如，图形登录），这种激活将不会被尝试。请注意，在<code>ReserveVT=</code>中配置的VT总是受到这种激活的影响，即使它不是用NAutoVTs=指令配置的VT之一。默认为6。当设置为0时，&ldquo;autovt &ldquo;服务的自动生成被禁用。</p></li><li><p><code>ReserveVT=</code> 取一个正整数。指定一个虚拟终端，该终端应无条件地保留给autovt@.server激活（见上文）。用这个选项选择的VT将被无条件地标记为繁忙，因此没有其他子系统会分配它。这个功能很有用，可以确保无论其他子系统分配了多少个VT，总有一个登录 &ldquo;getty"可用。默认为6（换句话说，Alt-F6上永远有一个 &ldquo;getty &ldquo;可用，getty详情见：<a href=https://wiki.archlinux.org/title/Getty_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87) title=Archwiki>Archwiki</a>。） 当设置为0时，VT保留被禁用。</p></li><li><p><code>KillUserProcesses=</code>接受一个布尔参数。配置当用户注销时是否应该杀死该用户的进程。如果为真，与会话对应的作用域单元和该作用域内的所有进程将被终止。如果为 &ldquo;false&rdquo;，则该作用域被 &ldquo;抛弃&rdquo;，参见systemd.scope(5)，进程不被杀死。默认为 &ldquo;true&rdquo;，但可参考下面的KillOnlyUsers=和KillExcludeUsers=选项。</p><p>除了会话进程外，用户进程还可以在用户管理单元user@.service下运行。根据linger的设置，这可能允许用户运行独立于其登录会话的进程。参见loginctl(1)中关于enable-linger的描述。</p><p>注意，设置<code>KillUserProcesses=yes</code>会破坏screen(1)和tmux(1)等工具，除非它们被移出会话范围。见systemd-run(1)中的例子。</p></li><li><p><code>KillOnlyUsers=</code>,<code>KillExcludeUsers=</code>这些设置采用空格分隔的用户名列表，覆盖 <code>KillUserProcesses=</code> 设置。一个用户名可以被添加到<code>KillExcludeUsers=</code>中，以排除该用户会话作用域中的进程被杀，即使<code>KillUserProcesses=yes</code>被设置。如果KillExcludeUsers=没有被设置，&ldquo;root &ldquo;用户被默认排除在外。<code>KillExcludeUsers=</code>可以被设置为一个空值来覆盖这个默认值。如果一个用户没有被排除，接下来会检查<code>KillOnlyUsers=</code>。如果指定了这个设置，只有这些用户的会话作用域中的进程将被杀死。否则，用户将受到<code>KillUserProcesses=yes</code>设置的影响。</p></li><li><p><code>IdleAction=</code>配置系统空闲时采取的行动。从 &ldquo;ignore&rdquo;、&ldquo;poweroff&rdquo;、&ldquo;reboot&rdquo;、&ldquo;halt&rdquo;、&ldquo;kexec&rdquo;（见<a href=https://wiki.archlinux.org/title/Kexec title=Archwiki>Archwiki</a>）、&ldquo;suspend&rdquo;、&ldquo;hibernate&rdquo;、&ldquo;hybrid-sleep&rdquo;、&ldquo;suspend-then-hibernate"和 &ldquo;lock"中选择一项。默认为 &ldquo;ignore&rdquo;。</p><p>注意，这需要用户会话正确地向系统报告空闲状态。系统将在所有会话报告他们是空闲的，没有空闲抑制锁处于活动状态，随后，<code>IdleActionSec=</code>（见下文）配置的时间已过后执行该动作。</p></li><li><p><code>IdleActionSec=</code>配置系统空闲后采取<code>IdleAction=</code>（见上文）中配置的动作的延迟</p></li><li><p><code>InhibitDelayMaxSec=</code>指定由于 &ldquo;delay &ldquo;类型的抑制器锁处于活动状态而延迟系统关闭或睡眠请求的最大时间，然后该抑制器被忽略，操作仍然执行。默认值为5。</p></li><li><p><code>UserStopDelaySec=</code>指定在用户完全注销后为其保留用户记录和每个用户服务user@.service的时间。如果设置为0，当用户的最后一个会话结束后，每个用户的服务会立即终止。如果这个选项被配置为非零，快速注销/登录周期就会加快，因为用户的服务管理器不会被不断重启。如果设置为 &ldquo;无穷大&rdquo;，用户的每个用户服务在第一次登录后就不会再终止，而是继续运行直到系统关闭。默认值为10s。</p></li><li><p><code>HandlePowerKey=</code>, <code>HandlePowerKeyLongPress=</code>,<code>HandleRebootKey=</code>, <code>HandleRebootKeyLongPress=</code>,<code>HandleSuspendKey=</code>, <code>HandleSuspendKeyLongPress=</code>,<code>HandleHibernateKey=</code>, <code>HandleHibernateKeyLongPress=</code>,<code>HandleLidSwitch=</code>, <code>HandleLidSwitchExternalPower=</code>,<code>HandleLidSwitchDocked=</code> 控制logind如何处理系统电源、重启和睡眠键，以及触发系统断电、重启或暂停等动作的盖子开关。可以是 &ldquo;忽略&rdquo;、&ldquo;关机&rdquo;、&ldquo;重启&rdquo;、&ldquo;停止&rdquo;、&ldquo;kexec&rdquo;、&ldquo;暂停&rdquo;、&ldquo;休眠&rdquo;、&ldquo;混合睡眠&rdquo;、&ldquo;暂停-休眠&rdquo;、&ldquo;锁定&rdquo;、&ldquo;工厂复位 &ldquo;中的一个。如果是 &ldquo;忽略&rdquo;，systemd-logind就不会处理这些键。如果是 &ldquo;锁定&rdquo;，所有正在运行的会话将被锁屏；否则，将在相应的事件中采取指定的行动。只有带有 &ldquo;power-switch &ldquo;udev标签的输入设备才会被观察到按键/盖板切换事件。</p><ul><li><code>HandlePowerKey=</code>默认为 &ldquo;关机&rdquo;</li><li><code>HandleRebootKey=</code>默认为 &ldquo;重启&rdquo;</li><li><code>HandleSuspendKey=</code>默认为 &ldquo;暂停&rdquo;,</li><li><code>HandleHibernateKey=</code>默认为 &ldquo;休眠&rdquo;</li><li><code>HandlePowerKeyLongPress=</code>默认为 &ldquo;忽略&rdquo;</li><li><code>HandleRebootKeyLongPress=</code>默认为 &ldquo;断电&rdquo;</li><li><code>HandleSuspendKeyLongPress=</code>默认为 &ldquo;休眠&rdquo;</li><li><code>HandleHibernateKeyLongPress=默认为 "忽略"</code></li><li><code>HandleLidSwitch=</code>默认为 &ldquo;暂停&rdquo;</li><li><code>HandleLidSwitchExternalPower=</code>默认情况下完全忽略（为了向后兼容）&ndash;在它被用来决定行为之前必须设置一个明确的值。</li><li><code>HandleLidSwitchDocked=</code>默认为 &ldquo;忽略&rdquo;。如果系统被插入拓展坞，或者连接了一个以上的显示器，就会发生<code>HandleLidSwitchDocked=</code>指定的动作；如果系统处于外部电源上，就会发生<code>HandleLidSwitchExternalPower=</code>指定的动作（如果有）；否则就会发生<code>HandleLidSwitch=</code>动作。
-不同的应用程序可以通过采取低级别的抑制锁（&ldquo;handle-power-key&rdquo;、&ldquo;handle-suspend-key&rdquo;、&ldquo;handle-hibernate-key&rdquo;、&ldquo;handle-lid-switch&rdquo;、&ldquo;handle-reboot-key&rdquo;）来禁用logind对系统电源和睡眠键及盖子开关的处理。这是图形化桌面环境最常使用的，用来接管暂停和休眠处理，并使用他们自己的配置机制。如果采取了低级别的抑制锁，当该键或开关被触发时，logind不会采取任何行动，<code>Handle*=</code>设置也就不重要了。</li></ul></li><li><p><code>PowerKeyIgnoreInhibited=</code>,<code>SuspendKeyIgnoreInhibited=</code>,<code>HibernateKeyIgnoreInhibited=</code>, <code>LidSwitchIgnoreInhibited=</code>,<code>RebootKeyIgnoreInhibited=</code>
-控制systemd-logind在电源键、重启键、休眠键和盖子开关被触发时采取的行动是否受制于高级抑制锁（&ldquo;关闭&rdquo;、&ldquo;重启&rdquo;、&ldquo;休眠&rdquo;、&ldquo;空闲&rdquo;）。低级抑制器锁（&ldquo;handle-power-key&rdquo;, &ldquo;handle-suspend-key&rdquo;, &ldquo;handle-hibernate-key&rdquo;, &ldquo;handle-lid-switch&rdquo;, &ldquo;handle-reboot-key&rdquo;），无论这个设置如何，都会不会被忽略。</p><p>这些设置的参数是布尔值。如果是 &ldquo;no&rdquo;，应用程序所采取的抑制锁将不会被忽略。如果 &ldquo;yes&rdquo;，&ldquo;关机&rdquo;、&ldquo;重启&rdquo;、&ldquo;睡眠 &ldquo;和 &ldquo;空闲 &ldquo;抑制器锁被忽略。
-<code>PowerKeyIgnoreInhibited=</code>, <code>SuspendKeyIgnoreInhibited=</code>, <code>HibernateKeyIgnoreInhibited=</code> 和 <code>RebootKeyIgnoreInhibited=</code> 默认为 &ldquo;no&rdquo;。<code>LidSwitchIgnoreInhibited=</code>默认为 &ldquo;yes&rdquo;。这意味着当systemd-logind自己处理事件时（没有低级别的抑制器锁被其他应用程序占用），盖子开关默认忽略暂停抑制器，但电源和睡眠键会不忽略。</p></li><li><p><code>HoldoffTimeoutSec=</code>指定系统启动或恢复后，systemd暂不对lid事件做出反应的时间段。这是为了让系统正确检测任何热插拔设备，以便在连接了外部显示器或底座（拓展坞）的情况下，systemd可以忽略lid事件。如果设置为0，systemd会立即做出反应，可能在内核完全探测到所有热拔插设备之前。这很安全，只要你不关心systemd对系统关闭时被插拔的设备的处理。默认值为30秒。</p></li><li><p><code>RuntimeDirectoryInodesMax=</code>设置每个登录用户的<code>$XDG_RUNTIME_DIR</code>运行时目录的大小限制。取一个以字节为单位的大小，可选择以通常的K、G、M和T为后缀，以1024为基准（IEC）。另外，也可以指定一个以&rdquo;%&ldquo;为后缀的数字百分比，它设定了相对于物理RAM量的大小限制。默认值是10%。注意，这个大小只是一个安全限制。由于每个运行时目录是一个tmpfs文件系统，它只消耗所需的内存</p></li><li><p><code>InhibitorsMax=</code>控制允许的最大并发抑制器数量。默认为8192（8K）</p></li><li><p><code>SessionsMax=</code>控制要管理的并发用户会话的最大数量。默认值为8192（8K）。根据PAM堆栈配置中的pam_systemd.so模块，进一步的登录会话将被拒绝，或者允许但不被systemd-logind跟踪</p></li><li><p><code>RemoveIPC=</code>控制当用户完全注销时，属于该用户的System V和POSIX IPC对象是否会被删除。接受一个布尔参数。如果启用，在用户的最后一个会话结束后，用户就不能再消耗IPC资源。这包括System V信号、共享内存和消息队列，以及POSIX共享内存和消息队列。请注意，根用户和其他系统用户的IPC对象不受此设置的影响。默认值为 &ldquo;yes&rdquo;</p></li></ul></div></article><aside class=post-toc><div class=post-toc-inner><p class=post-toc-title>目录</p><nav id=TableOfContents><ul><li><a href=#名称>名称</a></li><li><a href=#简介>简介</a></li><li><a href=#描述>描述</a></li><li><a href=#配置目录和优先级>配置目录和优先级</a></li><li><a href=#选项>选项</a></li></ul></nav></div></aside></section></main><footer class=site-footer><a class=footer-github href=https://github.com/xzl01 target=_blank rel="noopener noreferrer" aria-label=GitHub><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5A11.5 11.5.0 00.5 12.27a11.8 11.8.0 007.86 11.3c.58.11.8-.26.8-.57v-2.02c-3.2.72-3.88-1.58-3.88-1.58-.53-1.38-1.3-1.75-1.3-1.75-1.06-.75.08-.74.08-.74 1.18.09 1.79 1.25 1.79 1.25 1.05 1.86 2.75 1.32 3.42 1 .11-.78.41-1.32.74-1.62-2.55-.3-5.24-1.31-5.24-5.85.0-1.29.45-2.35 1.2-3.18-.12-.3-.52-1.52.11-3.17.0.0.98-.32 3.2 1.21a10.86 10.86.0 015.83.0c2.22-1.53 3.2-1.21 3.2-1.21.63 1.65.23 2.87.11 3.17.75.83 1.2 1.89 1.2 3.18.0 4.56-2.69 5.55-5.25 5.84.42.37.79 1.09.79 2.2V23c0 .31.21.68.8.57a11.8 11.8.0 007.85-11.3A11.5 11.5.0 0012 .5z"/></svg></a><p>&copy; 2026 HarryLoong</p></footer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js></script><script src=/js/site.js></script></body></html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>systemd-logind 配置文件指南 - HarryLoong&#39;s Blog</title>
+    <meta name="description" content="聚焦 logind.conf 关键项，说明 systemd-logind 的会话、电源键与用户行为控制配置方法。">
+    <script>document.documentElement.classList.add('js');</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/site.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+</head>
+<body class="inner-page">
+    <div class="bg-shape bg-shape-a" aria-hidden="true"></div>
+    <div class="bg-shape bg-shape-b" aria-hidden="true"></div>
+    <div class="solar-blob" aria-hidden="true"></div>
+
+    <header class="hero">
+        <div class="container hero-inner reveal">
+            
+            <p class="eyebrow">ARTICLE</p>
+            <h1>systemd-logind 配置文件指南</h1>
+            <p class="subtitle">聚焦 logind.conf 关键项，说明 systemd-logind 的会话、电源键与用户行为控制配置方法。</p>
+            
+        </div>
+    </header>
+
+    <nav class="top-nav">
+        <div class="container nav-inner">
+            <div class="nav-links" aria-label="主导航">
+                <a href="/">首页</a>
+                <a href="/blog/">文章</a>
+                <a href="/gallery/">图库</a>
+            </div>
+            <div class="theme-controls" aria-label="主题控制">
+                <select id="theme-mode-select" class="theme-select" aria-label="主题模式">
+                    <option value="auto">自动</option>
+                    <option value="manual">手动</option>
+                </select>
+                <select id="theme-palette-select" class="theme-select" aria-label="主题配色">
+                    <option value="sunrise">莫兰迪·日出</option>
+                    <option value="noon">莫兰迪·中午</option>
+                    <option value="dusk">莫兰迪·傍晚</option>
+                    <option value="midnight">莫兰迪·深夜</option>
+                    <option value="mist">莫兰迪·雾青</option>
+                    <option value="rose">莫兰迪·灰粉</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container main-wrap">
+        
+<section class="single-layout">
+    <article class="single-post">
+        <header class="post-header">
+            <p class="post-kicker">Article</p>
+            <h1 class="post-title">systemd-logind 配置文件指南</h1>
+            
+            <p class="post-summary">聚焦 logind.conf 关键项，说明 systemd-logind 的会话、电源键与用户行为控制配置方法。</p>
+            
+
+            <div class="post-meta">
+                <span>2026-03-04</span>
+                <span>·</span>
+                <span>1 分钟阅读</span>
+                
+                <span>·</span>
+                <span>Linux系统 / 系统服务</span>
+                
+            </div>
+
+            
+            <div class="tag-list post-tags">
+                
+                <span class="tag">Linux</span>
+                
+                <span class="tag">systemd</span>
+                
+                <span class="tag">logind</span>
+                
+                <span class="tag">配置</span>
+                
+            </div>
+            
+        </header>
+
+        <div class="post-divider" aria-hidden="true"></div>
+
+        <div class="post-content">
+            <h2 id="名称">名称</h2>
+<p>logind.conf, logind.conf.d — Login manager configuration files</p>
+<h2 id="简介">简介</h2>
+<p><code>etc/systemd/logind.conf</code></p>
+<p><code>/etc/systemd/logind.conf.d/*.conf</code></p>
+<p><code>/run/systemd/logind.conf.d/*.conf</code></p>
+<p><code>/usr/lib/systemd/logind.conf.d/*.conf</code></p>
+<h2 id="描述">描述</h2>
+<p>这些文件配置了 systemd 登录管理器 systemd-logind.service(8) 的各种参数。语法的一般描述见 systemd.syntax(7)。</p>
+<h2 id="配置目录和优先级">配置目录和优先级</h2>
+<p>默认配置是在编译过程中设置的，所以只有在需要更改这些默认值时才需要配置。最初，<code>/etc/systemd/</code>中的主配置文件包含已注释的条目，显示为默认值，这些默认值作为管理员的配置指南。可以通过编辑该文件或创建drop-ins来进行本地重写，如下所述。建议使用drop-ins进行本地配置，而不是修改主配置文件（drop-ins指的是对下面的conf文件进行删除和插入，而不去影响主要的文件）。</p>
+<p>除了 &ldquo;mian &ldquo;配置文件外，还可从<code>/usr/lib/systemd/*.conf.d/</code><em>、</em><code>/usr/local/lib/systemd/*.conf.d/</code>和<code>/etc/systemd/*.conf.d/</code>读取插入式配置片段。这些结尾为d的文件夹具有更高的优先权，并凌驾于主配置文件之上。<em>在</em><code>*.conf.d/</code>配置子目录中的文件，无论在哪个子目录中，都会按文件名以词法顺序排序。当多个文件指定相同的选项时，对于只接受一个值的选项，<strong>最后排序的文件中的条目优先</strong>，而对于接受一个值列表的选项，条目按照文件排序进行添加。</p>
+<p>当软件包需要用户定制配置时，它们可以在<code>/usr/</code>下安装drop-ins。<code>/etc/</code>中的文件是为本地管理员（root用户）保留的，他可以使用这个逻辑来覆盖供应商软件包所安装的配置文件。Drop-ins必须用来覆盖软件包的drop-ins，因为主配置文件的优先级较低。建议在这些子目录中的所有文件名前加一个两位数的数字和一个破折号前缀，以简化文件的排序。</p>
+<p>要禁用供应商提供的配置文件，推荐的方法是在/etc/的配置目录中放置一个指向/dev/null的符号链接，其文件名与供应商的配置文件相同。</p>
+<h2 id="选项">选项</h2>
+<p>所有的选项都是在[Login]部分配置的。</p>
+<ul>
+<li>
+<p><code>NAutoVTs=</code> 取一个正整数。配置默认分配多少个虚拟终端（VT），当切换到之前未使用的虚拟终端时，&ldquo;autovt &ldquo;服务会自动生成。这些服务是由模板单元autovt@.service为各自的VT TTY名称实例化的，例如，autovt@tty4.service。默认情况下，autovt@.service被链接到getty@.service。换句话说，当用户切换到未使用的虚拟终端时，登录提示会动态地启动。因此，这个参数控制了VT上有多少个登录 &ldquo;gettys &ldquo;可用。如果一个VT已经被其他子系统使用（例如，图形登录），这种激活将不会被尝试。请注意，在<code>ReserveVT=</code>中配置的VT总是受到这种激活的影响，即使它不是用NAutoVTs=指令配置的VT之一。默认为6。当设置为0时，&ldquo;autovt &ldquo;服务的自动生成被禁用。</p>
+</li>
+<li>
+<p><code>ReserveVT=</code> 取一个正整数。指定一个虚拟终端，该终端应无条件地保留给autovt@.server激活（见上文）。用这个选项选择的VT将被无条件地标记为繁忙，因此没有其他子系统会分配它。这个功能很有用，可以确保无论其他子系统分配了多少个VT，总有一个登录 &ldquo;getty&quot;可用。默认为6（换句话说，Alt-F6上永远有一个 &ldquo;getty &ldquo;可用，getty详情见：<a href="https://wiki.archlinux.org/title/Getty_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)" title="Archwiki">Archwiki</a>。） 当设置为0时，VT保留被禁用。</p>
+</li>
+<li>
+<p><code>KillUserProcesses=</code>接受一个布尔参数。配置当用户注销时是否应该杀死该用户的进程。如果为真，与会话对应的作用域单元和该作用域内的所有进程将被终止。如果为 &ldquo;false&rdquo;，则该作用域被 &ldquo;抛弃&rdquo;，参见systemd.scope(5)，进程不被杀死。默认为 &ldquo;true&rdquo;，但可参考下面的KillOnlyUsers=和KillExcludeUsers=选项。</p>
+<p>除了会话进程外，用户进程还可以在用户管理单元user@.service下运行。根据linger的设置，这可能允许用户运行独立于其登录会话的进程。参见loginctl(1)中关于enable-linger的描述。</p>
+<p>注意，设置<code>KillUserProcesses=yes</code>会破坏screen(1)和tmux(1)等工具，除非它们被移出会话范围。见systemd-run(1)中的例子。</p>
+</li>
+<li>
+<p><code>KillOnlyUsers=</code>,<code>KillExcludeUsers=</code>这些设置采用空格分隔的用户名列表，覆盖 <code>KillUserProcesses=</code> 设置。一个用户名可以被添加到<code>KillExcludeUsers=</code>中，以排除该用户会话作用域中的进程被杀，即使<code>KillUserProcesses=yes</code>被设置。如果KillExcludeUsers=没有被设置，&ldquo;root &ldquo;用户被默认排除在外。<code>KillExcludeUsers=</code>可以被设置为一个空值来覆盖这个默认值。如果一个用户没有被排除，接下来会检查<code>KillOnlyUsers=</code>。如果指定了这个设置，只有这些用户的会话作用域中的进程将被杀死。否则，用户将受到<code>KillUserProcesses=yes</code>设置的影响。</p>
+</li>
+<li>
+<p><code>IdleAction=</code>配置系统空闲时采取的行动。从 &ldquo;ignore&rdquo;、&ldquo;poweroff&rdquo;、&ldquo;reboot&rdquo;、&ldquo;halt&rdquo;、&ldquo;kexec&rdquo;（见<a href="https://wiki.archlinux.org/title/Kexec" title="Archwiki">Archwiki</a>）、&ldquo;suspend&rdquo;、&ldquo;hibernate&rdquo;、&ldquo;hybrid-sleep&rdquo;、&ldquo;suspend-then-hibernate&quot;和 &ldquo;lock&quot;中选择一项。默认为 &ldquo;ignore&rdquo;。</p>
+<p>注意，这需要用户会话正确地向系统报告空闲状态。系统将在所有会话报告他们是空闲的，没有空闲抑制锁处于活动状态，随后，<code>IdleActionSec=</code>（见下文）配置的时间已过后执行该动作。</p>
+</li>
+<li>
+<p><code>IdleActionSec=</code>配置系统空闲后采取<code>IdleAction=</code>（见上文）中配置的动作的延迟</p>
+</li>
+<li>
+<p><code>InhibitDelayMaxSec=</code>指定由于 &ldquo;delay &ldquo;类型的抑制器锁处于活动状态而延迟系统关闭或睡眠请求的最大时间，然后该抑制器被忽略，操作仍然执行。默认值为5。</p>
+</li>
+<li>
+<p><code>UserStopDelaySec=</code>指定在用户完全注销后为其保留用户记录和每个用户服务user@.service的时间。如果设置为0，当用户的最后一个会话结束后，每个用户的服务会立即终止。如果这个选项被配置为非零，快速注销/登录周期就会加快，因为用户的服务管理器不会被不断重启。如果设置为 &ldquo;无穷大&rdquo;，用户的每个用户服务在第一次登录后就不会再终止，而是继续运行直到系统关闭。默认值为10s。</p>
+</li>
+<li>
+<p><code>HandlePowerKey=</code>, <code>HandlePowerKeyLongPress=</code>,<code>HandleRebootKey=</code>, <code>HandleRebootKeyLongPress=</code>,<code>HandleSuspendKey=</code>, <code>HandleSuspendKeyLongPress=</code>,<code>HandleHibernateKey=</code>, <code>HandleHibernateKeyLongPress=</code>,<code>HandleLidSwitch=</code>, <code>HandleLidSwitchExternalPower=</code>,<code>HandleLidSwitchDocked=</code> 控制logind如何处理系统电源、重启和睡眠键，以及触发系统断电、重启或暂停等动作的盖子开关。可以是 &ldquo;忽略&rdquo;、&ldquo;关机&rdquo;、&ldquo;重启&rdquo;、&ldquo;停止&rdquo;、&ldquo;kexec&rdquo;、&ldquo;暂停&rdquo;、&ldquo;休眠&rdquo;、&ldquo;混合睡眠&rdquo;、&ldquo;暂停-休眠&rdquo;、&ldquo;锁定&rdquo;、&ldquo;工厂复位 &ldquo;中的一个。如果是 &ldquo;忽略&rdquo;，systemd-logind就不会处理这些键。如果是 &ldquo;锁定&rdquo;，所有正在运行的会话将被锁屏；否则，将在相应的事件中采取指定的行动。只有带有 &ldquo;power-switch &ldquo;udev标签的输入设备才会被观察到按键/盖板切换事件。</p>
+<ul>
+<li><code>HandlePowerKey=</code>默认为 &ldquo;关机&rdquo;</li>
+<li><code>HandleRebootKey=</code>默认为 &ldquo;重启&rdquo;</li>
+<li> <code>HandleSuspendKey=</code>默认为 &ldquo;暂停&rdquo;,</li>
+<li><code>HandleHibernateKey=</code>默认为 &ldquo;休眠&rdquo;</li>
+<li><code>HandlePowerKeyLongPress=</code>默认为 &ldquo;忽略&rdquo;</li>
+<li><code>HandleRebootKeyLongPress=</code>默认为 &ldquo;断电&rdquo;</li>
+<li><code>HandleSuspendKeyLongPress=</code>默认为 &ldquo;休眠&rdquo;</li>
+<li><code>HandleHibernateKeyLongPress=默认为 &quot;忽略&quot;</code></li>
+<li><code>HandleLidSwitch=</code>默认为 &ldquo;暂停&rdquo;</li>
+<li><code>HandleLidSwitchExternalPower=</code>默认情况下完全忽略（为了向后兼容）&ndash;在它被用来决定行为之前必须设置一个明确的值。</li>
+<li><code>HandleLidSwitchDocked=</code>默认为 &ldquo;忽略&rdquo;。如果系统被插入拓展坞，或者连接了一个以上的显示器，就会发生<code>HandleLidSwitchDocked=</code>指定的动作；如果系统处于外部电源上，就会发生<code>HandleLidSwitchExternalPower=</code>指定的动作（如果有）；否则就会发生<code>HandleLidSwitch=</code>动作。
+不同的应用程序可以通过采取低级别的抑制锁（&ldquo;handle-power-key&rdquo;、&ldquo;handle-suspend-key&rdquo;、&ldquo;handle-hibernate-key&rdquo;、&ldquo;handle-lid-switch&rdquo;、&ldquo;handle-reboot-key&rdquo;）来禁用logind对系统电源和睡眠键及盖子开关的处理。这是图形化桌面环境最常使用的，用来接管暂停和休眠处理，并使用他们自己的配置机制。如果采取了低级别的抑制锁，当该键或开关被触发时，logind不会采取任何行动，<code>Handle*=</code>设置也就不重要了。</li>
+</ul>
+</li>
+<li>
+<p><code>PowerKeyIgnoreInhibited=</code>,<code>SuspendKeyIgnoreInhibited=</code>,<code>HibernateKeyIgnoreInhibited=</code>, <code>LidSwitchIgnoreInhibited=</code>,<code>RebootKeyIgnoreInhibited=</code>
+控制systemd-logind在电源键、重启键、休眠键和盖子开关被触发时采取的行动是否受制于高级抑制锁（&ldquo;关闭&rdquo;、&ldquo;重启&rdquo;、&ldquo;休眠&rdquo;、&ldquo;空闲&rdquo;）。低级抑制器锁（&ldquo;handle-power-key&rdquo;, &ldquo;handle-suspend-key&rdquo;, &ldquo;handle-hibernate-key&rdquo;, &ldquo;handle-lid-switch&rdquo;, &ldquo;handle-reboot-key&rdquo;），无论这个设置如何，都会不会被忽略。</p>
+<p>这些设置的参数是布尔值。如果是 &ldquo;no&rdquo;，应用程序所采取的抑制锁将不会被忽略。如果 &ldquo;yes&rdquo;，&ldquo;关机&rdquo;、&ldquo;重启&rdquo;、&ldquo;睡眠 &ldquo;和 &ldquo;空闲 &ldquo;抑制器锁被忽略。
+<code>PowerKeyIgnoreInhibited=</code>, <code>SuspendKeyIgnoreInhibited=</code>, <code>HibernateKeyIgnoreInhibited=</code> 和 <code>RebootKeyIgnoreInhibited=</code> 默认为 &ldquo;no&rdquo;。<code>LidSwitchIgnoreInhibited=</code>默认为 &ldquo;yes&rdquo;。这意味着当systemd-logind自己处理事件时（没有低级别的抑制器锁被其他应用程序占用），盖子开关默认忽略暂停抑制器，但电源和睡眠键会不忽略。</p>
+</li>
+<li>
+<p><code>HoldoffTimeoutSec=</code>指定系统启动或恢复后，systemd暂不对lid事件做出反应的时间段。这是为了让系统正确检测任何热插拔设备，以便在连接了外部显示器或底座（拓展坞）的情况下，systemd可以忽略lid事件。如果设置为0，systemd会立即做出反应，可能在内核完全探测到所有热拔插设备之前。这很安全，只要你不关心systemd对系统关闭时被插拔的设备的处理。默认值为30秒。</p>
+</li>
+<li>
+<p><code>RuntimeDirectoryInodesMax=</code>设置每个登录用户的<code>$XDG_RUNTIME_DIR</code>运行时目录的大小限制。取一个以字节为单位的大小，可选择以通常的K、G、M和T为后缀，以1024为基准（IEC）。另外，也可以指定一个以&rdquo;%&ldquo;为后缀的数字百分比，它设定了相对于物理RAM量的大小限制。默认值是10%。注意，这个大小只是一个安全限制。由于每个运行时目录是一个tmpfs文件系统，它只消耗所需的内存</p>
+</li>
+<li>
+<p><code>InhibitorsMax=</code>控制允许的最大并发抑制器数量。默认为8192（8K）</p>
+</li>
+<li>
+<p><code>SessionsMax=</code>控制要管理的并发用户会话的最大数量。默认值为8192（8K）。根据PAM堆栈配置中的pam_systemd.so模块，进一步的登录会话将被拒绝，或者允许但不被systemd-logind跟踪</p>
+</li>
+<li>
+<p><code>RemoveIPC=</code>控制当用户完全注销时，属于该用户的System V和POSIX IPC对象是否会被删除。接受一个布尔参数。如果启用，在用户的最后一个会话结束后，用户就不能再消耗IPC资源。这包括System V信号、共享内存和消息队列，以及POSIX共享内存和消息队列。请注意，根用户和其他系统用户的IPC对象不受此设置的影响。默认值为 &ldquo;yes&rdquo;</p>
+</li>
+</ul>
+
+        </div>
+    </article>
+
+    
+    <aside class="post-toc">
+        <div class="post-toc-inner">
+            <p class="post-toc-title">目录</p>
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#名称">名称</a></li>
+    <li><a href="#简介">简介</a></li>
+    <li><a href="#描述">描述</a></li>
+    <li><a href="#配置目录和优先级">配置目录和优先级</a></li>
+    <li><a href="#选项">选项</a></li>
+  </ul>
+</nav>
+        </div>
+    </aside>
+    
+</section>
+
+    </main>
+
+    <footer class="site-footer">
+        <a class="footer-github" href="https://github.com/xzl01" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 .5A11.5 11.5 0 0 0 .5 12.27a11.8 11.8 0 0 0 7.86 11.3c.58.11.8-.26.8-.57v-2.02c-3.2.72-3.88-1.58-3.88-1.58-.53-1.38-1.3-1.75-1.3-1.75-1.06-.75.08-.74.08-.74 1.18.09 1.79 1.25 1.79 1.25 1.05 1.86 2.75 1.32 3.42 1 .11-.78.41-1.32.74-1.62-2.55-.3-5.24-1.31-5.24-5.85 0-1.29.45-2.35 1.2-3.18-.12-.3-.52-1.52.11-3.17 0 0 .98-.32 3.2 1.21a10.86 10.86 0 0 1 5.83 0c2.22-1.53 3.2-1.21 3.2-1.21.63 1.65.23 2.87.11 3.17.75.83 1.2 1.89 1.2 3.18 0 4.56-2.69 5.55-5.25 5.84.42.37.79 1.09.79 2.2V23c0 .31.21.68.8.57a11.8 11.8 0 0 0 7.85-11.3A11.5 11.5 0 0 0 12 .5Z"/>
+            </svg>
+        </a>
+        <p>&copy; 2026 HarryLoong</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="/js/site.js"></script>
+</body>
+</html>

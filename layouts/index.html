@@ -18,17 +18,27 @@
 
 <section class="home-intro reveal">
     <p class="home-label">Home</p>
-    <h2>简洁、稳定、持续更新</h2>
-    <p>这里按两条主线组织内容：博客记录技术实践，图库记录摄影作品。</p>
+    <h2>技术写作与摄影记录，共用一套更克制的首页结构。</h2>
+    <p>博客整理长期有效的工程经验，图库保留观察与取景的节奏，两者并列，不互相附属。</p>
 </section>
 
 <section class="home-channel-stack">
     <article class="home-channel-card reveal">
-        <div class="home-channel-media home-channel-media-blog" aria-hidden="true"></div>
+        <div class="home-channel-media home-channel-media-blog" aria-hidden="true">
+            <div class="home-channel-orb home-channel-orb-a"></div>
+            <div class="home-channel-orb home-channel-orb-b"></div>
+            <div class="home-channel-grid"></div>
+        </div>
         <div class="home-channel-body">
             <p class="home-label">Blog</p>
             <h3>技术博客</h3>
-            <p>Linux、系统维护、工程实践与排障记录。</p>
+            <p>Linux、系统维护、工程实践与排障记录，偏长期可复用的技术内容。</p>
+            {{ with index ($posts.ByDate.Reverse) 0 }}
+            <div class="home-channel-note">
+                <span>最近更新</span>
+                <strong>{{ .Title }}</strong>
+            </div>
+            {{ end }}
             <a class="home-channel-link" href="/blog/">进入博客</a>
         </div>
     </article>
@@ -38,12 +48,19 @@
             <img class="home-channel-image" src="/gallery/{{ $latestGallery }}" alt="摄影图库封面" loading="lazy">
         </a>
         {{ else }}
-        <div class="home-channel-media home-channel-media-gallery" aria-hidden="true"></div>
+        <div class="home-channel-media home-channel-media-gallery" aria-hidden="true">
+            <div class="home-channel-orb home-channel-orb-c"></div>
+            <div class="home-channel-orb home-channel-orb-d"></div>
+        </div>
         {{ end }}
         <div class="home-channel-body">
             <p class="home-label">Gallery</p>
             <h3>摄影图库</h3>
-            <p>一个大图入口，向下延展为持续更新的信息流。</p>
+            <p>以大图作为入口，下方延展为作品信息流，适合持续追加新的拍摄内容。</p>
+            <div class="home-channel-note">
+                <span>展示方式</span>
+                <strong>精选大图 + 顺序信息流</strong>
+            </div>
             <a class="home-channel-link" href="/gallery/">进入图库</a>
         </div>
     </article>
@@ -57,7 +74,10 @@
     <ul class="home-recent-list">
         {{ range first 6 ($posts.ByDate.Reverse) }}
         <li>
-            <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+            <div class="home-recent-copy">
+                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                <p>{{ with .Description }}{{ . | truncate 68 }}{{ else }}{{ .Summary | plainify | truncate 68 }}{{ end }}</p>
+            </div>
             <span>{{ .Date.Format "2006-01-02" }}</span>
         </li>
         {{ end }}

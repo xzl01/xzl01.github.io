@@ -1,138 +1,19 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>鼠标 on HarryLoong's Blog</title><link>https://xzl01.github.io/tags/%E9%BC%A0%E6%A0%87/</link><description>Recent content in 鼠标 on HarryLoong's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Mon, 02 Mar 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://xzl01.github.io/tags/%E9%BC%A0%E6%A0%87/index.xml" rel="self" type="application/rss+xml"/><item><title>Linux 下罗技键鼠配置指南 - logiops 使用教程</title><link>https://xzl01.github.io/blog/logitech-linux-config-guide/</link><pubDate>Mon, 02 Mar 2026 00:00:00 +0000</pubDate><guid>https://xzl01.github.io/blog/logitech-linux-config-guide/</guid><description>&lt;h1 id="linux-下罗技键鼠配置指南"&gt;Linux 下罗技键鼠配置指南&lt;/h1&gt;
-&lt;blockquote&gt;
-&lt;p&gt;本文将详细介绍如何在 Linux 上配置罗技鼠标/键盘，包含 logiops 驱动的安装、键位映射和调试方法。&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;hr&gt;
-&lt;h2 id="前置知识设备控制-id"&gt;前置知识：设备控制 ID&lt;/h2&gt;
-&lt;p&gt;在配置之前，需要了解罗技设备的控件 ID。以下是常用的控制 ID 表格：&lt;/p&gt;
-&lt;h3 id="鼠标按钮"&gt;鼠标按钮&lt;/h3&gt;
-&lt;table&gt;
- &lt;thead&gt;
- &lt;tr&gt;
- &lt;th&gt;控件 ID&lt;/th&gt;
- &lt;th&gt;功能&lt;/th&gt;
- &lt;/tr&gt;
- &lt;/thead&gt;
- &lt;tbody&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x0050&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;鼠标左键&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x0051&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;鼠标右键&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x0052&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;鼠标中键 / 手势按钮&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x0053&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;前进按钮&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x0054&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;后退按钮&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x0056&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;侧边前进&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x0057&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;侧边后退&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x005b&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;向左滚动&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x005d&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;向右滚动&lt;/td&gt;
- &lt;/tr&gt;
- &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h3 id="系统功能键"&gt;系统功能键&lt;/h3&gt;
-&lt;table&gt;
- &lt;thead&gt;
- &lt;tr&gt;
- &lt;th&gt;控件 ID&lt;/th&gt;
- &lt;th&gt;功能&lt;/th&gt;
- &lt;/tr&gt;
- &lt;/thead&gt;
- &lt;tbody&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x006e&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;显示桌面&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x006f&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;锁定屏幕&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x0090&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;最小化&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x0091&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;最大化&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x00ba&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;切换应用&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x00e0&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;任务视图&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x00e1&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;操作中心&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x00c3&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;手势按钮&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x00c4&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;智能切换&lt;/td&gt;
- &lt;/tr&gt;
- &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h3 id="媒体控制键"&gt;媒体控制键&lt;/h3&gt;
-&lt;table&gt;
- &lt;thead&gt;
- &lt;tr&gt;
- &lt;th&gt;控件 ID&lt;/th&gt;
- &lt;th&gt;功能&lt;/th&gt;
- &lt;/tr&gt;
- &lt;/thead&gt;
- &lt;tbody&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x00e4&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;上一曲目&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x00e5&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;播放/暂停&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x00e6&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;下一曲目&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x00e7&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;静音&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x00e8&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;降低音量&lt;/td&gt;
- &lt;/tr&gt;
- &lt;tr&gt;
- &lt;td&gt;&lt;code&gt;0x00e9&lt;/code&gt;&lt;/td&gt;
- &lt;td&gt;增加音量&lt;/td&gt;
- &lt;/tr&gt;
- &lt;/tbody&gt;
-&lt;/table&gt;
-&lt;blockquote&gt;
-&lt;p&gt;📋 完整键码列表请参考：&lt;a href="https://github.com/torvalds/linux/blob/master/include/uapi/linux/input-event-codes.h"&gt;linux/input-event-codes.h&lt;/a&gt;&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>鼠标 on HarryLoong&#39;s Blog</title>
+    <link>http://localhost:1313/tags/%E9%BC%A0%E6%A0%87/</link>
+    <description>Recent content in 鼠标 on HarryLoong&#39;s Blog</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 02 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/%E9%BC%A0%E6%A0%87/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Linux 下罗技键鼠配置指南 - logiops 使用教程</title>
+      <link>http://localhost:1313/blog/logitech-linux-config-guide/</link>
+      <pubDate>Mon, 02 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/logitech-linux-config-guide/</guid>
+      <description>&lt;h1 id=&#34;linux-下罗技键鼠配置指南&#34;&gt;Linux 下罗技键鼠配置指南&lt;/h1&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;本文将详细介绍如何在 Linux 上配置罗技鼠标/键盘，包含 logiops 驱动的安装、键位映射和调试方法。&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;前置知识设备控制-id&#34;&gt;前置知识：设备控制 ID&lt;/h2&gt;&#xA;&lt;p&gt;在配置之前，需要了解罗技设备的控件 ID。以下是常用的控制 ID 表格：&lt;/p&gt;&#xA;&lt;h3 id=&#34;鼠标按钮&#34;&gt;鼠标按钮&lt;/h3&gt;&#xA;&lt;table&gt;&#xA;  &lt;thead&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;th&gt;控件 ID&lt;/th&gt;&#xA;          &lt;th&gt;功能&lt;/th&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/thead&gt;&#xA;  &lt;tbody&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x0050&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;鼠标左键&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x0051&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;鼠标右键&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x0052&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;鼠标中键 / 手势按钮&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x0053&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;前进按钮&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x0054&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;后退按钮&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x0056&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;侧边前进&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x0057&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;侧边后退&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x005b&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;向左滚动&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x005d&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;向右滚动&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;h3 id=&#34;系统功能键&#34;&gt;系统功能键&lt;/h3&gt;&#xA;&lt;table&gt;&#xA;  &lt;thead&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;th&gt;控件 ID&lt;/th&gt;&#xA;          &lt;th&gt;功能&lt;/th&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/thead&gt;&#xA;  &lt;tbody&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x006e&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;显示桌面&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x006f&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;锁定屏幕&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x0090&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;最小化&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x0091&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;最大化&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x00ba&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;切换应用&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x00e0&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;任务视图&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x00e1&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;操作中心&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x00c3&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;手势按钮&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x00c4&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;智能切换&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;h3 id=&#34;媒体控制键&#34;&gt;媒体控制键&lt;/h3&gt;&#xA;&lt;table&gt;&#xA;  &lt;thead&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;th&gt;控件 ID&lt;/th&gt;&#xA;          &lt;th&gt;功能&lt;/th&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/thead&gt;&#xA;  &lt;tbody&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x00e4&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;上一曲目&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x00e5&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;播放/暂停&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x00e6&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;下一曲目&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x00e7&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;静音&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x00e8&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;降低音量&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td&gt;&lt;code&gt;0x00e9&lt;/code&gt;&lt;/td&gt;&#xA;          &lt;td&gt;增加音量&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/tbody&gt;&#xA;&lt;/table&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;📋 完整键码列表请参考：&lt;a href=&#34;https://github.com/torvalds/linux/blob/master/include/uapi/linux/input-event-codes.h&#34;&gt;linux/input-event-codes.h&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

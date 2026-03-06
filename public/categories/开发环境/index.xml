@@ -1,16 +1,19 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>开发环境 on HarryLoong's Blog</title><link>https://xzl01.github.io/categories/%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/</link><description>Recent content in 开发环境 on HarryLoong's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Wed, 04 Mar 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://xzl01.github.io/categories/%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/index.xml" rel="self" type="application/rss+xml"/><item><title>64位主机进入ARM/32位rootfs的chroot配置指南</title><link>https://xzl01.github.io/blog/chroot-cross-architecture/</link><pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate><guid>https://xzl01.github.io/blog/chroot-cross-architecture/</guid><description>&lt;h1 id="64位主机进入arm32位rootfs的chroot配置指南"&gt;64位主机进入ARM/32位rootfs的chroot配置指南&lt;/h1&gt;
-&lt;p&gt;在 64 位主机上使用 chroot 进入一个为不同架构（如 ARM 或 32 位 i386）准备的根文件系统（rootfs）时，为了确保环境能正常工作，必须正确挂载一系列虚拟文件系统。&lt;/p&gt;
-&lt;h2 id="1-挂载核心虚拟文件系统"&gt;1. 挂载核心虚拟文件系统&lt;/h2&gt;
-&lt;p&gt;在 chroot 之前，必须将宿主机的几个关键虚拟文件系统绑定挂载到目标 rootfs 的对应目录下。这是为了让 chroot 环境内的进程能够访问设备、进程信息和系统信息等核心资源。&lt;/p&gt;
-&lt;h3 id="proc---进程信息文件系统"&gt;/proc - 进程信息文件系统&lt;/h3&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo mount -t proc /proc /path/to/rootfs/proc
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 或使用 --bind 选项&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo mount --bind /proc /path/to/rootfs/proc
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="sys---系统内核信息"&gt;/sys - 系统内核信息&lt;/h3&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo mount -t sysfs /sys /path/to/rootfs/sys
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 或&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo mount --bind /sys /path/to/rootfs/sys
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="dev---设备文件系统"&gt;/dev - 设备文件系统&lt;/h3&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo mount --bind /dev /path/to/rootfs/dev
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id="devpts---伪终端支持"&gt;/dev/pts - 伪终端支持&lt;/h3&gt;
-&lt;p&gt;这是 &lt;code&gt;/dev&lt;/code&gt; 下的一个特殊目录，用于伪终端支持，对于运行 bash 等 Shell 是必要的：&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>开发环境 on HarryLoong&#39;s Blog</title>
+    <link>http://localhost:1313/categories/%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/</link>
+    <description>Recent content in 开发环境 on HarryLoong&#39;s Blog</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 04 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/categories/%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>64位主机进入ARM/32位rootfs的chroot配置指南</title>
+      <link>http://localhost:1313/blog/chroot-cross-architecture/</link>
+      <pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/chroot-cross-architecture/</guid>
+      <description>&lt;h1 id=&#34;64位主机进入arm32位rootfs的chroot配置指南&#34;&gt;64位主机进入ARM/32位rootfs的chroot配置指南&lt;/h1&gt;&#xA;&lt;p&gt;在 64 位主机上使用 chroot 进入一个为不同架构（如 ARM 或 32 位 i386）准备的根文件系统（rootfs）时，为了确保环境能正常工作，必须正确挂载一系列虚拟文件系统。&lt;/p&gt;&#xA;&lt;h2 id=&#34;1-挂载核心虚拟文件系统&#34;&gt;1. 挂载核心虚拟文件系统&lt;/h2&gt;&#xA;&lt;p&gt;在 chroot 之前，必须将宿主机的几个关键虚拟文件系统绑定挂载到目标 rootfs 的对应目录下。这是为了让 chroot 环境内的进程能够访问设备、进程信息和系统信息等核心资源。&lt;/p&gt;&#xA;&lt;h3 id=&#34;proc---进程信息文件系统&#34;&gt;/proc - 进程信息文件系统&lt;/h3&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo mount -t proc /proc /path/to/rootfs/proc&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 或使用 --bind 选项&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo mount --bind /proc /path/to/rootfs/proc&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;sys---系统内核信息&#34;&gt;/sys - 系统内核信息&lt;/h3&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo mount -t sysfs /sys /path/to/rootfs/sys&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 或&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo mount --bind /sys /path/to/rootfs/sys&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;dev---设备文件系统&#34;&gt;/dev - 设备文件系统&lt;/h3&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo mount --bind /dev /path/to/rootfs/dev&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;devpts---伪终端支持&#34;&gt;/dev/pts - 伪终端支持&lt;/h3&gt;&#xA;&lt;p&gt;这是 &lt;code&gt;/dev&lt;/code&gt; 下的一个特殊目录，用于伪终端支持，对于运行 bash 等 Shell 是必要的：&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
