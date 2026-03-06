@@ -78,7 +78,7 @@
                 <a href="{{ .RelPermalink }}">{{ .Title }}</a>
                 <p>{{ with .Description }}{{ . | truncate 68 }}{{ else }}{{ .Summary | plainify | truncate 68 }}{{ end }}</p>
             </div>
-            <span>{{ .Date.Format "2006-01-02" }}</span>
+            <span>{{ partial "post-time.html" . }}</span>
         </li>
         {{ end }}
     </ul>

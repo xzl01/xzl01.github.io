@@ -9,7 +9,7 @@
             {{ end }}
 
             <div class="post-meta">
-                <span>{{ .Date.Format "2006-01-02" }}</span>
+                <span>{{ partial "post-time.html" . }}</span>
                 <span>·</span>
                 <span>{{ .ReadingTime }} 分钟阅读</span>
                 {{ with .Params.categories }}
@@ -21,7 +21,7 @@
             {{ with .Params.tags }}
             <div class="tag-list post-tags">
                 {{ range . }}
-                <span class="tag">{{ . }}</span>
+                <a class="tag" href="{{ (printf "/tags/%s/" (. | urlize)) | relURL }}">{{ . }}</a>
                 {{ end }}
             </div>
             {{ end }}

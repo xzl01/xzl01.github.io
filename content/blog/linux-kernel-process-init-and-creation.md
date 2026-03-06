@@ -1,6 +1,6 @@
 ---
 title: "Linux 内核中的进程初始化与创建"
-date: 2026-03-06
+date: 2026-03-06T10:40:00+08:00
 description: "从调度器和 task_struct 出发，梳理 Linux 早期内核中的进程初始化、创建与状态组织方式。"
 categories: ["Linux系统", "系统原理"]
 tags: ["Linux", "内核", "进程管理", "调度器"]

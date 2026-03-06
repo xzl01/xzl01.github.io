@@ -1,6 +1,6 @@
 ---
 title: ".desktop 文件规范解读"
-date: 2026-03-06
+date: 2026-03-06T12:00:00+08:00
 description: "整理 .desktop 文件的命名、ID、分组、键类型和国际化规则，帮助理解 Linux 桌面条目的基础约定。"
 categories: ["Linux系统", "规范标准"]
 tags: ["Linux", "Desktop Entry", "FreeDesktop", "XDG"]

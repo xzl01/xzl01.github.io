@@ -614,12 +614,23 @@ body[data-theme="midnight"] {
 }
 
 .tag {
+  display: inline-flex;
+  align-items: center;
   padding: 0.2rem 0.62rem;
   border-radius: 999px;
   font-size: 0.76rem;
   background: linear-gradient(135deg, rgba(180, 83, 9, 0.12), rgba(15, 118, 110, 0.12));
   color: var(--brand-2);
   border: 1px solid rgba(15, 118, 110, 0.2);
+  text-decoration: none;
+  transition: transform 180ms ease, border-color 180ms ease, color 180ms ease, background 180ms ease;
+}
+
+.tag:hover {
+  transform: translateY(-1px);
+  color: var(--brand);
+  border-color: rgba(180, 83, 9, 0.28);
+  background: linear-gradient(135deg, rgba(180, 83, 9, 0.16), rgba(15, 118, 110, 0.16));
 }
 
 .single-post {
@@ -1624,6 +1635,14 @@ body[data-theme="midnight"] {
   text-align: center;
   color: var(--muted);
   padding: 1.4rem 0 2rem;
+}
+
+.footer-meta {
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  opacity: 0.92;
 }
 
 .footer-github {

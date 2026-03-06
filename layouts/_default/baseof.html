@@ -2,6 +2,9 @@
 <html lang="zh-CN">
 <head>
     {{ $assetVersion := now.Unix }}
+    {{ $fullCommit := getenv "HUGO_GIT_COMMIT_SHA" }}
+    {{ $commitShort := cond (gt (len $fullCommit) 7) (substr $fullCommit 0 7) $fullCommit }}
+    {{ $buildTime := now.Format "2006-01-02 15:04:05 -0700" }}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} - {{ .Site.Title }}{{ end }}</title>
@@ -66,6 +69,7 @@
             </svg>
         </a>
         <p>&copy; 2026 HarryLoong</p>
+        <p class="footer-meta">commit {{ if $commitShort }}{{ $commitShort }}{{ else }}local{{ end }} · updated {{ $buildTime }}</p>
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

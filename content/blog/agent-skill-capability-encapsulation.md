@@ -1,6 +1,6 @@
 ---
 title: "Agent Skill：把人的可执行能力封装给 AI Agent"
-date: 2026-03-06
+date: 2026-03-06T16:10:00+08:00
 description: "Skill 本质上是对一项可重复能力的封装。更理想的方式不是由人直接编写 skill，而是先教会 AI 做事，再由 AI 自己总结成 skill 并持续微调。"
 categories: ["AI Agent", "工程实践"]
 tags: ["AI Agent", "Skill", "自动化", "工作流"]

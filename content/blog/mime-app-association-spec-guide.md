@@ -1,6 +1,6 @@
 ---
 title: "MIME 类型与应用程序关联规范解读"
-date: 2026-03-06
+date: 2026-03-06T10:00:00+08:00
 description: "围绕 mimeapps.list 的查找顺序、默认应用规则和关联增删算法，整理 Linux 桌面环境中的 MIME 关联机制。"
 categories: ["Linux系统", "规范标准"]
 tags: ["Linux", "MIME", "FreeDesktop", "XDG"]

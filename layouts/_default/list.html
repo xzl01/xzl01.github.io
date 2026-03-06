@@ -6,13 +6,13 @@
 
 {{ range .Pages.ByDate.Reverse }}
 <article class="post-card reveal">
-    <p class="post-date">{{ .Date.Format "2006-01-02" }}</p>
+    <p class="post-date">{{ partial "post-time.html" . }}</p>
     <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
     <p class="post-desc">{{ with .Description }}{{ . }}{{ else }}{{ .Summary | plainify | truncate 120 }}{{ end }}</p>
     {{ with .Params.tags }}
     <div class="tag-list">
         {{ range . }}
-        <span class="tag">{{ . }}</span>
+        <a class="tag" href="{{ (printf "/tags/%s/" (. | urlize)) | relURL }}">{{ . }}</a>
         {{ end }}
     </div>
     {{ end }}

@@ -10,6 +10,7 @@ This file helps AI agents understand how to maintain this Hugo blog.
 - **Language**: Chinese (zh-cn)
 - **Content Directory**: `content/blog/`
 - **Deployment**: GitHub Pages (GitHub Actions)
+- **Code Highlighting**: highlight.js + local Catppuccin-style colors
 
 ## Key Files
 
@@ -45,8 +46,9 @@ This file helps AI agents understand how to maintain this Hugo blog.
 ```yaml
 ---
 title: "文章标题"
-date: 2026-03-04
+date: 2026-03-06T16:10:00+08:00
 description: "简短描述"
+categories: ["分类1", "分类2"]
 tags: ["标签1", "标签2"]
 ---
 
@@ -73,9 +75,22 @@ git push origin main
 | Field | Required | Description |
 |-------|----------|-------------|
 | title | Yes | 文章标题 |
-| date | Yes | 发布日期 (YYYY-MM-DD) |
+| date | Yes | 发布时间，优先使用完整时间戳 (`YYYY-MM-DDTHH:MM:SS+08:00`) |
 | description | No | 文章描述 |
+| categories | No | 分类数组 |
 | tags | No | 标签数组 |
+
+### Date/Time Policy
+
+- Do **not** default to date-only front matter for newly added or imported posts.
+- Prefer full timestamps so multiple posts on the same day can be sorted correctly.
+- Existing old posts may still use date-only values, but new maintenance work should use full time.
+
+Example:
+
+```yaml
+date: 2026-03-06T16:10:00+08:00
+```
 
 ### Content Structure
 - Use `---` separators for front matter
@@ -86,7 +101,7 @@ git push origin main
 
 ## Code Highlighting
 
-This blog uses highlight.js with github-dark theme.
+This blog uses highlight.js with a local Catppuccin-style theme defined in `static/css/site.css`.
 
 ### Supported Languages
 
@@ -169,6 +184,13 @@ Example:
 ### Add New Category/Tag
 Tags are defined in post front matter. No central config needed.
 
+### Tag Behavior
+
+- Tags shown on article pages must be clickable.
+- Tags shown on list pages should also be clickable when rendered.
+- Clicking a tag should open the corresponding Hugo taxonomy page under `/tags/<tag>/`.
+- Do not render article tags as plain text pills unless there is a deliberate design reason.
+
 ## Layout Files
 
 | File | Purpose |
@@ -177,6 +199,7 @@ Tags are defined in post front matter. No central config needed.
 | `layouts/_default/single.html` | Single post layout |
 | `layouts/_default/list.html` | List page layout |
 | `layouts/_default/baseof.html` | Base template |
+| `layouts/partials/post-time.html` | Shared date/time display formatter |
 
 ## Config.toml Reference
 
@@ -197,6 +220,28 @@ title = "Your Title"
     unsafe = true
 ```
 
+## Current UX Rules
+
+### Footer Build Info
+
+- The footer should display:
+  - current commit short hash
+  - build/update time
+- Local preview may show `commit local`.
+- GitHub Pages production build should inject the real commit hash through GitHub Actions.
+
+### Article Layout
+
+- Article content width should be wider than the default Hugo-like narrow column.
+- The table of contents should sit in the right-side whitespace area instead of shrinking the main reading column.
+- On mobile, the TOC should fall back above the article content.
+
+### Homepage
+
+- Homepage should stay minimal.
+- Blog and gallery are the same priority.
+- Avoid count widgets such as article totals or tag totals unless explicitly requested.
+
 ## For AI Agents
 
 When maintaining this blog:
@@ -208,6 +253,9 @@ When maintaining this blog:
 5. **Commit Messages**: Use descriptive Chinese/English messages
 6. **Images**: Use relative paths in `static/` folder
 7. **Links**: Use absolute paths starting with `/`
+8. **Tags**: Render tags as clickable links to taxonomy pages
+9. **Time**: Prefer full timestamps over date-only values for new posts
+10. **Footer**: Keep commit hash and update time visible in the footer
 
 ## Troubleshooting
 
@@ -223,7 +271,13 @@ When maintaining this blog:
 
 ### Code Not Highlighting
 - Ensure language tag is correct (e.g., ```bash not ```shell)
-- Check config.toml has highlight settings
+- Check `static/css/site.css` for local highlight theme rules
+- Avoid relying on third-party highlight theme CSS
+
+### Remote Page Looks Different From Local
+- Check `.github/workflows/hugo.yml` Hugo version matches local Hugo version
+- Check asset cache busting is still present for `/css/site.css` and `/js/site.js`
+- Check GitHub Actions build actually ran after push
 
 ## Contact
 
@@ -233,7 +287,9 @@ When maintaining this blog:
 ## Import Records
 
 - Import records are stored in `.github/import-records/`.
-- Latest record: `.github/import-records/2026-03-04-w-ktny-import.md`
+- Latest records:
+  - `.github/import-records/2026-03-04-w-ktny-import.md`
+  - `.github/import-records/2026-03-06-w-ktny-import-batch-2.md`
 
 ## Import Cleanup Automation
 

@@ -1,6 +1,6 @@
 ---
 title: "Debian 打包更新带 Patch 的软件包：以 Doxygen 为例"
-date: 2026-03-06
+date: 2026-03-06T11:20:00+08:00
 description: "以 Doxygen 为例，记录 Debian 软件包在存在 patch 的情况下如何完成版本升级、构建排查与 patch 刷新。"
 categories: ["工程实践", "软件打包"]
 tags: ["Debian", "软件打包", "Patch", "Doxygen"]
