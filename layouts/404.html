@@ -1,0 +1,35 @@
+{{ define "main" }}
+<section class="not-found-page reveal">
+  <div class="not-found-terminal" role="status" aria-live="polite">
+    <div class="terminal-bar">
+      <span></span><span></span><span></span>
+      <p>panic://kernel/not-found</p>
+    </div>
+    <div class="terminal-body">
+      <p class="terminal-line"><span class="prompt">$</span> curl -I {{ .Permalink }}</p>
+      <p class="terminal-line terminal-error">HTTP/2 404 Not Found</p>
+      <p class="terminal-line"><span class="prompt">$</span> dmesg | tail -n 2</p>
+      <p class="terminal-line">Kernel Panic, but only for this URL.</p>
+      <p class="terminal-line">Hint: route pointer is null, fallback to known-good entrypoint.</p>
+    </div>
+    <div class="terminal-actions">
+      <a href="/" class="terminal-btn">返回首页</a>
+      <a href="/blog/" class="terminal-btn terminal-btn-alt">进入文章库</a>
+    </div>
+  </div>
+
+  <aside class="not-found-side" aria-label="ASCII penguin">
+    <p class="not-found-side-title">panic witness</p>
+    <pre class="ascii-penguin">
+   .--.
+  |o_o |
+  |:_/ |
+ //   \ \
+(|     | )
+/\'\_   _/`\
+\___)=(___/
+    </pre>
+    <p class="not-found-side-note">tux is shivering while waiting for a valid route...</p>
+  </aside>
+</section>
+{{ end }}

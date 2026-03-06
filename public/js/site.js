@@ -233,7 +233,13 @@
       if (!hash || !hash.startsWith("#")) {
         return;
       }
-      var id = decodeURIComponent(hash.slice(1));
+      var rawId = hash.slice(1);
+      var id = rawId;
+      try {
+        id = decodeURIComponent(rawId);
+      } catch (err) {
+        id = rawId;
+      }
       var target = document.getElementById(id);
       if (target) {
         headingMap.set(target, link);
@@ -252,6 +258,32 @@
       if (link) {
         link.classList.add("active");
       }
+    }
+
+    if ("IntersectionObserver" in window) {
+      var seen = new Map();
+      var io = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            seen.set(entry.target, entry.isIntersecting ? entry.boundingClientRect.top : Infinity);
+          });
+          var visible = Array.from(seen.entries())
+            .filter(function (pair) {
+              return Number.isFinite(pair[1]);
+            })
+            .sort(function (a, b) {
+              return a[1] - b[1];
+            });
+          if (visible.length) {
+            setActive(headingMap.get(visible[0][0]));
+          }
+        },
+        { rootMargin: "-90px 0px -65% 0px", threshold: [0, 1] }
+      );
+
+      headings.forEach(function (h) {
+        io.observe(h);
+      });
     }
 
     function updateActiveByScroll() {
