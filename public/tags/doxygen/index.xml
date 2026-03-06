@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Doxygen on HarryLoong&#39;s Blog</title>
+    <link>http://localhost:1313/tags/doxygen/</link>
+    <description>Recent content in Doxygen on HarryLoong&#39;s Blog</description>
+    <generator>Hugo</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 06 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/doxygen/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Debian 打包更新带 Patch 的软件包：以 Doxygen 为例</title>
+      <link>http://localhost:1313/blog/debian-package-patch-refresh-doxygen/</link>
+      <pubDate>Fri, 06 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/blog/debian-package-patch-refresh-doxygen/</guid>
+      <description>&lt;p&gt;这篇文章记录一次比较典型的发行版维护场景：上游版本已经前进，但发行版的软件包仍停留在旧版本，而且还叠加了一组历史 patch。目标不是“直接升级”，而是先理解已有 patch 的作用，再决定哪些需要刷新、哪些需要保留。&lt;/p&gt;&#xA;&lt;h2 id=&#34;1-软件包背景&#34;&gt;1. 软件包背景&lt;/h2&gt;&#xA;&lt;p&gt;上游地址：&lt;a href=&#34;https://github.com/doxygen/doxygen&#34; title=&#34;https://github.com/doxygen/doxygen&#34;&gt;https://github.com/doxygen/doxygen&lt;/a&gt;&lt;/p&gt;&#xA;&lt;p&gt;Debian打包地址： &lt;a href=&#34;https://packages.debian.org/bookworm/doxygen&#34; title=&#34;https://packages.debian.org/bookworm/doxygen&#34;&gt;https://packages.debian.org/bookworm/doxygen&lt;/a&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;2-分析软件包&#34;&gt;2. 分析软件包&lt;/h2&gt;&#xA;&lt;p&gt;当时的情况是：上游版本已经来到 &lt;code&gt;1.9.6&lt;/code&gt;，而 Debian 打包版本仍停留在 &lt;code&gt;1.9.4&lt;/code&gt;。这意味着如果要基于 Debian 的现有打包成果继续前进，就必须先搞清楚旧版本里那一组 patch 的背景和作用。&lt;/p&gt;&#xA;&lt;h2 id=&#34;3-升级尝试&#34;&gt;3. 升级尝试&lt;/h2&gt;&#xA;&lt;h3 id=&#34;第一次尝试&#34;&gt;第一次尝试：&lt;/h3&gt;&#xA;&lt;p&gt;先把 &lt;code&gt;1.9.4&lt;/code&gt; 中的 &lt;code&gt;debian/&lt;/code&gt; 目录整体迁移到 &lt;code&gt;1.9.6&lt;/code&gt;，并暂时关闭所有 patch（把 &lt;code&gt;series&lt;/code&gt; 重命名为 &lt;code&gt;series.bak&lt;/code&gt;）。&lt;/p&gt;&#xA;&lt;p&gt;然后执行构建：&lt;code&gt;dpkg-buildpackage -us -uc -b&lt;/code&gt;。很快就能发现第一个问题：上游 &lt;code&gt;1.9.6&lt;/code&gt; 调整了依赖文件路径到 &lt;code&gt;./deps/&lt;/code&gt;，因此旧的打包逻辑无法直接复用。&lt;/p&gt;&#xA;&lt;h3 id=&#34;第二次尝试&#34;&gt;第二次尝试：&lt;/h3&gt;&#xA;&lt;p&gt;修改 &lt;code&gt;debian/control&lt;/code&gt; 以及相关构建逻辑，把原先依赖 &lt;code&gt;./deps/&lt;/code&gt; 的部分改成新版本的正确路径。&lt;/p&gt;&#xA;&lt;p&gt;再次构建后仍然失败，问题主要集中在 &lt;code&gt;jquery&lt;/code&gt; 相关的构建文件上。&lt;/p&gt;&#xA;&lt;h3 id=&#34;第三次尝试&#34;&gt;第三次尝试：&lt;/h3&gt;&#xA;&lt;p&gt;继续阅读 Debian 现有的 patch/diff，发现它们本来就对 &lt;code&gt;jquery&lt;/code&gt; 的构建流程做过定制，因此接下来的关键不再是“绕开 patch”，而是把这些 patch 刷新到新目录结构上。&lt;/p&gt;&#xA;&lt;h2 id=&#34;4-更新-patchdiff&#34;&gt;4. 更新 patch/diff&lt;/h2&gt;&#xA;&lt;p&gt;更新 patch 的常见步骤通常是：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;检查patch是否可以被应用：&lt;code&gt;git apply --check &amp;lt;diff name&amp;gt;&lt;/code&gt; &lt;/p&gt;&#xA;&lt;p&gt;我们现在的情况是jquery的文件夹被移动到一个新的目录，所以我们应该对patch的内容进行修改：&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
