@@ -1,26 +1,41 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>工程实践 on HarryLoong&#39;s Blog</title>
-    <link>http://localhost:1313/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/</link>
-    <description>Recent content in 工程实践 on HarryLoong&#39;s Blog</description>
-    <generator>Hugo</generator>
-    <language>zh-cn</language>
-    <lastBuildDate>Fri, 06 Mar 2026 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Debian 打包更新带 Patch 的软件包：以 Doxygen 为例</title>
-      <link>http://localhost:1313/blog/debian-package-patch-refresh-doxygen/</link>
-      <pubDate>Fri, 06 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/debian-package-patch-refresh-doxygen/</guid>
-      <description>&lt;p&gt;这篇文章记录一次比较典型的发行版维护场景：上游版本已经前进，但发行版的软件包仍停留在旧版本，而且还叠加了一组历史 patch。目标不是“直接升级”，而是先理解已有 patch 的作用，再决定哪些需要刷新、哪些需要保留。&lt;/p&gt;&#xA;&lt;h2 id=&#34;1-软件包背景&#34;&gt;1. 软件包背景&lt;/h2&gt;&#xA;&lt;p&gt;上游地址：&lt;a href=&#34;https://github.com/doxygen/doxygen&#34; title=&#34;https://github.com/doxygen/doxygen&#34;&gt;https://github.com/doxygen/doxygen&lt;/a&gt;&lt;/p&gt;&#xA;&lt;p&gt;Debian打包地址： &lt;a href=&#34;https://packages.debian.org/bookworm/doxygen&#34; title=&#34;https://packages.debian.org/bookworm/doxygen&#34;&gt;https://packages.debian.org/bookworm/doxygen&lt;/a&gt;&lt;/p&gt;&#xA;&lt;h2 id=&#34;2-分析软件包&#34;&gt;2. 分析软件包&lt;/h2&gt;&#xA;&lt;p&gt;当时的情况是：上游版本已经来到 &lt;code&gt;1.9.6&lt;/code&gt;，而 Debian 打包版本仍停留在 &lt;code&gt;1.9.4&lt;/code&gt;。这意味着如果要基于 Debian 的现有打包成果继续前进，就必须先搞清楚旧版本里那一组 patch 的背景和作用。&lt;/p&gt;&#xA;&lt;h2 id=&#34;3-升级尝试&#34;&gt;3. 升级尝试&lt;/h2&gt;&#xA;&lt;h3 id=&#34;第一次尝试&#34;&gt;第一次尝试：&lt;/h3&gt;&#xA;&lt;p&gt;先把 &lt;code&gt;1.9.4&lt;/code&gt; 中的 &lt;code&gt;debian/&lt;/code&gt; 目录整体迁移到 &lt;code&gt;1.9.6&lt;/code&gt;，并暂时关闭所有 patch（把 &lt;code&gt;series&lt;/code&gt; 重命名为 &lt;code&gt;series.bak&lt;/code&gt;）。&lt;/p&gt;&#xA;&lt;p&gt;然后执行构建：&lt;code&gt;dpkg-buildpackage -us -uc -b&lt;/code&gt;。很快就能发现第一个问题：上游 &lt;code&gt;1.9.6&lt;/code&gt; 调整了依赖文件路径到 &lt;code&gt;./deps/&lt;/code&gt;，因此旧的打包逻辑无法直接复用。&lt;/p&gt;&#xA;&lt;h3 id=&#34;第二次尝试&#34;&gt;第二次尝试：&lt;/h3&gt;&#xA;&lt;p&gt;修改 &lt;code&gt;debian/control&lt;/code&gt; 以及相关构建逻辑，把原先依赖 &lt;code&gt;./deps/&lt;/code&gt; 的部分改成新版本的正确路径。&lt;/p&gt;&#xA;&lt;p&gt;再次构建后仍然失败，问题主要集中在 &lt;code&gt;jquery&lt;/code&gt; 相关的构建文件上。&lt;/p&gt;&#xA;&lt;h3 id=&#34;第三次尝试&#34;&gt;第三次尝试：&lt;/h3&gt;&#xA;&lt;p&gt;继续阅读 Debian 现有的 patch/diff，发现它们本来就对 &lt;code&gt;jquery&lt;/code&gt; 的构建流程做过定制，因此接下来的关键不再是“绕开 patch”，而是把这些 patch 刷新到新目录结构上。&lt;/p&gt;&#xA;&lt;h2 id=&#34;4-更新-patchdiff&#34;&gt;4. 更新 patch/diff&lt;/h2&gt;&#xA;&lt;p&gt;更新 patch 的常见步骤通常是：&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;检查patch是否可以被应用：&lt;code&gt;git apply --check &amp;lt;diff name&amp;gt;&lt;/code&gt; &lt;/p&gt;&#xA;&lt;p&gt;我们现在的情况是jquery的文件夹被移动到一个新的目录，所以我们应该对patch的内容进行修改：&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>REUSE 使用指南</title>
-      <link>http://localhost:1313/blog/reuse-compliance-guide/</link>
-      <pubDate>Fri, 06 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/reuse-compliance-guide/</guid>
-      <description>&lt;p&gt;REUSE 适合解决一个很实际的问题：当项目中文件越来越多时，许可证文本、版权声明和资源文件的合规信息很容易逐步失控。与其靠人工约定，不如把这些信息放进可检查、可自动化处理的流程中。&lt;/p&gt;&#xA;&lt;h2 id=&#34;什么是-reuse&#34;&gt;什么是 REUSE&lt;/h2&gt;&#xA;&lt;p&gt;REUSE 是一套围绕开源合规整理出来的工具与约定，主要用于下载许可证文本、补充版权声明，并检查项目中的声明是否符合规范。&lt;/p&gt;&#xA;&lt;h2 id=&#34;使用-reuse-配置项目&#34;&gt;使用 REUSE 配置项目&lt;/h2&gt;&#xA;&lt;h2 id=&#34;安装&#34;&gt;安装&lt;/h2&gt;&#xA;&lt;p&gt;REUSE 依赖本地 Python 环境，因此需要先安装 &lt;code&gt;python&lt;/code&gt; 和 &lt;code&gt;pip&lt;/code&gt;。&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo apt install python3&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo python3 get-pip.py&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;然后安装 REUSE：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;pip3 install --user reuse&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安装完成后，需要确保 &lt;code&gt;~/.local/bin&lt;/code&gt; 已经在 &lt;code&gt;$PATH&lt;/code&gt; 中。在 Windows 上，对应路径通常类似于 &lt;code&gt;%USERPROFILE%\AppData\Roaming\Python\Python39\Scripts&lt;/code&gt;，具体取决于 Python 版本。&lt;/p&gt;&#xA;&lt;h2 id=&#34;使用&#34;&gt;使用&lt;/h2&gt;&#xA;&lt;h3 id=&#34;初始化项目&#34;&gt;初始化项目&lt;/h3&gt;&#xA;&lt;p&gt;进入项目后运行 &lt;code&gt;reuse init&lt;/code&gt;，工具会以交互方式询问所需许可证、版权所有人和邮箱。这里最重要的是许可证名称必须使用标准 SPDX 标识：&lt;a href=&#34;https://spdx.org/licenses/&#34; title=&#34;许可证名称&#34;&gt;许可证名称&lt;/a&gt;。&lt;/p&gt;&#xA;&lt;p&gt;如果初始化时漏掉了某个许可证，也可以后续使用 &lt;code&gt;reuse download &amp;lt;许可证名称&amp;gt;&lt;/code&gt; 单独下载，工具会把它们统一放到项目的 &lt;code&gt;LICENSES&lt;/code&gt; 目录中。&lt;/p&gt;&#xA;&lt;h3 id=&#34;为代码文件添加版权声明&#34;&gt;为代码文件添加版权声明&lt;/h3&gt;&#xA;&lt;h4 id=&#34;使用自动化脚本添加&#34;&gt;使用自动化脚本添加&lt;/h4&gt;&#xA;&lt;p&gt;含有代码逻辑文件添加版权声明方法为：&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;reuse addheader --copyright&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;UnionTech Software Technology Co., Ltd.&amp;#34;&lt;/span&gt; --license&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;GPL-3.0-or-later -r &amp;lt;目录&amp;gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;这只是一个简单示例，REUSE 还有更多参数可用：&lt;/p&gt;</description>
-    </item>
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>工程实践 on HarryLoong's Blog</title><link>https://xzl01.github.io/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/</link><description>Recent content in 工程实践 on HarryLoong's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Fri, 06 Mar 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://xzl01.github.io/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/index.xml" rel="self" type="application/rss+xml"/><item><title>Debian 打包更新带 Patch 的软件包：以 Doxygen 为例</title><link>https://xzl01.github.io/blog/debian-package-patch-refresh-doxygen/</link><pubDate>Fri, 06 Mar 2026 00:00:00 +0000</pubDate><guid>https://xzl01.github.io/blog/debian-package-patch-refresh-doxygen/</guid><description>&lt;p&gt;这篇文章记录一次比较典型的发行版维护场景：上游版本已经前进，但发行版的软件包仍停留在旧版本，而且还叠加了一组历史 patch。目标不是“直接升级”，而是先理解已有 patch 的作用，再决定哪些需要刷新、哪些需要保留。&lt;/p&gt;
+&lt;h2 id="1-软件包背景"&gt;1. 软件包背景&lt;/h2&gt;
+&lt;p&gt;上游地址：&lt;a href="https://github.com/doxygen/doxygen" title="https://github.com/doxygen/doxygen"&gt;https://github.com/doxygen/doxygen&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Debian打包地址： &lt;a href="https://packages.debian.org/bookworm/doxygen" title="https://packages.debian.org/bookworm/doxygen"&gt;https://packages.debian.org/bookworm/doxygen&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id="2-分析软件包"&gt;2. 分析软件包&lt;/h2&gt;
+&lt;p&gt;当时的情况是：上游版本已经来到 &lt;code&gt;1.9.6&lt;/code&gt;，而 Debian 打包版本仍停留在 &lt;code&gt;1.9.4&lt;/code&gt;。这意味着如果要基于 Debian 的现有打包成果继续前进，就必须先搞清楚旧版本里那一组 patch 的背景和作用。&lt;/p&gt;
+&lt;h2 id="3-升级尝试"&gt;3. 升级尝试&lt;/h2&gt;
+&lt;h3 id="第一次尝试"&gt;第一次尝试：&lt;/h3&gt;
+&lt;p&gt;先把 &lt;code&gt;1.9.4&lt;/code&gt; 中的 &lt;code&gt;debian/&lt;/code&gt; 目录整体迁移到 &lt;code&gt;1.9.6&lt;/code&gt;，并暂时关闭所有 patch（把 &lt;code&gt;series&lt;/code&gt; 重命名为 &lt;code&gt;series.bak&lt;/code&gt;）。&lt;/p&gt;
+&lt;p&gt;然后执行构建：&lt;code&gt;dpkg-buildpackage -us -uc -b&lt;/code&gt;。很快就能发现第一个问题：上游 &lt;code&gt;1.9.6&lt;/code&gt; 调整了依赖文件路径到 &lt;code&gt;./deps/&lt;/code&gt;，因此旧的打包逻辑无法直接复用。&lt;/p&gt;
+&lt;h3 id="第二次尝试"&gt;第二次尝试：&lt;/h3&gt;
+&lt;p&gt;修改 &lt;code&gt;debian/control&lt;/code&gt; 以及相关构建逻辑，把原先依赖 &lt;code&gt;./deps/&lt;/code&gt; 的部分改成新版本的正确路径。&lt;/p&gt;
+&lt;p&gt;再次构建后仍然失败，问题主要集中在 &lt;code&gt;jquery&lt;/code&gt; 相关的构建文件上。&lt;/p&gt;
+&lt;h3 id="第三次尝试"&gt;第三次尝试：&lt;/h3&gt;
+&lt;p&gt;继续阅读 Debian 现有的 patch/diff，发现它们本来就对 &lt;code&gt;jquery&lt;/code&gt; 的构建流程做过定制，因此接下来的关键不再是“绕开 patch”，而是把这些 patch 刷新到新目录结构上。&lt;/p&gt;
+&lt;h2 id="4-更新-patchdiff"&gt;4. 更新 patch/diff&lt;/h2&gt;
+&lt;p&gt;更新 patch 的常见步骤通常是：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;检查patch是否可以被应用：&lt;code&gt;git apply --check &amp;lt;diff name&amp;gt;&lt;/code&gt; &lt;/p&gt;
+&lt;p&gt;我们现在的情况是jquery的文件夹被移动到一个新的目录，所以我们应该对patch的内容进行修改：&lt;/p&gt;</description></item><item><title>REUSE 使用指南</title><link>https://xzl01.github.io/blog/reuse-compliance-guide/</link><pubDate>Fri, 06 Mar 2026 00:00:00 +0000</pubDate><guid>https://xzl01.github.io/blog/reuse-compliance-guide/</guid><description>&lt;p&gt;REUSE 适合解决一个很实际的问题：当项目中文件越来越多时，许可证文本、版权声明和资源文件的合规信息很容易逐步失控。与其靠人工约定，不如把这些信息放进可检查、可自动化处理的流程中。&lt;/p&gt;
+&lt;h2 id="什么是-reuse"&gt;什么是 REUSE&lt;/h2&gt;
+&lt;p&gt;REUSE 是一套围绕开源合规整理出来的工具与约定，主要用于下载许可证文本、补充版权声明，并检查项目中的声明是否符合规范。&lt;/p&gt;
+&lt;h2 id="使用-reuse-配置项目"&gt;使用 REUSE 配置项目&lt;/h2&gt;
+&lt;h2 id="安装"&gt;安装&lt;/h2&gt;
+&lt;p&gt;REUSE 依赖本地 Python 环境，因此需要先安装 &lt;code&gt;python&lt;/code&gt; 和 &lt;code&gt;pip&lt;/code&gt;。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo apt install python3
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo python3 get-pip.py
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;然后安装 REUSE：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pip3 install --user reuse
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安装完成后，需要确保 &lt;code&gt;~/.local/bin&lt;/code&gt; 已经在 &lt;code&gt;$PATH&lt;/code&gt; 中。在 Windows 上，对应路径通常类似于 &lt;code&gt;%USERPROFILE%\AppData\Roaming\Python\Python39\Scripts&lt;/code&gt;，具体取决于 Python 版本。&lt;/p&gt;
+&lt;h2 id="使用"&gt;使用&lt;/h2&gt;
+&lt;h3 id="初始化项目"&gt;初始化项目&lt;/h3&gt;
+&lt;p&gt;进入项目后运行 &lt;code&gt;reuse init&lt;/code&gt;，工具会以交互方式询问所需许可证、版权所有人和邮箱。这里最重要的是许可证名称必须使用标准 SPDX 标识：&lt;a href="https://spdx.org/licenses/" title="许可证名称"&gt;许可证名称&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;如果初始化时漏掉了某个许可证，也可以后续使用 &lt;code&gt;reuse download &amp;lt;许可证名称&amp;gt;&lt;/code&gt; 单独下载，工具会把它们统一放到项目的 &lt;code&gt;LICENSES&lt;/code&gt; 目录中。&lt;/p&gt;
+&lt;h3 id="为代码文件添加版权声明"&gt;为代码文件添加版权声明&lt;/h3&gt;
+&lt;h4 id="使用自动化脚本添加"&gt;使用自动化脚本添加&lt;/h4&gt;
+&lt;p&gt;含有代码逻辑文件添加版权声明方法为：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;reuse addheader --copyright&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;UnionTech Software Technology Co., Ltd.&amp;#34;&lt;/span&gt; --license&lt;span class="o"&gt;=&lt;/span&gt;GPL-3.0-or-later -r &amp;lt;目录&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;这只是一个简单示例，REUSE 还有更多参数可用：&lt;/p&gt;</description></item></channel></rss>

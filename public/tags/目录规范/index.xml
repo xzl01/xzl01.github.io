@@ -1,19 +1,47 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>目录规范 on HarryLoong&#39;s Blog</title>
-    <link>http://localhost:1313/tags/%E7%9B%AE%E5%BD%95%E8%A7%84%E8%8C%83/</link>
-    <description>Recent content in 目录规范 on HarryLoong&#39;s Blog</description>
-    <generator>Hugo</generator>
-    <language>zh-cn</language>
-    <lastBuildDate>Wed, 04 Mar 2026 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://localhost:1313/tags/%E7%9B%AE%E5%BD%95%E8%A7%84%E8%8C%83/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>XDG 基本目录规范解读</title>
-      <link>http://localhost:1313/blog/xdg-base-directory-spec/</link>
-      <pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate>
-      <guid>http://localhost:1313/blog/xdg-base-directory-spec/</guid>
-      <description>&lt;h2 id=&#34;介绍&#34;&gt;介绍&lt;/h2&gt;&#xA;&lt;p&gt;各种规范指定文件和文件格式。该规范通过定义一个或多个相对于哪些文件应位于的基本目录来定义应在何处查找这些文件。&lt;/p&gt;&#xA;&lt;h2 id=&#34;基本&#34;&gt;基本&lt;/h2&gt;&#xA;&lt;p&gt;XDG 基本目录规范基于以下概念：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;有一个相对于用户特定数据文件的唯一基础目录，应将其写入其中。该目录由环境变量定义：&lt;code&gt;$XDG_DATA_HOME&lt;/code&gt;。&lt;/li&gt;&#xA;&lt;li&gt;有一个唯一的基础目录，应将用户特定的配置文件写入该目录中。该目录由环境变量定义：&lt;code&gt;$XDG_CONFIG_HOME&lt;/code&gt;。&lt;/li&gt;&#xA;&lt;li&gt;有一个相对于应该写入用户特定状态数据的基本目录。该目录由环境变量定义&lt;code&gt;$XDG_STATE_HOME&lt;/code&gt;。&lt;/li&gt;&#xA;&lt;li&gt;有一个相对于其可以写入用户特定可执行文件的基本目录。&lt;/li&gt;&#xA;&lt;li&gt;有一组与应搜索的数据文件相关的优先排序基本目录。这组目录由环境变量定义&lt;code&gt;$XDG_DATA_DIRS&lt;/code&gt;。&lt;/li&gt;&#xA;&lt;li&gt;有一组优先排序的基本目录相对于应该搜索的配置文件。这组目录由环境变量定义&lt;code&gt;$XDG_CONFIG_DIRS&lt;/code&gt;。&lt;/li&gt;&#xA;&lt;li&gt;有一个相对于应该写入用户特定的非必要（缓存）数据的基本目录。该目录由环境变量定义&lt;code&gt;$XDG_CACHE_HOME&lt;/code&gt;。&lt;/li&gt;&#xA;&lt;li&gt;有一个相对于应该放置用户特定运行时文件和其他文件对象的基本目录。该目录由环境变量定义&lt;code&gt;$XDG_RUNTIME_DIR&lt;/code&gt;。&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;在这些环境变量中设置的所有路径都必须是绝对的。如果实现在任何这些变量中遇到相对路径，它应该认为路径无效并忽略它。&lt;/p&gt;&#xA;&lt;h2 id=&#34;环境变量&#34;&gt;环境变量&lt;/h2&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;code&gt;$XDG_DATA_HOME&lt;/code&gt;定义了相对于用户特定数据文件的基本目录。如果&lt;code&gt;$XDG_DATA_HOME&lt;/code&gt;没有设置或为空，则应使用默认的&lt;code&gt;$HOME/.local/share&lt;/code&gt;。&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;$XDG_CONFIG_HOME&lt;/code&gt;定义了相对于用户特定的配置文件应该被存储的基本目录。如&lt;code&gt;$XDG_CONFIG_HOME&lt;/code&gt;没有设置或为空，则应使用默认值&lt;code&gt;$HOME/.config&lt;/code&gt;。&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;$XDG_STATE_HOME&lt;/code&gt; 定义了存储用户特定状态文件的基本目录。如果&lt;code&gt;$XDG_STATE_HOME&lt;/code&gt;没有设置或为空，则应使用默认的&lt;code&gt;$HOME/.local/state&lt;/code&gt;。&lt;/li&gt;&#xA;&lt;li&gt;&lt;code&gt;$XDG_STATE_HOME&lt;/code&gt;包含的状态数据应该在（应用程序）重启之间持续存在，但对用户来说并不重要或可移植到应该存储在&lt;code&gt;$XDG_DATA_HOME中&lt;/code&gt;。它可能包含:&#xA;&lt;ul&gt;&#xA;&lt;li&gt;操作历史记录（日志、历史记录、最近使用的文件……）&lt;/li&gt;&#xA;&lt;li&gt;可以在重新启动时重用的应用程序的当前状态（视图、布局、打开的文件、撤消历史记录……）&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;用户特定的可执行文件可能存储在 &lt;code&gt;$HOME/.local/bin&lt;/code&gt;中。发行版应确保此目录显示在 UNIX&lt;code&gt;$PATH&lt;/code&gt; 环境变量中的适当位置。&lt;/p&gt;&#xA;&lt;p&gt;由于&lt;code&gt;$HOME&lt;/code&gt;可能在不同架构的系统之间共享，将编译后的二进制文件安装到 &lt;code&gt;$HOME/.local/bin &lt;/code&gt;可能会在不同架构的系统上使用时导致问题。这通常不是问题，但 &lt;code&gt;$HOME&lt;/code&gt;如果将已编译的二进制文件放入其中，则其只能适用于部分架构。&lt;/p&gt;&#xA;&lt;p&gt;&lt;code&gt;$XDG_DATA_DIRS&lt;/code&gt;定义一定优先顺序搜索除 &lt;code&gt;$XDG_DATA_HOME&lt;/code&gt;基本目录之外的数据文件。中的目录&lt;code&gt;$XDG_DATA_DIRS&lt;/code&gt;应该用冒号“：”分隔。&lt;/p&gt;&#xA;&lt;p&gt;如果&lt;code&gt;$XDG_DATA_DIRS&lt;/code&gt;未设置或为空，则应使用等于 /usr/local/share/:/usr/share/ 的值。&lt;/p&gt;&#xA;&lt;p&gt;&lt;code&gt;$XDG_CONFIG_DIRS&lt;/code&gt;定义优先顺序的基本目录集以搜索除 &lt;code&gt;$XDG_CONFIG_HOME&lt;/code&gt;基本目录之外的配置文件。中的目录&lt;code&gt;$XDG_CONFIG_DIRS&lt;/code&gt;应该用冒号“：”分隔。&lt;/p&gt;&#xA;&lt;p&gt;如果&lt;code&gt;$XDG_CONFIG_DIRS&lt;/code&gt;未设置或为空，则应使用等于 /etc/xdg 的值。&lt;/p&gt;&#xA;&lt;p&gt;基本目录的顺序表示它们的重要性；列出的第一个目录是最重要的。当在多个位置定义相同的信息时，相对于更重要的基本目录定义的信息优先。由 定义的基本目录&lt;code&gt;$XDG_DATA_HOME&lt;/code&gt;被认为比由 定义的任何基本目录更重要&lt;code&gt;$XDG_DATA_DIRS&lt;/code&gt;。由 定义的基本目录&lt;code&gt;$XDG_CONFIG_HOME&lt;/code&gt;被认为比由 定义的任何基本目录更重要&lt;code&gt;$XDG_CONFIG_DIRS&lt;/code&gt;。&lt;/p&gt;&#xA;&lt;p&gt;&lt;code&gt;$XDG_CACHE_HOME&lt;/code&gt;定义相对于应该存储用户特定的非必要数据文件的基本目录。如果 未设置或为空，则应使用 &lt;code&gt;$XDG_CACHE_HOME&lt;/code&gt;等于 /.cache 的默认值 。&lt;code&gt;$HOME&lt;/code&gt;&lt;/p&gt;&#xA;&lt;p&gt;&lt;code&gt;$XDG_RUNTIME_DIR&lt;/code&gt;定义相对于用户特定的非必要运行时文件和其他文件对象（如套接字、命名管道等）应该存储的基本目录。该目录必须由用户拥有，并且他必须是唯一拥有对该目录的读写权限的人。它的 Unix 访问模式必须是 0700。&lt;/p&gt;&#xA;&lt;p&gt;目录的生命周期必须与正在登录的用户绑定。它必须在用户首次登录时创建，如果用户完全注销，则必须删除目录。如果用户多次登录，他应该被指向同一个目录，并且从他第一次登录到他最后一次注销系统，该目录必须继续存在，并且在这期间不能被删除。目录中的文件必须不能在重新启动或完整的注销/登录周期后继续存在。&lt;/p&gt;&#xA;&lt;p&gt;该目录必须位于本地文件系统上，并且不与任何其他系统共享。该目录必须完全符合操作系统的标准。更具体地说，在类 Unix 操作系统上 AF_UNIX 套接字、符号链接、硬链接、适当的权限、文件锁定、稀疏文件、内存映射、文件更改通知，必须支持可靠的硬链接计数，并且对文件名没有限制字符集应该被强加。此目录中的文件可能会受到定期清理。为确保您的文件不会被删除，它们的访问时间时间戳应至少每 6 小时单调时间修改一次，或者应在文件上设置“粘性”位。&lt;/p&gt;&#xA;&lt;p&gt;如果&lt;code&gt;$XDG_RUNTIME_DIR&lt;/code&gt;未设置，应用程序应退回到具有类似功能的替换目录并打印警告消息。应用程序应将此目录用于通信和同步目的，并且不应在其中放置较大的文件，因为它可能驻留在运行时内存中并且不一定会换出到磁盘。&lt;/p&gt;&#xA;&lt;h2 id=&#34;参考本规范&#34;&gt;参考本规范&lt;/h2&gt;&#xA;&lt;p&gt;其他规范可以通过将数据文件的位置指定为 &lt;code&gt;$XDG_DATA_DIRS/subdir/filename&lt;/code&gt; 来引用此规范。这意味着：&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;此类文件应安装到&lt;code&gt;$datadir/subdir/filename&lt;/code&gt;，&lt;code&gt;$datadir&lt;/code&gt;默认为 &lt;code&gt;/usr/share&lt;/code&gt;。&lt;/li&gt;&#xA;&lt;li&gt;可以在 &lt;code&gt;$XDG_DATA_HOME/subdir/filename&lt;/code&gt; 中创建用户特定版本的数据文件，同时考虑&lt;code&gt;$XDG_DATA_HOME&lt;/code&gt;if &lt;code&gt;$XDG_DATA_HOME&lt;/code&gt;未设置的默认值。&lt;/li&gt;&#xA;&lt;li&gt;数据文件的查找应搜索 ./subdir/filename 相对于&lt;code&gt;$XDG_DATA_HOME&lt;/code&gt;和 指定的所有基本目录&lt;code&gt;$XDG_DATA_DIRS&lt;/code&gt;。如果环境变量未设置或为空，则应使用本规范定义的默认值。&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;规范可以通过将配置文件的位置指定为 &lt;code&gt;$XDG_CONFIG_DIRS&lt;/code&gt;/subdir/filename 来引用此规范。这意味着：&lt;/p&gt;</description>
-    </item>
-  </channel>
-</rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>目录规范 on HarryLoong's Blog</title><link>https://xzl01.github.io/tags/%E7%9B%AE%E5%BD%95%E8%A7%84%E8%8C%83/</link><description>Recent content in 目录规范 on HarryLoong's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Wed, 04 Mar 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://xzl01.github.io/tags/%E7%9B%AE%E5%BD%95%E8%A7%84%E8%8C%83/index.xml" rel="self" type="application/rss+xml"/><item><title>XDG 基本目录规范解读</title><link>https://xzl01.github.io/blog/xdg-base-directory-spec/</link><pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate><guid>https://xzl01.github.io/blog/xdg-base-directory-spec/</guid><description>&lt;h2 id="介绍"&gt;介绍&lt;/h2&gt;
+&lt;p&gt;各种规范指定文件和文件格式。该规范通过定义一个或多个相对于哪些文件应位于的基本目录来定义应在何处查找这些文件。&lt;/p&gt;
+&lt;h2 id="基本"&gt;基本&lt;/h2&gt;
+&lt;p&gt;XDG 基本目录规范基于以下概念：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;有一个相对于用户特定数据文件的唯一基础目录，应将其写入其中。该目录由环境变量定义：&lt;code&gt;$XDG_DATA_HOME&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;有一个唯一的基础目录，应将用户特定的配置文件写入该目录中。该目录由环境变量定义：&lt;code&gt;$XDG_CONFIG_HOME&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;有一个相对于应该写入用户特定状态数据的基本目录。该目录由环境变量定义&lt;code&gt;$XDG_STATE_HOME&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;有一个相对于其可以写入用户特定可执行文件的基本目录。&lt;/li&gt;
+&lt;li&gt;有一组与应搜索的数据文件相关的优先排序基本目录。这组目录由环境变量定义&lt;code&gt;$XDG_DATA_DIRS&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;有一组优先排序的基本目录相对于应该搜索的配置文件。这组目录由环境变量定义&lt;code&gt;$XDG_CONFIG_DIRS&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;有一个相对于应该写入用户特定的非必要（缓存）数据的基本目录。该目录由环境变量定义&lt;code&gt;$XDG_CACHE_HOME&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;有一个相对于应该放置用户特定运行时文件和其他文件对象的基本目录。该目录由环境变量定义&lt;code&gt;$XDG_RUNTIME_DIR&lt;/code&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在这些环境变量中设置的所有路径都必须是绝对的。如果实现在任何这些变量中遇到相对路径，它应该认为路径无效并忽略它。&lt;/p&gt;
+&lt;h2 id="环境变量"&gt;环境变量&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;$XDG_DATA_HOME&lt;/code&gt;定义了相对于用户特定数据文件的基本目录。如果&lt;code&gt;$XDG_DATA_HOME&lt;/code&gt;没有设置或为空，则应使用默认的&lt;code&gt;$HOME/.local/share&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;$XDG_CONFIG_HOME&lt;/code&gt;定义了相对于用户特定的配置文件应该被存储的基本目录。如&lt;code&gt;$XDG_CONFIG_HOME&lt;/code&gt;没有设置或为空，则应使用默认值&lt;code&gt;$HOME/.config&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;$XDG_STATE_HOME&lt;/code&gt; 定义了存储用户特定状态文件的基本目录。如果&lt;code&gt;$XDG_STATE_HOME&lt;/code&gt;没有设置或为空，则应使用默认的&lt;code&gt;$HOME/.local/state&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;$XDG_STATE_HOME&lt;/code&gt;包含的状态数据应该在（应用程序）重启之间持续存在，但对用户来说并不重要或可移植到应该存储在&lt;code&gt;$XDG_DATA_HOME中&lt;/code&gt;。它可能包含:
+&lt;ul&gt;
+&lt;li&gt;操作历史记录（日志、历史记录、最近使用的文件……）&lt;/li&gt;
+&lt;li&gt;可以在重新启动时重用的应用程序的当前状态（视图、布局、打开的文件、撤消历史记录……）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;用户特定的可执行文件可能存储在 &lt;code&gt;$HOME/.local/bin&lt;/code&gt;中。发行版应确保此目录显示在 UNIX&lt;code&gt;$PATH&lt;/code&gt; 环境变量中的适当位置。&lt;/p&gt;
+&lt;p&gt;由于&lt;code&gt;$HOME&lt;/code&gt;可能在不同架构的系统之间共享，将编译后的二进制文件安装到 &lt;code&gt;$HOME/.local/bin &lt;/code&gt;可能会在不同架构的系统上使用时导致问题。这通常不是问题，但 &lt;code&gt;$HOME&lt;/code&gt;如果将已编译的二进制文件放入其中，则其只能适用于部分架构。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;$XDG_DATA_DIRS&lt;/code&gt;定义一定优先顺序搜索除 &lt;code&gt;$XDG_DATA_HOME&lt;/code&gt;基本目录之外的数据文件。中的目录&lt;code&gt;$XDG_DATA_DIRS&lt;/code&gt;应该用冒号“：”分隔。&lt;/p&gt;
+&lt;p&gt;如果&lt;code&gt;$XDG_DATA_DIRS&lt;/code&gt;未设置或为空，则应使用等于 /usr/local/share/:/usr/share/ 的值。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;$XDG_CONFIG_DIRS&lt;/code&gt;定义优先顺序的基本目录集以搜索除 &lt;code&gt;$XDG_CONFIG_HOME&lt;/code&gt;基本目录之外的配置文件。中的目录&lt;code&gt;$XDG_CONFIG_DIRS&lt;/code&gt;应该用冒号“：”分隔。&lt;/p&gt;
+&lt;p&gt;如果&lt;code&gt;$XDG_CONFIG_DIRS&lt;/code&gt;未设置或为空，则应使用等于 /etc/xdg 的值。&lt;/p&gt;
+&lt;p&gt;基本目录的顺序表示它们的重要性；列出的第一个目录是最重要的。当在多个位置定义相同的信息时，相对于更重要的基本目录定义的信息优先。由 定义的基本目录&lt;code&gt;$XDG_DATA_HOME&lt;/code&gt;被认为比由 定义的任何基本目录更重要&lt;code&gt;$XDG_DATA_DIRS&lt;/code&gt;。由 定义的基本目录&lt;code&gt;$XDG_CONFIG_HOME&lt;/code&gt;被认为比由 定义的任何基本目录更重要&lt;code&gt;$XDG_CONFIG_DIRS&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;$XDG_CACHE_HOME&lt;/code&gt;定义相对于应该存储用户特定的非必要数据文件的基本目录。如果 未设置或为空，则应使用 &lt;code&gt;$XDG_CACHE_HOME&lt;/code&gt;等于 /.cache 的默认值 。&lt;code&gt;$HOME&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;$XDG_RUNTIME_DIR&lt;/code&gt;定义相对于用户特定的非必要运行时文件和其他文件对象（如套接字、命名管道等）应该存储的基本目录。该目录必须由用户拥有，并且他必须是唯一拥有对该目录的读写权限的人。它的 Unix 访问模式必须是 0700。&lt;/p&gt;
+&lt;p&gt;目录的生命周期必须与正在登录的用户绑定。它必须在用户首次登录时创建，如果用户完全注销，则必须删除目录。如果用户多次登录，他应该被指向同一个目录，并且从他第一次登录到他最后一次注销系统，该目录必须继续存在，并且在这期间不能被删除。目录中的文件必须不能在重新启动或完整的注销/登录周期后继续存在。&lt;/p&gt;
+&lt;p&gt;该目录必须位于本地文件系统上，并且不与任何其他系统共享。该目录必须完全符合操作系统的标准。更具体地说，在类 Unix 操作系统上 AF_UNIX 套接字、符号链接、硬链接、适当的权限、文件锁定、稀疏文件、内存映射、文件更改通知，必须支持可靠的硬链接计数，并且对文件名没有限制字符集应该被强加。此目录中的文件可能会受到定期清理。为确保您的文件不会被删除，它们的访问时间时间戳应至少每 6 小时单调时间修改一次，或者应在文件上设置“粘性”位。&lt;/p&gt;
+&lt;p&gt;如果&lt;code&gt;$XDG_RUNTIME_DIR&lt;/code&gt;未设置，应用程序应退回到具有类似功能的替换目录并打印警告消息。应用程序应将此目录用于通信和同步目的，并且不应在其中放置较大的文件，因为它可能驻留在运行时内存中并且不一定会换出到磁盘。&lt;/p&gt;
+&lt;h2 id="参考本规范"&gt;参考本规范&lt;/h2&gt;
+&lt;p&gt;其他规范可以通过将数据文件的位置指定为 &lt;code&gt;$XDG_DATA_DIRS/subdir/filename&lt;/code&gt; 来引用此规范。这意味着：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;此类文件应安装到&lt;code&gt;$datadir/subdir/filename&lt;/code&gt;，&lt;code&gt;$datadir&lt;/code&gt;默认为 &lt;code&gt;/usr/share&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;可以在 &lt;code&gt;$XDG_DATA_HOME/subdir/filename&lt;/code&gt; 中创建用户特定版本的数据文件，同时考虑&lt;code&gt;$XDG_DATA_HOME&lt;/code&gt;if &lt;code&gt;$XDG_DATA_HOME&lt;/code&gt;未设置的默认值。&lt;/li&gt;
+&lt;li&gt;数据文件的查找应搜索 ./subdir/filename 相对于&lt;code&gt;$XDG_DATA_HOME&lt;/code&gt;和 指定的所有基本目录&lt;code&gt;$XDG_DATA_DIRS&lt;/code&gt;。如果环境变量未设置或为空，则应使用本规范定义的默认值。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;规范可以通过将配置文件的位置指定为 &lt;code&gt;$XDG_CONFIG_DIRS&lt;/code&gt;/subdir/filename 来引用此规范。这意味着：&lt;/p&gt;</description></item></channel></rss>
