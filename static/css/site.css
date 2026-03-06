@@ -20,6 +20,22 @@
   --sun-opacity: 0.28;
   --sun-core: rgba(241, 197, 142, 0.82);
   --sun-edge: rgba(241, 197, 142, 0.1);
+  --code-bg: #eff1f5;
+  --code-panel: #e6e9ef;
+  --code-border: #bcc0cc;
+  --code-text: #4c4f69;
+  --code-muted: #7c7f93;
+  --code-inline-bg: #dce0e8;
+  --code-inline-text: #8839ef;
+  --code-comment: #9ca0b0;
+  --code-red: #d20f39;
+  --code-orange: #fe640b;
+  --code-yellow: #df8e1d;
+  --code-green: #40a02b;
+  --code-teal: #179299;
+  --code-blue: #1e66f5;
+  --code-mauve: #8839ef;
+  --code-pink: #ea76cb;
 }
 
 * {
@@ -80,7 +96,7 @@ body::after {
 }
 
 .container {
-  width: min(960px, 92vw);
+  width: min(1180px, 94vw);
   margin: 0 auto;
 }
 
@@ -471,8 +487,8 @@ body[data-theme="midnight"] .tag {
 }
 
 body[data-theme="midnight"] .post-content code:not(pre code) {
-  background: rgba(88, 101, 122, 0.88);
-  color: #f1f5fb;
+  background: var(--code-inline-bg);
+  color: var(--code-inline-text);
 }
 
 body[data-theme="mist"] {
@@ -507,6 +523,25 @@ body[data-theme="rose"] {
   --shape-a2: #b5a7b0;
   --shape-b1: #b7c3bd;
   --shape-b2: #d7c0b7;
+}
+
+body[data-theme="midnight"] {
+  --code-bg: #1e1e2e;
+  --code-panel: #181825;
+  --code-border: #45475a;
+  --code-text: #cdd6f4;
+  --code-muted: #7f849c;
+  --code-inline-bg: #313244;
+  --code-inline-text: #cba6f7;
+  --code-comment: #6c7086;
+  --code-red: #f38ba8;
+  --code-orange: #fab387;
+  --code-yellow: #f9e2af;
+  --code-green: #a6e3a1;
+  --code-teal: #94e2d5;
+  --code-blue: #89b4fa;
+  --code-mauve: #cba6f7;
+  --code-pink: #f5c2e7;
 }
 
 .main-wrap {
@@ -592,14 +627,12 @@ body[data-theme="rose"] {
 }
 
 .single-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
-  gap: 1.35rem;
-  align-items: start;
+  position: relative;
+  padding-right: 310px;
 }
 
 .post-header {
-  max-width: 760px;
+  max-width: 900px;
 }
 
 .post-kicker {
@@ -648,7 +681,7 @@ body[data-theme="rose"] {
   font-family: "Noto Sans SC", sans-serif;
   font-size: 1.02rem;
   line-height: 1.9;
-  max-width: 760px;
+  max-width: 900px;
 }
 
 .post-content p,
@@ -695,8 +728,8 @@ body[data-theme="rose"] {
 .post-content code:not(pre code) {
   font-family: "JetBrains Mono", monospace;
   font-size: 0.86rem;
-  color: #7c2d12;
-  background: #ffedd5;
+  color: var(--code-inline-text);
+  background: var(--code-inline-bg);
   border-radius: 6px;
   padding: 0.12rem 0.34rem;
 }
@@ -704,13 +737,89 @@ body[data-theme="rose"] {
 .post-content pre {
   border-radius: 12px;
   overflow: auto;
-  border: 1px solid #30363d;
+  border: 1px solid var(--code-border);
+  background: var(--code-bg);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .post-content pre code {
   font-family: "JetBrains Mono", monospace;
   font-size: 0.82rem;
   line-height: 1.65;
+  color: var(--code-text);
+  background: transparent;
+  display: block;
+  padding: 1rem 1.05rem;
+}
+
+.hljs {
+  background: var(--code-bg);
+  color: var(--code-text);
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: var(--code-comment);
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-subst {
+  color: var(--code-mauve);
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag .hljs-attr {
+  color: var(--code-orange);
+}
+
+.hljs-string,
+.hljs-doctag,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: var(--code-green);
+}
+
+.hljs-title,
+.hljs-section,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-type,
+.hljs-built_in,
+.hljs-builtin-name {
+  color: var(--code-blue);
+}
+
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-attr,
+.hljs-selector-pseudo {
+  color: var(--code-teal);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: 700;
+}
+
+.hljs-deletion {
+  color: var(--code-red);
+}
+
+.hljs-operator,
+.hljs-punctuation {
+  color: var(--code-muted);
 }
 
 .post-content blockquote {
@@ -751,11 +860,15 @@ body[data-theme="rose"] {
 }
 
 .post-toc {
-  position: sticky;
-  top: 92px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 280px;
 }
 
 .post-toc-inner {
+  position: sticky;
+  top: 92px;
   background: var(--card);
   border: 1px solid rgba(217, 211, 196, 0.9);
   border-radius: 18px;
@@ -1682,12 +1795,13 @@ body[data-theme="rose"] {
   }
 
   .single-layout {
-    grid-template-columns: 1fr;
+    padding-right: 0;
   }
 
   .post-toc {
     position: static;
     order: -1;
+    width: auto;
   }
 
   .post-toc-inner {
