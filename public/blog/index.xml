@@ -33,9 +33,10 @@
 &lt;p&gt;组织优化。&lt;/p&gt;
 &lt;p&gt;感谢贡献。&lt;/p&gt;
 &lt;p&gt;最后落到具体数字上，是 N+1。税后大概十五万。&lt;/p&gt;
-&lt;p&gt;HR 说，如果需要推荐信，公司会尽可能配合；如果有心理支持需求，也可以申请短期员工关怀服务；如果后续有合适岗位，公司欢迎他重新加入生态。&lt;/p&gt;
-&lt;p&gt;生态。&lt;/p&gt;
-&lt;p&gt;这个词比裁员还让人不舒服。&lt;/p&gt;
+&lt;p&gt;HR 说，如果需要推荐信，公司会尽可能配合；如果有心理支持需求，也可以申请短期员工关怀服务；这次不是“裁员”，是“毕业”，公司会把他纳入长期人才库，后续如果有合适岗位，会优先回流。&lt;/p&gt;
+&lt;p&gt;毕业。&lt;/p&gt;
+&lt;p&gt;人才库。&lt;/p&gt;
+&lt;p&gt;这些词比裁员还让人不舒服。&lt;/p&gt;
 &lt;p&gt;林墨当时坐在会议室里，脑子里只剩一个朴素的问题：十五万够撑多久？&lt;/p&gt;
 &lt;p&gt;房贷一万八，是几年前在龙华高位上车那套房的月供，房子现在给父母住着，卖不掉，也不可能断供；女儿学费和托管费四千多，社保自己续，房租、吃饭、交通、水电，再加上那些平常不会被专门拿出来计算的小钱，一家三口每个月没三万根本打不住。&lt;/p&gt;
 &lt;p&gt;五个月。&lt;/p&gt;
@@ -45,8 +46,7 @@
 &lt;p&gt;地铁上，林墨缩在车厢角落。车里大部分人都戴着 AR 眼镜，神情专注地对着空气划来划去。对面一个二十岁出头的年轻人面前悬着半透明代码界面，指尖像在弹钢琴一样飞快移动。那是现在最流行的协作编程方式，人出意图，AI 出执行，屏幕上的每一段代码都像长在空气里。&lt;/p&gt;
 &lt;p&gt;林墨看了两眼就别开视线。&lt;/p&gt;
 &lt;p&gt;旁边一个中年男人靠着门睡着了，西装皱巴巴的，手里还握着手机。屏幕停在招聘 APP，页面上是一行大字：&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;该岗位已结束招聘&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;这行字林墨很熟，熟到看一眼都觉得胸口发闷。&lt;/p&gt;</description></item><item><title>Agent Skill：把人的可执行能力封装给 AI Agent</title><link>https://xzl01.github.io/blog/agent-skill-capability-encapsulation/</link><pubDate>Fri, 06 Mar 2026 16:10:00 +0800</pubDate><guid>https://xzl01.github.io/blog/agent-skill-capability-encapsulation/</guid><description>&lt;p&gt;很多人第一次接触 &lt;code&gt;agent skill&lt;/code&gt; 时，会把它理解成“给 AI 增加一个插件”。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;该岗位已结束招聘&lt;/code&gt;&lt;/p&gt;</description></item><item><title>Agent Skill：把人的可执行能力封装给 AI Agent</title><link>https://xzl01.github.io/blog/agent-skill-capability-encapsulation/</link><pubDate>Fri, 06 Mar 2026 16:10:00 +0800</pubDate><guid>https://xzl01.github.io/blog/agent-skill-capability-encapsulation/</guid><description>&lt;p&gt;很多人第一次接触 &lt;code&gt;agent skill&lt;/code&gt; 时，会把它理解成“给 AI 增加一个插件”。&lt;/p&gt;
 &lt;p&gt;这个理解不算错，但还不够准确。&lt;/p&gt;
 &lt;p&gt;我更愿意把 &lt;code&gt;skill&lt;/code&gt; 看成一层能力封装：它不是单纯扩展了一个功能入口，而是把一件原本需要人手动完成的事情，整理成一套 AI agent 可以稳定复用的执行方法。&lt;/p&gt;
 &lt;p&gt;而且我越来越倾向于认为，&lt;code&gt;skill&lt;/code&gt; 最好的来源并不是“人坐下来写一份说明书”，而是用户先把 agent 教会，再由 agent 自己把这项能力总结出来。&lt;/p&gt;
