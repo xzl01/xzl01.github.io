@@ -2006,3 +2006,62 @@ body[data-theme="midnight"] {
     max-height: none;
   }
 }
+
+/* ===== beautification: back-to-top button ===== */
+.back-to-top {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  width: 3.25rem;
+  height: 3.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--paper);
+  box-shadow: 0 12px 24px rgba(31, 41, 51, 0.16);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(16px);
+  transition: transform 300ms ease, box-shadow 300ms ease, opacity 300ms ease, visibility 300ms ease;
+  z-index: 40;
+}
+
+.back-to-top.is-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.back-to-top:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 34px rgba(31, 41, 51, 0.24);
+}
+
+/* ===== beautification: card hover ===== */
+.summary-card,
+.post-card,
+.home-card {
+  transition: transform 300ms ease, box-shadow 300ms ease;
+}
+
+.summary-card:hover,
+.post-card:hover,
+.home-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 32px rgba(31, 41, 51, 0.14);
+}
+
+/* ===== beautification: code block ===== */
+pre {
+  border: 2px solid var(--code-border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+pre code {
+  font-family: "JetBrains Mono", "Fira Code", "SFMono-Regular", Consolas, monospace;
+}
