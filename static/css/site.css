@@ -2065,3 +2065,73 @@ pre {
 pre code {
   font-family: "JetBrains Mono", "Fira Code", "SFMono-Regular", Consolas, monospace;
 }
+
+/* ===== beautification: enhanced dark mode transition ===== */
+:root {
+  --theme-ease: 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  --border-soft: color-mix(in srgb, var(--text) 10%, transparent);
+  --border-strong: color-mix(in srgb, var(--brand) 24%, transparent);
+  --shadow-soft: 0 10px 30px rgba(47, 56, 69, 0.08);
+  --shadow-lift: 0 18px 50px rgba(47, 56, 69, 0.12);
+}
+
+html[data-theme="dark"] {
+  --bg: #1f2126;
+  --text: #ece4d8;
+  --brand: #c6a588;
+  --border-soft: rgba(236, 228, 216, 0.12);
+  --border-strong: rgba(198, 165, 136, 0.34);
+  --shadow-soft: 0 12px 32px rgba(0, 0, 0, 0.28);
+  --shadow-lift: 0 22px 60px rgba(0, 0, 0, 0.4);
+}
+
+html, body, a, button, input, textarea, select,
+.card, .post-item, .nav, .site-header, .site-footer,
+blockquote, pre, table, hr, .post-card, .home-card,
+.summary-card, .home-channel-card, .back-to-top {
+  transition:
+    background-color var(--theme-ease),
+    color var(--theme-ease),
+    border-color var(--theme-ease),
+    box-shadow var(--theme-ease),
+    opacity var(--theme-ease);
+}
+
+a {
+  text-decoration-color: color-mix(in srgb, var(--brand) 45%, transparent);
+  text-underline-offset: 0.18em;
+}
+
+/* ===== beautification: home intro hero ===== */
+.home-intro {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(4rem, 8vw, 7rem) clamp(1.25rem, 4vw, 3rem);
+  border-radius: 24px;
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-soft);
+}
+
+.home-intro h1 {
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  font-weight: 800;
+  text-wrap: balance;
+  margin: 0 0 1rem;
+}
+
+/* ===== beautification: home channel cards ===== */
+.home-channel-card {
+  transition:
+    transform 300ms ease,
+    box-shadow 300ms ease,
+    border-color var(--theme-ease),
+    background-color var(--theme-ease) !important;
+}
+
+.home-channel-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lift);
+  border-color: var(--border-strong) !important;
+}
