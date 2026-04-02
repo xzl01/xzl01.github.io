@@ -1,88 +1,33 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>工程实践 on HarryLoong's Blog</title><link>https://xzl01.github.io/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/</link><description>Recent content in 工程实践 on HarryLoong's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Fri, 06 Mar 2026 16:10:00 +0800</lastBuildDate><atom:link href="https://xzl01.github.io/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/index.xml" rel="self" type="application/rss+xml"/><item><title>Agent Skill：把人的可执行能力封装给 AI Agent</title><link>https://xzl01.github.io/blog/agent-skill-capability-encapsulation/</link><pubDate>Fri, 06 Mar 2026 16:10:00 +0800</pubDate><guid>https://xzl01.github.io/blog/agent-skill-capability-encapsulation/</guid><description>&lt;p&gt;很多人第一次接触 &lt;code&gt;agent skill&lt;/code&gt; 时，会把它理解成“给 AI 增加一个插件”。&lt;/p&gt;
-&lt;p&gt;这个理解不算错，但还不够准确。&lt;/p&gt;
-&lt;p&gt;我更愿意把 &lt;code&gt;skill&lt;/code&gt; 看成一层能力封装：它不是单纯扩展了一个功能入口，而是把一件原本需要人手动完成的事情，整理成一套 AI agent 可以稳定复用的执行方法。&lt;/p&gt;
-&lt;p&gt;而且我越来越倾向于认为，&lt;code&gt;skill&lt;/code&gt; 最好的来源并不是“人坐下来写一份说明书”，而是用户先把 agent 教会，再由 agent 自己把这项能力总结出来。&lt;/p&gt;
-&lt;h2 id="skill-到底在封装什么"&gt;Skill 到底在封装什么&lt;/h2&gt;
-&lt;p&gt;所谓 &lt;code&gt;skill&lt;/code&gt;，封装的并不是“某个按钮”或者“某个命令”，而是一段相对完整的能力。&lt;/p&gt;
-&lt;p&gt;比如：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;如何检查一个仓库的构建是否正常&lt;/li&gt;
-&lt;li&gt;如何把一批 Markdown 文档整理成博客文章&lt;/li&gt;
-&lt;li&gt;如何为一个项目生成符合约定的发布说明&lt;/li&gt;
-&lt;li&gt;如何在固定目录下扫描日志并提取异常信息&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;这些事情的共同点是：&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;有明确目标&lt;/li&gt;
-&lt;li&gt;有可重复步骤&lt;/li&gt;
-&lt;li&gt;有输入和输出&lt;/li&gt;
-&lt;li&gt;能通过计算机完成&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;一旦满足这四点，它就不再只是“某个人会做的一件事”，而是可以被工程化描述、被标准化复用、被 agent 调用的一项能力。&lt;/p&gt;
-&lt;h2 id="skill-的本质是经验的结构化"&gt;Skill 的本质是经验的结构化&lt;/h2&gt;
-&lt;p&gt;一个人能做某件事，不代表 agent 立刻就能做。&lt;/p&gt;
-&lt;p&gt;中间差的那一步，就是把人的经验从“脑子里的模糊直觉”，变成“机器可执行的结构化说明”。&lt;/p&gt;
-&lt;p&gt;这一步通常包括：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;说明这项能力的目标是什么&lt;/li&gt;
-&lt;li&gt;指定输入从哪里来&lt;/li&gt;
-&lt;li&gt;规定执行时要遵循哪些步骤&lt;/li&gt;
-&lt;li&gt;明确什么算成功，什么算失败&lt;/li&gt;
-&lt;li&gt;约束边界条件和风险点&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;换句话说，&lt;code&gt;skill&lt;/code&gt; 不是凭空制造能力，而是把已有能力整理成一种更稳定、更可组合的形式。&lt;/p&gt;
-&lt;p&gt;人会做，才有可能封装。&lt;/p&gt;
-&lt;p&gt;如果连人自己都说不清“这件事到底怎么做、做到什么程度算完成、出错时怎么判断”，那它通常还不具备被封装成 skill 的条件。&lt;/p&gt;
-&lt;h2 id="只要人能通过计算机完成就有机会被封装"&gt;只要人能通过计算机完成，就有机会被封装&lt;/h2&gt;
-&lt;p&gt;这是我觉得最重要的一点。&lt;/p&gt;
-&lt;p&gt;如果一个人能够借助计算机完成一件事情，那么原则上，这件事情就有机会被封装成 &lt;code&gt;skill&lt;/code&gt;，再交给 AI agent 使用。&lt;/p&gt;
-&lt;p&gt;这里的关键不在于“这件事是否复杂”，而在于“它是否可以被描述清楚”。&lt;/p&gt;
-&lt;p&gt;例如：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;部署一个服务&lt;/li&gt;
-&lt;li&gt;检查一份配置是否符合规范&lt;/li&gt;
-&lt;li&gt;批量重命名文件&lt;/li&gt;
-&lt;li&gt;从代码库里抽取变更点并整理成周报&lt;/li&gt;
-&lt;li&gt;根据既有风格撰写一篇技术博客&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;这些事情里，有的偏工程，有的偏内容，有的偏运维，有的偏数据处理。&lt;/p&gt;</description></item><item><title>Debian 打包更新带 Patch 的软件包：以 Doxygen 为例</title><link>https://xzl01.github.io/blog/debian-package-patch-refresh-doxygen/</link><pubDate>Fri, 06 Mar 2026 11:20:00 +0800</pubDate><guid>https://xzl01.github.io/blog/debian-package-patch-refresh-doxygen/</guid><description>&lt;p&gt;这篇文章记录一次比较典型的发行版维护场景：上游版本已经前进，但发行版的软件包仍停留在旧版本，而且还叠加了一组历史 patch。目标不是“直接升级”，而是先理解已有 patch 的作用，再决定哪些需要刷新、哪些需要保留。&lt;/p&gt;
-&lt;h2 id="1-软件包背景"&gt;1. 软件包背景&lt;/h2&gt;
-&lt;p&gt;上游地址：&lt;a href="https://github.com/doxygen/doxygen" title="https://github.com/doxygen/doxygen"&gt;https://github.com/doxygen/doxygen&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;Debian打包地址： &lt;a href="https://packages.debian.org/bookworm/doxygen" title="https://packages.debian.org/bookworm/doxygen"&gt;https://packages.debian.org/bookworm/doxygen&lt;/a&gt;&lt;/p&gt;
-&lt;h2 id="2-分析软件包"&gt;2. 分析软件包&lt;/h2&gt;
-&lt;p&gt;当时的情况是：上游版本已经来到 &lt;code&gt;1.9.6&lt;/code&gt;，而 Debian 打包版本仍停留在 &lt;code&gt;1.9.4&lt;/code&gt;。这意味着如果要基于 Debian 的现有打包成果继续前进，就必须先搞清楚旧版本里那一组 patch 的背景和作用。&lt;/p&gt;
-&lt;h2 id="3-升级尝试"&gt;3. 升级尝试&lt;/h2&gt;
-&lt;h3 id="第一次尝试"&gt;第一次尝试：&lt;/h3&gt;
-&lt;p&gt;先把 &lt;code&gt;1.9.4&lt;/code&gt; 中的 &lt;code&gt;debian/&lt;/code&gt; 目录整体迁移到 &lt;code&gt;1.9.6&lt;/code&gt;，并暂时关闭所有 patch（把 &lt;code&gt;series&lt;/code&gt; 重命名为 &lt;code&gt;series.bak&lt;/code&gt;）。&lt;/p&gt;
-&lt;p&gt;然后执行构建：&lt;code&gt;dpkg-buildpackage -us -uc -b&lt;/code&gt;。很快就能发现第一个问题：上游 &lt;code&gt;1.9.6&lt;/code&gt; 调整了依赖文件路径到 &lt;code&gt;./deps/&lt;/code&gt;，因此旧的打包逻辑无法直接复用。&lt;/p&gt;
-&lt;h3 id="第二次尝试"&gt;第二次尝试：&lt;/h3&gt;
-&lt;p&gt;修改 &lt;code&gt;debian/control&lt;/code&gt; 以及相关构建逻辑，把原先依赖 &lt;code&gt;./deps/&lt;/code&gt; 的部分改成新版本的正确路径。&lt;/p&gt;
-&lt;p&gt;再次构建后仍然失败，问题主要集中在 &lt;code&gt;jquery&lt;/code&gt; 相关的构建文件上。&lt;/p&gt;
-&lt;h3 id="第三次尝试"&gt;第三次尝试：&lt;/h3&gt;
-&lt;p&gt;继续阅读 Debian 现有的 patch/diff，发现它们本来就对 &lt;code&gt;jquery&lt;/code&gt; 的构建流程做过定制，因此接下来的关键不再是“绕开 patch”，而是把这些 patch 刷新到新目录结构上。&lt;/p&gt;
-&lt;h2 id="4-更新-patchdiff"&gt;4. 更新 patch/diff&lt;/h2&gt;
-&lt;p&gt;更新 patch 的常见步骤通常是：&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;
-&lt;p&gt;检查patch是否可以被应用：&lt;code&gt;git apply --check &amp;lt;diff name&amp;gt;&lt;/code&gt; &lt;/p&gt;
-&lt;p&gt;我们现在的情况是jquery的文件夹被移动到一个新的目录，所以我们应该对patch的内容进行修改：&lt;/p&gt;</description></item><item><title>REUSE 使用指南</title><link>https://xzl01.github.io/blog/reuse-compliance-guide/</link><pubDate>Fri, 06 Mar 2026 09:20:00 +0800</pubDate><guid>https://xzl01.github.io/blog/reuse-compliance-guide/</guid><description>&lt;p&gt;REUSE 适合解决一个很实际的问题：当项目中文件越来越多时，许可证文本、版权声明和资源文件的合规信息很容易逐步失控。与其靠人工约定，不如把这些信息放进可检查、可自动化处理的流程中。&lt;/p&gt;
-&lt;h2 id="什么是-reuse"&gt;什么是 REUSE&lt;/h2&gt;
-&lt;p&gt;REUSE 是一套围绕开源合规整理出来的工具与约定，主要用于下载许可证文本、补充版权声明，并检查项目中的声明是否符合规范。&lt;/p&gt;
-&lt;h2 id="使用-reuse-配置项目"&gt;使用 REUSE 配置项目&lt;/h2&gt;
-&lt;h2 id="安装"&gt;安装&lt;/h2&gt;
-&lt;p&gt;REUSE 依赖本地 Python 环境，因此需要先安装 &lt;code&gt;python&lt;/code&gt; 和 &lt;code&gt;pip&lt;/code&gt;。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo apt install python3
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo python3 get-pip.py
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;然后安装 REUSE：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pip3 install --user reuse
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安装完成后，需要确保 &lt;code&gt;~/.local/bin&lt;/code&gt; 已经在 &lt;code&gt;$PATH&lt;/code&gt; 中。在 Windows 上，对应路径通常类似于 &lt;code&gt;%USERPROFILE%\AppData\Roaming\Python\Python39\Scripts&lt;/code&gt;，具体取决于 Python 版本。&lt;/p&gt;
-&lt;h2 id="使用"&gt;使用&lt;/h2&gt;
-&lt;h3 id="初始化项目"&gt;初始化项目&lt;/h3&gt;
-&lt;p&gt;进入项目后运行 &lt;code&gt;reuse init&lt;/code&gt;，工具会以交互方式询问所需许可证、版权所有人和邮箱。这里最重要的是许可证名称必须使用标准 SPDX 标识：&lt;a href="https://spdx.org/licenses/" title="许可证名称"&gt;许可证名称&lt;/a&gt;。&lt;/p&gt;
-&lt;p&gt;如果初始化时漏掉了某个许可证，也可以后续使用 &lt;code&gt;reuse download &amp;lt;许可证名称&amp;gt;&lt;/code&gt; 单独下载，工具会把它们统一放到项目的 &lt;code&gt;LICENSES&lt;/code&gt; 目录中。&lt;/p&gt;
-&lt;h3 id="为代码文件添加版权声明"&gt;为代码文件添加版权声明&lt;/h3&gt;
-&lt;h4 id="使用自动化脚本添加"&gt;使用自动化脚本添加&lt;/h4&gt;
-&lt;p&gt;含有代码逻辑文件添加版权声明方法为：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;reuse addheader --copyright&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;UnionTech Software Technology Co., Ltd.&amp;#34;&lt;/span&gt; --license&lt;span class="o"&gt;=&lt;/span&gt;GPL-3.0-or-later -r &amp;lt;目录&amp;gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;这只是一个简单示例，REUSE 还有更多参数可用：&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>工程实践 on HarryLoong&#39;s Blog</title>
+    <link>https://xzl01.github.io/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/</link>
+    <description>Recent content in 工程实践 on HarryLoong&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 06 Mar 2026 16:10:00 +0800</lastBuildDate>
+    <atom:link href="https://xzl01.github.io/categories/%E5%B7%A5%E7%A8%8B%E5%AE%9E%E8%B7%B5/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Agent Skill：把人的可执行能力封装给 AI Agent</title>
+      <link>https://xzl01.github.io/blog/agent-skill-capability-encapsulation/</link>
+      <pubDate>Fri, 06 Mar 2026 16:10:00 +0800</pubDate>
+      <guid>https://xzl01.github.io/blog/agent-skill-capability-encapsulation/</guid>
+      <description>很多人第一次接触 agent skill 时，会把它理解成“给 AI 增加一个插件”。&#xA;这个理解不算错，但还不够准确。&#xA;我更愿意把 skill 看成一层能力封装：它不是单纯扩展了一个功能入口，而是把一件原本需要人手动完成的事情，整理成一套 AI agent 可以稳定复用的执行方法。&#xA;而且我越来越倾向于认为，skill 最好的来源并不是“人坐下来写一份说明书”，而是用户先把 agent 教会，再由 agent 自己把这项能力总结出来。&#xA;Skill 到底在封装什么 所谓 skill，封装的并不是“某个按钮”或者“某个命令”，而是一段相对完整的能力。&#xA;比如：&#xA;如何检查一个仓库的构建是否正常 如何把一批 Markdown 文档整理成博客文章 如何为一个项目生成符合约定的发布说明 如何在固定目录下扫描日志并提取异常信息 这些事情的共同点是：&#xA;有明确目标 有可重复步骤 有输入和输出 能通过计算机完成 一旦满足这四点，它就不再只是“某个人会做的一件事”，而是可以被工程化描述、被标准化复用、被 agent 调用的一项能力。&#xA;Skill 的本质是经验的结构化 一个人能做某件事，不代表 agent 立刻就能做。&#xA;中间差的那一步，就是把人的经验从“脑子里的模糊直觉”，变成“机器可执行的结构化说明”。&#xA;这一步通常包括：&#xA;说明这项能力的目标是什么 指定输入从哪里来 规定执行时要遵循哪些步骤 明确什么算成功，什么算失败 约束边界条件和风险点 换句话说，skill 不是凭空制造能力，而是把已有能力整理成一种更稳定、更可组合的形式。&#xA;人会做，才有可能封装。&#xA;如果连人自己都说不清“这件事到底怎么做、做到什么程度算完成、出错时怎么判断”，那它通常还不具备被封装成 skill 的条件。&#xA;只要人能通过计算机完成，就有机会被封装 这是我觉得最重要的一点。&#xA;如果一个人能够借助计算机完成一件事情，那么原则上，这件事情就有机会被封装成 skill，再交给 AI agent 使用。&#xA;这里的关键不在于“这件事是否复杂”，而在于“它是否可以被描述清楚”。&#xA;例如：&#xA;部署一个服务 检查一份配置是否符合规范 批量重命名文件 从代码库里抽取变更点并整理成周报 根据既有风格撰写一篇技术博客 这些事情里，有的偏工程，有的偏内容，有的偏运维，有的偏数据处理。</description>
+    </item>
+    <item>
+      <title>Debian 打包更新带 Patch 的软件包：以 Doxygen 为例</title>
+      <link>https://xzl01.github.io/blog/debian-package-patch-refresh-doxygen/</link>
+      <pubDate>Fri, 06 Mar 2026 11:20:00 +0800</pubDate>
+      <guid>https://xzl01.github.io/blog/debian-package-patch-refresh-doxygen/</guid>
+      <description>这篇文章记录一次比较典型的发行版维护场景：上游版本已经前进，但发行版的软件包仍停留在旧版本，而且还叠加了一组历史 patch。目标不是“直接升级”，而是先理解已有 patch 的作用，再决定哪些需要刷新、哪些需要保留。&#xA;1. 软件包背景 上游地址：https://github.com/doxygen/doxygen&#xA;Debian打包地址： https://packages.debian.org/bookworm/doxygen&#xA;2. 分析软件包 当时的情况是：上游版本已经来到 1.9.6，而 Debian 打包版本仍停留在 1.9.4。这意味着如果要基于 Debian 的现有打包成果继续前进，就必须先搞清楚旧版本里那一组 patch 的背景和作用。&#xA;3. 升级尝试 第一次尝试： 先把 1.9.4 中的 debian/ 目录整体迁移到 1.9.6，并暂时关闭所有 patch（把 series 重命名为 series.bak）。&#xA;然后执行构建：dpkg-buildpackage -us -uc -b。很快就能发现第一个问题：上游 1.9.6 调整了依赖文件路径到 ./deps/，因此旧的打包逻辑无法直接复用。&#xA;第二次尝试： 修改 debian/control 以及相关构建逻辑，把原先依赖 ./deps/ 的部分改成新版本的正确路径。&#xA;再次构建后仍然失败，问题主要集中在 jquery 相关的构建文件上。&#xA;第三次尝试： 继续阅读 Debian 现有的 patch/diff，发现它们本来就对 jquery 的构建流程做过定制，因此接下来的关键不再是“绕开 patch”，而是把这些 patch 刷新到新目录结构上。&#xA;4. 更新 patch/diff 更新 patch 的常见步骤通常是：&#xA;检查patch是否可以被应用：git apply --check &amp;lt;diff name&amp;gt; 我们现在的情况是jquery的文件夹被移动到一个新的目录，所以我们应该对patch的内容进行修改：</description>
+    </item>
+    <item>
+      <title>REUSE 使用指南</title>
+      <link>https://xzl01.github.io/blog/reuse-compliance-guide/</link>
+      <pubDate>Fri, 06 Mar 2026 09:20:00 +0800</pubDate>
+      <guid>https://xzl01.github.io/blog/reuse-compliance-guide/</guid>
+      <description>REUSE 适合解决一个很实际的问题：当项目中文件越来越多时，许可证文本、版权声明和资源文件的合规信息很容易逐步失控。与其靠人工约定，不如把这些信息放进可检查、可自动化处理的流程中。&#xA;什么是 REUSE REUSE 是一套围绕开源合规整理出来的工具与约定，主要用于下载许可证文本、补充版权声明，并检查项目中的声明是否符合规范。&#xA;使用 REUSE 配置项目 安装 REUSE 依赖本地 Python 环境，因此需要先安装 python 和 pip。&#xA;sudo apt install python3 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py sudo python3 get-pip.py 然后安装 REUSE：&#xA;pip3 install --user reuse 安装完成后，需要确保 ~/.local/bin 已经在 $PATH 中。在 Windows 上，对应路径通常类似于 %USERPROFILE%\AppData\Roaming\Python\Python39\Scripts，具体取决于 Python 版本。&#xA;使用 初始化项目 进入项目后运行 reuse init，工具会以交互方式询问所需许可证、版权所有人和邮箱。这里最重要的是许可证名称必须使用标准 SPDX 标识：许可证名称。&#xA;如果初始化时漏掉了某个许可证，也可以后续使用 reuse download &amp;lt;许可证名称&amp;gt; 单独下载，工具会把它们统一放到项目的 LICENSES 目录中。&#xA;为代码文件添加版权声明 使用自动化脚本添加 含有代码逻辑文件添加版权声明方法为：&#xA;reuse addheader --copyright=&amp;#34;UnionTech Software Technology Co., Ltd.&amp;#34; --license=GPL-3.0-or-later -r &amp;lt;目录&amp;gt; 这只是一个简单示例，REUSE 还有更多参数可用：</description>
+    </item>
+  </channel>
+</rss>

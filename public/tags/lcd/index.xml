@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>LCD on HarryLoong&#39;s Blog</title>
+    <link>https://xzl01.github.io/tags/lcd/</link>
+    <description>Recent content in LCD on HarryLoong&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 27 Mar 2026 18:30:00 +0800</lastBuildDate>
+    <atom:link href="https://xzl01.github.io/tags/lcd/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>ROCK 5A 驱动 ST7789 横屏（320×240）完整指南</title>
+      <link>https://xzl01.github.io/blog/rock5a-st7789-lcd-guide/</link>
+      <pubDate>Fri, 27 Mar 2026 18:30:00 +0800</pubDate>
+      <guid>https://xzl01.github.io/blog/rock5a-st7789-lcd-guide/</guid>
+      <description>&lt;h2 id=&#34;背景&#34;&gt;背景&lt;/h2&gt;&#xA;&lt;p&gt;ST7789 是一款常见的液晶控制芯片，最大分辨率 240×320。这块屏幕原生是竖屏（240 宽 × 320 高），通过 MADCTL 寄存器旋转后可以配置为横屏（320 宽 × 240 高）。&lt;/p&gt;&#xA;&lt;p&gt;在 ROCK 5A 上用 Python + spidev 调试时，遇到了 X 坐标超过 240 后画面&amp;quot;折回&amp;quot;到左侧的问题——根本原因是横屏旋转后显存地址窗口没有正确设置。&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

@@ -1,99 +1,19 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>DBMS on HarryLoong's Blog</title><link>https://xzl01.github.io/tags/dbms/</link><description>Recent content in DBMS on HarryLoong's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Wed, 04 Mar 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://xzl01.github.io/tags/dbms/index.xml" rel="self" type="application/rss+xml"/><item><title>数据库系统概述</title><link>https://xzl01.github.io/blog/database-overview/</link><pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate><guid>https://xzl01.github.io/blog/database-overview/</guid><description>&lt;p&gt;前期数据管理是用文件管理，而现在用数据库来管理。数据库系统是建立在操作系统的文件系统之上的&lt;/p&gt;
-&lt;h2 id="数据库管理数据的优势"&gt;数据库管理数据的优势：&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;数据完整性安全性的控制&lt;/li&gt;
-&lt;li&gt;数据统一管理&lt;/li&gt;
-&lt;li&gt;并发访问&lt;/li&gt;
-&lt;li&gt;数据恢复&lt;/li&gt;
-&lt;li&gt;有组织，长期存储，可共享&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id="为啥要学习研究数据库"&gt;为啥要学习研究数据库&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;最基础的数据进行有效管理&lt;/li&gt;
-&lt;li&gt;高端应用（科学应用与研究）&lt;/li&gt;
-&lt;li&gt;数据种类和规模开始急剧膨胀，应用广泛&lt;/li&gt;
-&lt;li&gt;数据库管理系统软件（DBMS）的实现包含了计算机技术发展的绝大部分成果&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id="数据"&gt;数据&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;数据就是一个描述现实世界的符号。&lt;/li&gt;
-&lt;li&gt;数据模型是描述数据的一组概念和定义。&lt;/li&gt;
-&lt;li&gt;（schema）数据模式是用某种数据类型描述企业&lt;/li&gt;
-&lt;li&gt;关系数据模型是我们现在用的主流数据模型（MongoDB是属于非关系型数据库），关系模型中的数据结构就是表，由行和列组成。行：元组 列：属性&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id="数据的特性"&gt;数据的特性:&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;数据是有&amp;quot;型”和“值&amp;quot;之分。数据的型是指数据的结构,数据的值是指数据的具体取值。&lt;/li&gt;
-&lt;li&gt;数据有定性表示和定量表示之分。（1，2，3，4是定量，大和小就是定性的）&lt;/li&gt;
-&lt;li&gt;数据受数据类型和取值范围的约束。数据类型是针对不同的应用场合设计的数据约束。数据类型不同,则数据的表示形式、存储方式以及能进行的操作运算也是各不相同。&lt;/li&gt;
-&lt;li&gt;数据具有载体和多种表现形式。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;信息:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;定义:信息是有一定含义的,经过加工处理的,对决策有价值的数据。（数据本身是没有意义的）&lt;/li&gt;
-&lt;li&gt;信息是对现实世界中存在的客观实体、现象、联系进行描述的有特定语义的数据，它是人类共享的一切知识及客观加工提炼出的各种消息的总和。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id="数据与信息"&gt;数据与信息&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;信息和数据既有联系,又有区别。在数据库领域,通常处理的是像学生记录这样的数据,它是有结构的,称之为结构化数据。正因为如此,通常对数据和信息不作严格区分。（结构化数据就是用类或者结构体能表述的数据，数据库只能存储这些数据，对于非结构化的数据比如word文档，这就要使用nosql数据库）&lt;/li&gt;
-&lt;li&gt;信息与数据的关系可以归纳为:数据是信息的载体,信息是数据的内涵。即数据是信息的符号表示,而信息通过数据描述，又是数据语义的解释。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id="数据处理"&gt;数据处理&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;
-&lt;p&gt;定义:又称为信息处理,是指对各种形式的数据进行收集、存储、传播和加工直至产生新信息输出的全过程。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;目的:&lt;/p&gt;
-&lt;p&gt;1.借助计算机科学地保存和管理大量复杂的数据，以方便而充分地利用这些宝贵的信息资源;&lt;/p&gt;
-&lt;p&gt;2.从大量已知的表示某些信息的原始数据出发,抽取、导出对人们有价值的、新的信息。&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id="数据管理"&gt;数据管理:&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;是数据处理的中心问题，是指数据的收集、整理、组织、存储、查询、维护和传送等各种操作,也是数据处理的基本环节,是数据处理必有的共性部分。&lt;/li&gt;
-&lt;li&gt;数据处理和数据管理是相互联系的,数据管理中各种操作都是数据处理业务必不可少的基本环节,数据管理技术的好坏,直接影响到数据处理的效率。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id="数据的抽象级联"&gt;数据的抽象级联&lt;/h2&gt;
-&lt;p&gt;&lt;img src="https://xzl01.github.io/images/imported/w-ktny/image_MkZ6-dBCRM.png" alt=""&gt;&lt;/p&gt;
-&lt;p&gt;physical schema描述的是数据是以何种方式存储在磁盘之上的（文件结构：堆，栈之类的）物理数据独立性&lt;/p&gt;
-&lt;p&gt;conceptual schema 概念模式，数据库的逻辑结构，概念模式中的表成为基表（数据是放在概念模式中）逻辑数据独立性&lt;/p&gt;
-&lt;p&gt;external schema 视图模式，在概念模式可以映射出不同的视图给用户，分权限访问&lt;/p&gt;
-&lt;h2 id="数据独立性"&gt;数据独立性&lt;/h2&gt;
-&lt;p&gt;应用程序不受数据的具体结构和存储方式的影响，数据库只负责数据方面的内容&lt;/p&gt;
-&lt;h3 id="逻辑数据独立性"&gt;逻辑数据独立性&lt;/h3&gt;
-&lt;p&gt;在一个数据库系统之上开发的应用程序不受存储逻辑结构的影响（应用程序都是基于view模式开发的）&lt;/p&gt;
-&lt;h3 id="数据物理独立性"&gt;数据物理独立性&lt;/h3&gt;
-&lt;p&gt;当数据的物理存储结构发生变化的时候，应用程序不发生变化&lt;/p&gt;
-&lt;p&gt;这二者是用数据库系统管理数据的最大的好处之一&lt;/p&gt;
-&lt;h2 id="数据库管理系统database-management-system-dbms"&gt;数据库管理系统(Database Management System, DBMS):&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;定义:位于用户和操作系统之间的一层数据管理软件,是数据库和用户之间的一个接口。&lt;/li&gt;
-&lt;li&gt;属性:数据库管理系统和操作系统一样都属于计算机的基础软件,也是一个大型复杂的软件系统。&lt;/li&gt;
-&lt;li&gt;作用:主要作用是在数据库建立、运行和维护时对数据库进行统一的管理控制和提供数据服务。&lt;/li&gt;
-&lt;li&gt;是数据库系统的一个重要组成部分&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id="数据库发展历史以及其分类"&gt;数据库发展历史以及其分类&lt;/h2&gt;
-&lt;h4 id="从数据管理方式看数据库"&gt;从数据管理方式看数据库：&lt;/h4&gt;
-&lt;ol&gt;
-&lt;li&gt;无管理阶段：计算机初级阶段，没有对数据永久保存的需求&lt;/li&gt;
-&lt;li&gt;文件系统数据管理阶段：计算机的非数征应用使得有长期保存数据的需求，操作系统出现让文件管理成为可能&lt;/li&gt;
-&lt;li&gt;数据库管理阶段：网状数据模型和层次数据模型————&amp;gt;关系数据模型&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h4 id="体系结构看数据库"&gt;体系结构看数据库：&lt;/h4&gt;
-&lt;ol&gt;
-&lt;li&gt;集中存放在一台主机（集中式的数据库系统）&lt;/li&gt;
-&lt;li&gt;并行的数据库系统，利用并行计算机的并行处理能力&lt;/li&gt;
-&lt;li&gt;分布式数据库系统（基于分布式的计算机系统）&lt;/li&gt;
-&lt;li&gt;联邦式数据库系统（也是基于分布式计算机系统，松散耦合）&lt;/li&gt;
-&lt;li&gt;移动数据库系统（移动通信能力）&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h4 id="基于数据库的应用系统的体系发展"&gt;基于数据库的应用系统的体系发展：&lt;/h4&gt;
-&lt;ol&gt;
-&lt;li&gt;集中式的结构&lt;/li&gt;
-&lt;li&gt;分布式结构&lt;/li&gt;
-&lt;li&gt;cs结构（客户端服务器结构）&lt;/li&gt;
-&lt;li&gt;bs结构 三层或者多层体系结构（前端只需要浏览器，不需要很强的处理能力（瘦客户机））
-这是未来的趋势，小程序和webapp&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;&lt;img src="https://xzl01.github.io/images/imported/w-ktny/image_1y9KhTAivY.png" alt="三层或者多层的体系结构 三层或者多层的体系结构 " title="三层或者多层的体系结构 三层或者多层的体系结构 "&gt;&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>DBMS on HarryLoong&#39;s Blog</title>
+    <link>https://xzl01.github.io/tags/dbms/</link>
+    <description>Recent content in DBMS on HarryLoong&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 04 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://xzl01.github.io/tags/dbms/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>数据库系统概述</title>
+      <link>https://xzl01.github.io/blog/database-overview/</link>
+      <pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://xzl01.github.io/blog/database-overview/</guid>
+      <description>前期数据管理是用文件管理，而现在用数据库来管理。数据库系统是建立在操作系统的文件系统之上的&#xA;数据库管理数据的优势： 数据完整性安全性的控制 数据统一管理 并发访问 数据恢复 有组织，长期存储，可共享 为啥要学习研究数据库 最基础的数据进行有效管理 高端应用（科学应用与研究） 数据种类和规模开始急剧膨胀，应用广泛 数据库管理系统软件（DBMS）的实现包含了计算机技术发展的绝大部分成果 数据 数据就是一个描述现实世界的符号。 数据模型是描述数据的一组概念和定义。 （schema）数据模式是用某种数据类型描述企业 关系数据模型是我们现在用的主流数据模型（MongoDB是属于非关系型数据库），关系模型中的数据结构就是表，由行和列组成。行：元组 列：属性 数据的特性: 数据是有&amp;quot;型”和“值&amp;quot;之分。数据的型是指数据的结构,数据的值是指数据的具体取值。 数据有定性表示和定量表示之分。（1，2，3，4是定量，大和小就是定性的） 数据受数据类型和取值范围的约束。数据类型是针对不同的应用场合设计的数据约束。数据类型不同,则数据的表示形式、存储方式以及能进行的操作运算也是各不相同。 数据具有载体和多种表现形式。 信息:&#xA;定义:信息是有一定含义的,经过加工处理的,对决策有价值的数据。（数据本身是没有意义的） 信息是对现实世界中存在的客观实体、现象、联系进行描述的有特定语义的数据，它是人类共享的一切知识及客观加工提炼出的各种消息的总和。 数据与信息 信息和数据既有联系,又有区别。在数据库领域,通常处理的是像学生记录这样的数据,它是有结构的,称之为结构化数据。正因为如此,通常对数据和信息不作严格区分。（结构化数据就是用类或者结构体能表述的数据，数据库只能存储这些数据，对于非结构化的数据比如word文档，这就要使用nosql数据库） 信息与数据的关系可以归纳为:数据是信息的载体,信息是数据的内涵。即数据是信息的符号表示,而信息通过数据描述，又是数据语义的解释。 数据处理 定义:又称为信息处理,是指对各种形式的数据进行收集、存储、传播和加工直至产生新信息输出的全过程。&#xA;目的:&#xA;1.借助计算机科学地保存和管理大量复杂的数据，以方便而充分地利用这些宝贵的信息资源;&#xA;2.从大量已知的表示某些信息的原始数据出发,抽取、导出对人们有价值的、新的信息。&#xA;数据管理: 是数据处理的中心问题，是指数据的收集、整理、组织、存储、查询、维护和传送等各种操作,也是数据处理的基本环节,是数据处理必有的共性部分。 数据处理和数据管理是相互联系的,数据管理中各种操作都是数据处理业务必不可少的基本环节,数据管理技术的好坏,直接影响到数据处理的效率。 数据的抽象级联 physical schema描述的是数据是以何种方式存储在磁盘之上的（文件结构：堆，栈之类的）物理数据独立性&#xA;conceptual schema 概念模式，数据库的逻辑结构，概念模式中的表成为基表（数据是放在概念模式中）逻辑数据独立性&#xA;external schema 视图模式，在概念模式可以映射出不同的视图给用户，分权限访问&#xA;数据独立性 应用程序不受数据的具体结构和存储方式的影响，数据库只负责数据方面的内容&#xA;逻辑数据独立性 在一个数据库系统之上开发的应用程序不受存储逻辑结构的影响（应用程序都是基于view模式开发的）&#xA;数据物理独立性 当数据的物理存储结构发生变化的时候，应用程序不发生变化&#xA;这二者是用数据库系统管理数据的最大的好处之一&#xA;数据库管理系统(Database Management System, DBMS): 定义:位于用户和操作系统之间的一层数据管理软件,是数据库和用户之间的一个接口。 属性:数据库管理系统和操作系统一样都属于计算机的基础软件,也是一个大型复杂的软件系统。 作用:主要作用是在数据库建立、运行和维护时对数据库进行统一的管理控制和提供数据服务。 是数据库系统的一个重要组成部分 数据库发展历史以及其分类 从数据管理方式看数据库： 无管理阶段：计算机初级阶段，没有对数据永久保存的需求 文件系统数据管理阶段：计算机的非数征应用使得有长期保存数据的需求，操作系统出现让文件管理成为可能 数据库管理阶段：网状数据模型和层次数据模型————&amp;gt;关系数据模型 体系结构看数据库： 集中存放在一台主机（集中式的数据库系统） 并行的数据库系统，利用并行计算机的并行处理能力 分布式数据库系统（基于分布式的计算机系统） 联邦式数据库系统（也是基于分布式计算机系统，松散耦合） 移动数据库系统（移动通信能力） 基于数据库的应用系统的体系发展： 集中式的结构 分布式结构 cs结构（客户端服务器结构） bs结构 三层或者多层体系结构（前端只需要浏览器，不需要很强的处理能力（瘦客户机）） 这是未来的趋势，小程序和webapp 云计算是未来</description>
+    </item>
+  </channel>
+</rss>

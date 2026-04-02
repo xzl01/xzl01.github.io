@@ -1,13 +1,19 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Desktop Entry on HarryLoong's Blog</title><link>https://xzl01.github.io/tags/desktop-entry/</link><description>Recent content in Desktop Entry on HarryLoong's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Fri, 06 Mar 2026 12:00:00 +0800</lastBuildDate><atom:link href="https://xzl01.github.io/tags/desktop-entry/index.xml" rel="self" type="application/rss+xml"/><item><title>.desktop 文件规范解读</title><link>https://xzl01.github.io/blog/desktop-entry-spec-guide/</link><pubDate>Fri, 06 Mar 2026 12:00:00 +0800</pubDate><guid>https://xzl01.github.io/blog/desktop-entry-spec-guide/</guid><description>&lt;p&gt;&lt;code&gt;.desktop&lt;/code&gt; 文件看上去只是一个配置文件，但它背后承载的是桌面入口、应用标识、MIME 声明以及本地化展示等一整套约定。把这些规则理清楚之后，很多桌面环境里的行为都会更容易解释。&lt;/p&gt;
-&lt;h2 id="文件命名"&gt;文件命名&lt;/h2&gt;
-&lt;p&gt;桌面条目文件应具有&lt;code&gt;.desktop&lt;/code&gt; 扩展名，但应具有扩展名的文件&lt;code&gt;Type&lt;/code&gt; &lt;code&gt;Directory&lt;/code&gt;除外 &lt;code&gt;.directory&lt;/code&gt;。根据扩展名确定文件类型非常容易和快速。当不存在文件扩展名时，桌面系统应通过“魔术检测”回退到识别。&lt;/p&gt;
-&lt;p&gt;对于应用程序，桌面文件的名称在扩展名之前的 &lt;code&gt;.desktop&lt;/code&gt;部分应该是有效的 &lt;a href="https://dbus.freedesktop.org/doc/dbus-specification.html#message-protocol-names" title="D-Bus 众所周知的名称"&gt;D-Bus 众所周知的名称&lt;/a&gt;。这意味着它是由点分隔的非空元素序列 (U+002E FULL STOP)，不能以数字开头，并且每个元素仅包含集合中的字符&lt;code&gt;[A-Za-z0-9-_]&lt;/code&gt;：ASCII 字母、数字、破折号 (U +002D HYPHEN-MINUS）和下划线（U+005F LOW LINE）。&lt;/p&gt;
-&lt;p&gt;桌面条目的名称应遵循“反向 DNS”约定：它应以应用程序作者控制的反向 DNS 域名开头，小写。域名后面应该是应用程序的名称，它通常由连在一起的单词和首字母大写 (CamelCase) 组成。例如，如果所有者 &lt;code&gt;example.org&lt;/code&gt;写入“Foo Viewer”，他们可能会选择名称&lt;code&gt;org.example.FooViewer&lt;/code&gt;，从而生成一个名为&lt;code&gt;org.example.FooViewer.desktop&lt;/code&gt; （与dbus命名方式一致）&lt;/p&gt;
-&lt;p&gt;允许但是不推荐使用破折号，因为在反向 DNS 名称的某些相关用途中不允许使用破折号，例如 D-Bus 对象路径和接口名称，以及 Flatpak 应用程序 ID。如果作者的域名包含破折号，建议用下划线代替：这不会引起歧义，因为下划线不允许出现在 DNS 域名中。&lt;/p&gt;
-&lt;p&gt;如果作者的域名包含以数字开头的标签（这在 D-Bus 知名名称中是不允许的），建议在桌面条目名称的该元素前加上下划线。例如，&lt;a href="http://7-zip.org" title="7-zip.org"&gt;7-zip.org&lt;/a&gt; 可能会发布一个名为 &lt;code&gt;org._7_zip.Archiver&lt;/code&gt;.（规避数字开头）&lt;/p&gt;
-&lt;h3 id="桌面文件-id"&gt;桌面文件 ID&lt;/h3&gt;
-&lt;p&gt;代表应用程序的每个桌面条目都由其&lt;em&gt;desktop file ID&lt;/em&gt;标识，该文件 ID 基于其文件名。&lt;/p&gt;
-&lt;p&gt;要确定桌面文件的 ID，请使其完整路径相对于 &lt;code&gt;$XDG_DATA_DIRS&lt;/code&gt;（见 &lt;a href="https://xzl01.github.io/blog/xdg-base-directory-spec/"&gt;XDG 基本目录规范&lt;/a&gt;）安装桌面文件的组件，删除 &lt;code&gt;applications/&lt;/code&gt; 之前的所有前缀，并将 &lt;code&gt;/&lt;/code&gt; 转换为 &lt;code&gt;-&lt;/code&gt;。&lt;/p&gt;
-&lt;p&gt;例如&lt;code&gt;/usr/share/applications/foo/bar.desktop&lt;/code&gt;具有桌面文件 ID &lt;code&gt;foo-bar.desktop&lt;/code&gt;。&lt;/p&gt;
-&lt;p&gt;如果多个文件具有相同的桌面文件 ID，则使用 &lt;code&gt;$XDG_DATA_DIRS&lt;/code&gt; 优先顺序中的第一个。&lt;/p&gt;
-&lt;p&gt;例如，如果&lt;code&gt;$XDG_DATA_DIRS&lt;/code&gt;包含默认路径 &lt;code&gt;/usr/local/share:/usr/share&lt;/code&gt;，则 &lt;code&gt;/usr/local/share/applications/org.foo.bar.desktop&lt;/code&gt;和 &lt;code&gt;/usr/share/applications/org.foo.bar.desktop&lt;/code&gt;都具有相同的桌面文件 ID &lt;code&gt;org.foo.bar.desktop&lt;/code&gt;，但只会使用第一个。&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Desktop Entry on HarryLoong&#39;s Blog</title>
+    <link>https://xzl01.github.io/tags/desktop-entry/</link>
+    <description>Recent content in Desktop Entry on HarryLoong&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 06 Mar 2026 12:00:00 +0800</lastBuildDate>
+    <atom:link href="https://xzl01.github.io/tags/desktop-entry/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>.desktop 文件规范解读</title>
+      <link>https://xzl01.github.io/blog/desktop-entry-spec-guide/</link>
+      <pubDate>Fri, 06 Mar 2026 12:00:00 +0800</pubDate>
+      <guid>https://xzl01.github.io/blog/desktop-entry-spec-guide/</guid>
+      <description>.desktop 文件看上去只是一个配置文件，但它背后承载的是桌面入口、应用标识、MIME 声明以及本地化展示等一整套约定。把这些规则理清楚之后，很多桌面环境里的行为都会更容易解释。&#xA;文件命名 桌面条目文件应具有.desktop 扩展名，但应具有扩展名的文件Type Directory除外 .directory。根据扩展名确定文件类型非常容易和快速。当不存在文件扩展名时，桌面系统应通过“魔术检测”回退到识别。&#xA;对于应用程序，桌面文件的名称在扩展名之前的 .desktop部分应该是有效的 D-Bus 众所周知的名称。这意味着它是由点分隔的非空元素序列 (U+002E FULL STOP)，不能以数字开头，并且每个元素仅包含集合中的字符[A-Za-z0-9-_]：ASCII 字母、数字、破折号 (U +002D HYPHEN-MINUS）和下划线（U+005F LOW LINE）。&#xA;桌面条目的名称应遵循“反向 DNS”约定：它应以应用程序作者控制的反向 DNS 域名开头，小写。域名后面应该是应用程序的名称，它通常由连在一起的单词和首字母大写 (CamelCase) 组成。例如，如果所有者 example.org写入“Foo Viewer”，他们可能会选择名称org.example.FooViewer，从而生成一个名为org.example.FooViewer.desktop （与dbus命名方式一致）&#xA;允许但是不推荐使用破折号，因为在反向 DNS 名称的某些相关用途中不允许使用破折号，例如 D-Bus 对象路径和接口名称，以及 Flatpak 应用程序 ID。如果作者的域名包含破折号，建议用下划线代替：这不会引起歧义，因为下划线不允许出现在 DNS 域名中。&#xA;如果作者的域名包含以数字开头的标签（这在 D-Bus 知名名称中是不允许的），建议在桌面条目名称的该元素前加上下划线。例如，7-zip.org 可能会发布一个名为 org._7_zip.Archiver.（规避数字开头）&#xA;桌面文件 ID 代表应用程序的每个桌面条目都由其desktop file ID标识，该文件 ID 基于其文件名。&#xA;要确定桌面文件的 ID，请使其完整路径相对于 $XDG_DATA_DIRS（见 XDG 基本目录规范）安装桌面文件的组件，删除 applications/ 之前的所有前缀，并将 / 转换为 -。&#xA;例如/usr/share/applications/foo/bar.desktop具有桌面文件 ID foo-bar.desktop。&#xA;如果多个文件具有相同的桌面文件 ID，则使用 $XDG_DATA_DIRS 优先顺序中的第一个。&#xA;例如，如果$XDG_DATA_DIRS包含默认路径 /usr/local/share:/usr/share，则 /usr/local/share/applications/org.</description>
+    </item>
+  </channel>
+</rss>

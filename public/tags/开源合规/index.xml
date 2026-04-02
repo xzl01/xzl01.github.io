@@ -1,21 +1,19 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>开源合规 on HarryLoong's Blog</title><link>https://xzl01.github.io/tags/%E5%BC%80%E6%BA%90%E5%90%88%E8%A7%84/</link><description>Recent content in 开源合规 on HarryLoong's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Fri, 06 Mar 2026 09:20:00 +0800</lastBuildDate><atom:link href="https://xzl01.github.io/tags/%E5%BC%80%E6%BA%90%E5%90%88%E8%A7%84/index.xml" rel="self" type="application/rss+xml"/><item><title>REUSE 使用指南</title><link>https://xzl01.github.io/blog/reuse-compliance-guide/</link><pubDate>Fri, 06 Mar 2026 09:20:00 +0800</pubDate><guid>https://xzl01.github.io/blog/reuse-compliance-guide/</guid><description>&lt;p&gt;REUSE 适合解决一个很实际的问题：当项目中文件越来越多时，许可证文本、版权声明和资源文件的合规信息很容易逐步失控。与其靠人工约定，不如把这些信息放进可检查、可自动化处理的流程中。&lt;/p&gt;
-&lt;h2 id="什么是-reuse"&gt;什么是 REUSE&lt;/h2&gt;
-&lt;p&gt;REUSE 是一套围绕开源合规整理出来的工具与约定，主要用于下载许可证文本、补充版权声明，并检查项目中的声明是否符合规范。&lt;/p&gt;
-&lt;h2 id="使用-reuse-配置项目"&gt;使用 REUSE 配置项目&lt;/h2&gt;
-&lt;h2 id="安装"&gt;安装&lt;/h2&gt;
-&lt;p&gt;REUSE 依赖本地 Python 环境，因此需要先安装 &lt;code&gt;python&lt;/code&gt; 和 &lt;code&gt;pip&lt;/code&gt;。&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo apt install python3
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;sudo python3 get-pip.py
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;然后安装 REUSE：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;pip3 install --user reuse
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;安装完成后，需要确保 &lt;code&gt;~/.local/bin&lt;/code&gt; 已经在 &lt;code&gt;$PATH&lt;/code&gt; 中。在 Windows 上，对应路径通常类似于 &lt;code&gt;%USERPROFILE%\AppData\Roaming\Python\Python39\Scripts&lt;/code&gt;，具体取决于 Python 版本。&lt;/p&gt;
-&lt;h2 id="使用"&gt;使用&lt;/h2&gt;
-&lt;h3 id="初始化项目"&gt;初始化项目&lt;/h3&gt;
-&lt;p&gt;进入项目后运行 &lt;code&gt;reuse init&lt;/code&gt;，工具会以交互方式询问所需许可证、版权所有人和邮箱。这里最重要的是许可证名称必须使用标准 SPDX 标识：&lt;a href="https://spdx.org/licenses/" title="许可证名称"&gt;许可证名称&lt;/a&gt;。&lt;/p&gt;
-&lt;p&gt;如果初始化时漏掉了某个许可证，也可以后续使用 &lt;code&gt;reuse download &amp;lt;许可证名称&amp;gt;&lt;/code&gt; 单独下载，工具会把它们统一放到项目的 &lt;code&gt;LICENSES&lt;/code&gt; 目录中。&lt;/p&gt;
-&lt;h3 id="为代码文件添加版权声明"&gt;为代码文件添加版权声明&lt;/h3&gt;
-&lt;h4 id="使用自动化脚本添加"&gt;使用自动化脚本添加&lt;/h4&gt;
-&lt;p&gt;含有代码逻辑文件添加版权声明方法为：&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;reuse addheader --copyright&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;#34;UnionTech Software Technology Co., Ltd.&amp;#34;&lt;/span&gt; --license&lt;span class="o"&gt;=&lt;/span&gt;GPL-3.0-or-later -r &amp;lt;目录&amp;gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;这只是一个简单示例，REUSE 还有更多参数可用：&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>开源合规 on HarryLoong&#39;s Blog</title>
+    <link>https://xzl01.github.io/tags/%E5%BC%80%E6%BA%90%E5%90%88%E8%A7%84/</link>
+    <description>Recent content in 开源合规 on HarryLoong&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 06 Mar 2026 09:20:00 +0800</lastBuildDate>
+    <atom:link href="https://xzl01.github.io/tags/%E5%BC%80%E6%BA%90%E5%90%88%E8%A7%84/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>REUSE 使用指南</title>
+      <link>https://xzl01.github.io/blog/reuse-compliance-guide/</link>
+      <pubDate>Fri, 06 Mar 2026 09:20:00 +0800</pubDate>
+      <guid>https://xzl01.github.io/blog/reuse-compliance-guide/</guid>
+      <description>REUSE 适合解决一个很实际的问题：当项目中文件越来越多时，许可证文本、版权声明和资源文件的合规信息很容易逐步失控。与其靠人工约定，不如把这些信息放进可检查、可自动化处理的流程中。&#xA;什么是 REUSE REUSE 是一套围绕开源合规整理出来的工具与约定，主要用于下载许可证文本、补充版权声明，并检查项目中的声明是否符合规范。&#xA;使用 REUSE 配置项目 安装 REUSE 依赖本地 Python 环境，因此需要先安装 python 和 pip。&#xA;sudo apt install python3 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py sudo python3 get-pip.py 然后安装 REUSE：&#xA;pip3 install --user reuse 安装完成后，需要确保 ~/.local/bin 已经在 $PATH 中。在 Windows 上，对应路径通常类似于 %USERPROFILE%\AppData\Roaming\Python\Python39\Scripts，具体取决于 Python 版本。&#xA;使用 初始化项目 进入项目后运行 reuse init，工具会以交互方式询问所需许可证、版权所有人和邮箱。这里最重要的是许可证名称必须使用标准 SPDX 标识：许可证名称。&#xA;如果初始化时漏掉了某个许可证，也可以后续使用 reuse download &amp;lt;许可证名称&amp;gt; 单独下载，工具会把它们统一放到项目的 LICENSES 目录中。&#xA;为代码文件添加版权声明 使用自动化脚本添加 含有代码逻辑文件添加版权声明方法为：&#xA;reuse addheader --copyright=&amp;#34;UnionTech Software Technology Co., Ltd.&amp;#34; --license=GPL-3.0-or-later -r &amp;lt;目录&amp;gt; 这只是一个简单示例，REUSE 还有更多参数可用：</description>
+    </item>
+  </channel>
+</rss>

@@ -1,40 +1,19 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>AccountsService on HarryLoong's Blog</title><link>https://xzl01.github.io/tags/accountsservice/</link><description>Recent content in AccountsService on HarryLoong's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Wed, 04 Mar 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://xzl01.github.io/tags/accountsservice/index.xml" rel="self" type="application/rss+xml"/><item><title>AccountsService 接口说明</title><link>https://xzl01.github.io/blog/linux-accountsservice-guide/</link><pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate><guid>https://xzl01.github.io/blog/linux-accountsservice-guide/</guid><description>&lt;h2 id="cacheuser-"&gt;CacheUser ()&lt;/h2&gt;
-&lt;p&gt;CacheUser (in &amp;rsquo;s&amp;rsquo; name, out &amp;lsquo;o&amp;rsquo; user)
-缓存一个用户帐户，以便它显示在ListCachedUsers() 输出中。用户名可以是远程用户，但是系统必须能够查找用户名并解析用户信息。&lt;/p&gt;
-&lt;p&gt;传入参数*&lt;code&gt;name&lt;/code&gt;*:用户的用户名&lt;/p&gt;
-&lt;p&gt;返回参数*&lt;code&gt;user&lt;/code&gt;*:用户对象的路径&lt;/p&gt;
-&lt;h3 id="错误"&gt;错误&lt;/h3&gt;
-&lt;p&gt;&lt;em&gt;&lt;code&gt;org.freedesktop.Accounts.Error.PermissionDenied&lt;/code&gt;&lt;/em&gt;:&lt;/p&gt;
-&lt;p&gt;如果调用者缺乏适当的PolicyKit授权&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;&lt;code&gt;org.freedesktop.Accounts.Error.UserDoesNotExist&lt;/code&gt;&lt;/em&gt;:
-如果用户名无法解析(含有非法字符）&lt;/p&gt;
-&lt;h3 id="权限"&gt;权限&lt;/h3&gt;
-&lt;p&gt;调用者需要有 &lt;code&gt;org.freedesktop.accounts.user-administration&lt;/code&gt; PolicyKit 权限.&lt;/p&gt;
-&lt;h2 id="createuser-"&gt;CreateUser ()&lt;/h2&gt;
-&lt;p&gt;CreateUser (in &amp;rsquo;s&amp;rsquo; name,&lt;/p&gt;
-&lt;p&gt;in &amp;rsquo;s&amp;rsquo; fullname,&lt;/p&gt;
-&lt;p&gt;out &amp;lsquo;o&amp;rsquo; user,&lt;/p&gt;
-&lt;p&gt;in &amp;lsquo;i&amp;rsquo; accountType)&lt;/p&gt;
-&lt;p&gt;创建一个新的用户账户
-accountType参数可以采用以下值:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;0:&lt;/strong&gt; 普通用户&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;1:&lt;/strong&gt; 管理员&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;em&gt;&lt;code&gt;name&lt;/code&gt;&lt;/em&gt;:&lt;/p&gt;
-&lt;p&gt;新用户的用户名&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;&lt;code&gt;fullname&lt;/code&gt;&lt;/em&gt;:&lt;/p&gt;
-&lt;p&gt;新用户的真实姓名（全名）&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;&lt;code&gt;user&lt;/code&gt;&lt;/em&gt;:&lt;/p&gt;
-&lt;p&gt;新用户的对象路径&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;&lt;code&gt;accountType&lt;/code&gt;&lt;/em&gt;:&lt;/p&gt;
-&lt;p&gt;用户类型&lt;/p&gt;
-&lt;h3 id="errors"&gt;Errors&lt;/h3&gt;
-&lt;p&gt;&lt;em&gt;&lt;code&gt;org.freedesktop.Accounts.Error.PermissionDenied&lt;/code&gt;&lt;/em&gt;:&lt;/p&gt;
-&lt;p&gt;如果调用者缺乏适当的PolicyKit授权&lt;/p&gt;
-&lt;p&gt;&lt;em&gt;&lt;code&gt;org.freedesktop.Accounts.Error.Failed&lt;/code&gt;&lt;/em&gt;:&lt;/p&gt;
-&lt;p&gt;如果操作失败&lt;/p&gt;
-&lt;h3 id="permissions"&gt;Permissions&lt;/h3&gt;
-&lt;p&gt;The caller needs the org.freedesktop.accounts.user-administration PolicyKit authorization.&lt;/p&gt;
-&lt;h2 id="deleteuser-"&gt;DeleteUser ()&lt;/h2&gt;
-&lt;p&gt;DeleteUser (in &amp;lsquo;x&amp;rsquo; id,&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>AccountsService on HarryLoong&#39;s Blog</title>
+    <link>https://xzl01.github.io/tags/accountsservice/</link>
+    <description>Recent content in AccountsService on HarryLoong&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 04 Mar 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://xzl01.github.io/tags/accountsservice/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>AccountsService 接口说明</title>
+      <link>https://xzl01.github.io/blog/linux-accountsservice-guide/</link>
+      <pubDate>Wed, 04 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>https://xzl01.github.io/blog/linux-accountsservice-guide/</guid>
+      <description>CacheUser () CacheUser (in &amp;rsquo;s&amp;rsquo; name, out &amp;lsquo;o&amp;rsquo; user) 缓存一个用户帐户，以便它显示在ListCachedUsers() 输出中。用户名可以是远程用户，但是系统必须能够查找用户名并解析用户信息。&#xA;传入参数*name*:用户的用户名&#xA;返回参数*user*:用户对象的路径&#xA;错误 org.freedesktop.Accounts.Error.PermissionDenied:&#xA;如果调用者缺乏适当的PolicyKit授权&#xA;org.freedesktop.Accounts.Error.UserDoesNotExist: 如果用户名无法解析(含有非法字符）&#xA;权限 调用者需要有 org.freedesktop.accounts.user-administration PolicyKit 权限.&#xA;CreateUser () CreateUser (in &amp;rsquo;s&amp;rsquo; name,&#xA;in &amp;rsquo;s&amp;rsquo; fullname,&#xA;out &amp;lsquo;o&amp;rsquo; user,&#xA;in &amp;lsquo;i&amp;rsquo; accountType)&#xA;创建一个新的用户账户 accountType参数可以采用以下值:&#xA;0: 普通用户 1: 管理员 name:&#xA;新用户的用户名&#xA;fullname:&#xA;新用户的真实姓名（全名）&#xA;user:&#xA;新用户的对象路径&#xA;accountType:&#xA;用户类型&#xA;Errors org.freedesktop.Accounts.Error.PermissionDenied:&#xA;如果调用者缺乏适当的PolicyKit授权&#xA;org.freedesktop.Accounts.Error.Failed:&#xA;如果操作失败&#xA;Permissions The caller needs the org.freedesktop.accounts.user-administration PolicyKit authorization.&#xA;DeleteUser () DeleteUser (in &amp;lsquo;x&amp;rsquo; id,</description>
+    </item>
+  </channel>
+</rss>

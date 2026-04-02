@@ -1,11 +1,289 @@
-<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Agent Skill：把人的可执行能力封装给 AI Agent - HarryLoong's Blog</title><meta name=description content="Skill 本质上是对一项可重复能力的封装。更理想的方式不是由人直接编写 skill，而是先教会 AI 做事，再由 AI 自己总结成 skill 并持续微调。"><script>document.documentElement.classList.add("js")</script><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet href="/css/site.css?v=1773197987"></head><body class=inner-page><div class="bg-shape bg-shape-a" aria-hidden=true></div><div class="bg-shape bg-shape-b" aria-hidden=true></div><div class=solar-blob aria-hidden=true></div><header class=hero><div class="container hero-inner reveal"><p class=eyebrow>ARTICLE</p><h1>Agent Skill：把人的可执行能力封装给 AI Agent</h1><p class=subtitle>Skill 本质上是对一项可重复能力的封装。更理想的方式不是由人直接编写 skill，而是先教会 AI 做事，再由 AI 自己总结成 skill 并持续微调。</p></div></header><nav class=top-nav><div class="container nav-inner"><div class=nav-links aria-label=主导航><a href=/>首页</a>
-<a href=/blog/>文章</a>
-<a href=/gallery/>图库</a></div><div class=theme-controls aria-label=主题控制><select id=theme-mode-select class=theme-select aria-label=主题模式><option value=auto>自动</option><option value=manual>手动</option></select>
-<select id=theme-palette-select class=theme-select aria-label=主题配色><option value=sunrise>莫兰迪·日出</option><option value=noon>莫兰迪·中午</option><option value=dusk>莫兰迪·傍晚</option><option value=midnight>莫兰迪·深夜</option><option value=mist>莫兰迪·雾青</option><option value=rose>莫兰迪·灰粉</option></select></div></div></nav><main class="container main-wrap"><section class=single-layout><article class=single-post><header class=post-header><p class=post-kicker>Article</p><h1 class=post-title>Agent Skill：把人的可执行能力封装给 AI Agent</h1><p class=post-summary>Skill 本质上是对一项可重复能力的封装。更理想的方式不是由人直接编写 skill，而是先教会 AI 做事，再由 AI 自己总结成 skill 并持续微调。</p><div class=post-meta><span>2026-03-06 16:10
-</span><span>·</span>
-<span>2 分钟阅读</span>
-<span>·</span>
-<span>AI Agent / 工程实践</span></div><div class="tag-list post-tags"><a class=tag href=/tags/ai-agent/>AI Agent</a>
-<a class=tag href=/tags/skill/>Skill</a>
-<a class=tag href=/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/>自动化</a>
-<a class=tag href=/tags/%E5%B7%A5%E4%BD%9C%E6%B5%81/>工作流</a></div></header><div class=post-divider aria-hidden=true></div><div class=post-content><p>很多人第一次接触 <code>agent skill</code> 时，会把它理解成“给 AI 增加一个插件”。</p><p>这个理解不算错，但还不够准确。</p><p>我更愿意把 <code>skill</code> 看成一层能力封装：它不是单纯扩展了一个功能入口，而是把一件原本需要人手动完成的事情，整理成一套 AI agent 可以稳定复用的执行方法。</p><p>而且我越来越倾向于认为，<code>skill</code> 最好的来源并不是“人坐下来写一份说明书”，而是用户先把 agent 教会，再由 agent 自己把这项能力总结出来。</p><h2 id=skill-到底在封装什么>Skill 到底在封装什么</h2><p>所谓 <code>skill</code>，封装的并不是“某个按钮”或者“某个命令”，而是一段相对完整的能力。</p><p>比如：</p><ul><li>如何检查一个仓库的构建是否正常</li><li>如何把一批 Markdown 文档整理成博客文章</li><li>如何为一个项目生成符合约定的发布说明</li><li>如何在固定目录下扫描日志并提取异常信息</li></ul><p>这些事情的共同点是：</p><ol><li>有明确目标</li><li>有可重复步骤</li><li>有输入和输出</li><li>能通过计算机完成</li></ol><p>一旦满足这四点，它就不再只是“某个人会做的一件事”，而是可以被工程化描述、被标准化复用、被 agent 调用的一项能力。</p><h2 id=skill-的本质是经验的结构化>Skill 的本质是经验的结构化</h2><p>一个人能做某件事，不代表 agent 立刻就能做。</p><p>中间差的那一步，就是把人的经验从“脑子里的模糊直觉”，变成“机器可执行的结构化说明”。</p><p>这一步通常包括：</p><ul><li>说明这项能力的目标是什么</li><li>指定输入从哪里来</li><li>规定执行时要遵循哪些步骤</li><li>明确什么算成功，什么算失败</li><li>约束边界条件和风险点</li></ul><p>换句话说，<code>skill</code> 不是凭空制造能力，而是把已有能力整理成一种更稳定、更可组合的形式。</p><p>人会做，才有可能封装。</p><p>如果连人自己都说不清“这件事到底怎么做、做到什么程度算完成、出错时怎么判断”，那它通常还不具备被封装成 skill 的条件。</p><h2 id=只要人能通过计算机完成就有机会被封装>只要人能通过计算机完成，就有机会被封装</h2><p>这是我觉得最重要的一点。</p><p>如果一个人能够借助计算机完成一件事情，那么原则上，这件事情就有机会被封装成 <code>skill</code>，再交给 AI agent 使用。</p><p>这里的关键不在于“这件事是否复杂”，而在于“它是否可以被描述清楚”。</p><p>例如：</p><ul><li>部署一个服务</li><li>检查一份配置是否符合规范</li><li>批量重命名文件</li><li>从代码库里抽取变更点并整理成周报</li><li>根据既有风格撰写一篇技术博客</li></ul><p>这些事情里，有的偏工程，有的偏内容，有的偏运维，有的偏数据处理。</p><p>它们领域不同，但抽象结构非常相似：输入一组上下文，按照一套规则执行，输出一个结果。</p><p>而这正是 skill 最适合承载的东西。</p><p>这里的关键不是“先写一个 skill 文件”，而是先确认这项能力本身是否真的存在、是否能被重复执行、是否能被 agent 学会。</p><h2 id=为什么不应该主要靠人直接写-skill>为什么不应该主要靠人直接写 Skill</h2><p>很多人会自然地想到：既然 skill 是一套能力描述，那就让人来写不就行了。</p><p>但这件事的问题恰恰在这里。</p><p>人写出来的东西，往往会带着这些问题：</p><ul><li>表达模糊</li><li>默认前提太多</li><li>步骤跳跃</li><li>边界条件写不清</li><li>成功标准不稳定</li></ul><p>一个熟练的人类工程师，在脑子里会自动补全很多上下文，所以他写下来的说明看起来已经“够用了”。但对于 agent 来说，这种说明经常是不够精确的。</p><p>最典型的情况是：</p><ul><li>人觉得“这里改一下配置就行”</li><li>agent 不知道到底要改哪个文件、改哪一行、改完之后怎么验证</li></ul><p>也就是说，人类写 skill 的方式，天然容易把大量隐性经验藏在字缝里。</p><p>这会导致 skill 看起来像是有了，实际上执行起来依旧不稳定。</p><h2 id=更合理的方式先教会-agent再让-agent-总结>更合理的方式：先教会 Agent，再让 Agent 总结</h2><p>我更认同的方式是：</p><ol><li>用户先带着 agent 完成一件具体的事情</li><li>在过程中不断纠正 agent 的理解和动作</li><li>当任务完成后，让 agent 反过来总结“这件事情应该如何做”</li><li>再把这份总结沉淀成 skill</li></ol><p>这样做有一个明显优势：</p><p>这份 skill 不是凭空写出来的，而是从一次真实执行中长出来的。</p><p>它记录的不是“人以为应该怎么做”，而是“agent 在真实环境里怎样才能做成”。</p><p>两者差别很大。</p><p>前者更像纸面流程，后者更像经过验证的工作流。</p><h2 id=skill-应该是可演化的不是一次性文档>Skill 应该是可演化的，不是一次性文档</h2><p>如果 skill 真的是能力封装，那么它就不应该是一次写完、永远不变的东西。</p><p>它应该随着执行不断被修正。</p><p>比如：</p><ul><li>某一步经常失败，那就应该补充前置检查</li><li>某个命令在不同环境下不稳定，那就应该加入分支条件</li><li>某类输入经常引起歧义，那就应该补充更明确的约束</li><li>某个输出不符合预期，那就应该重写成功标准</li></ul><p>从这个角度看，skill 更像是一份持续迭代的执行资产。</p><p>第一次只是初稿。</p><p>后面每次真实调用、每次失败、每次人工纠正，都会让这份 skill 更接近“一个真正可用的能力模块”。</p><p>所以更合理的链路不是：</p><p><code>人写 skill -> agent 使用</code></p><p>而应该是：</p><p><code>人教 agent 做事 -> agent 总结 skill -> 后续执行持续微调</code></p><p>这条链路更符合 agent 的成长方式，也更符合工程现实。</p><h2 id=为什么-skill-对-agent-特别重要>为什么 Skill 对 Agent 特别重要</h2><p>没有 skill 的 agent，更多依赖临场推理。</p><p>它可以回答问题，也可以尝试做事，但执行质量会明显依赖上下文是否完整、提示词是否精确，以及这次推理是否刚好走到了正确路径。</p><p>有了 skill 之后，agent 的能力会出现一个很大的变化：从“每次重新想一遍”，变成“调用一套已经整理好的做法”。</p><p>这会带来几个直接收益：</p><ul><li>稳定性更高</li><li>输出更一致</li><li>更容易复用</li><li>更容易组合成更长的工作流</li></ul><p>本来需要一个熟练工程师反复做的事情，一旦被整理成 skill，就可能变成 agent 的基础能力模块。</p><p>而当基础能力模块足够多，agent 才真正开始接近“可用的协作者”，而不是“偶尔聪明的聊天机器人”。</p><h2 id=skill-不是魔法仍然是工程>Skill 不是魔法，仍然是工程</h2><p>讲到这里，很容易把 skill 想得过于理想化，好像只要写一段说明，agent 就自动掌握了一项技能。</p><p>实际并不是这样。</p><p>好的 skill，依旧是一种工程产物。</p><p>它需要反复迭代，需要处理失败场景，需要考虑权限、依赖、环境差异、输入脏数据、输出质量、人工确认节点。</p><p>也就是说，封装 skill 的过程，本身就是在做一件非常标准的工程化工作：</p><ul><li>抽象问题</li><li>固化流程</li><li>降低不确定性</li><li>把经验沉淀成资产</li></ul><p>从这个角度看，<code>skill</code> 其实很像函数、脚本、CLI 工具、操作手册和 SOP 的结合体。</p><p>区别只是：它最终服务的对象，不再只是人，而是 AI agent。</p><h2 id=对个人和团队来说这意味着什么>对个人和团队来说，这意味着什么</h2><p>如果你接受“skill 是能力封装”这个视角，那么很多事情都会变得更清楚。</p><p>对于个人来说，skill 的沉淀过程，其实是在逼自己回答一个问题：</p><blockquote><p>我到底会什么？我会的这件事，能不能被我讲清楚、拆清楚、交给别人或者交给 agent 去执行？</p></blockquote><p>对于团队来说，skill 的价值更大。</p><p>很多原本附着在少数人身上的经验，例如打包发布、故障排查、文档整理、合规检查、数据导出，这些都可以逐步沉淀为可复用能力，而不是一直停留在“只有某个人会”的状态。</p><p>这会让团队知识更容易继承，也会让 agent 真正开始接入生产流程。</p><h2 id=最后>最后</h2><p>我越来越倾向于把 AI agent 看成一种新的执行接口。</p><p>而 <code>skill</code>，就是这个接口背后的能力描述层。</p><p>它的价值不在于“让 AI 看起来更强”，而在于把人的能力以一种可执行、可复用、可组合的方式重新组织起来。</p><p>所以我对 skill 的理解很简单：</p><p>如果一个人能通过计算机干成一件事情，那么这件事情就值得尝试被封装成 skill。</p><p>但这个封装动作，未必应该由人直接拿键盘去写。</p><p>更好的方式，是先让用户把 agent 教会，让它在真实任务中学会边界、步骤、验证方法和失败处理，再由它自己把这些经验总结成 skill，并在后续反复执行中持续微调。</p><p>这样形成的 skill，才更像真正的能力，而不是一份看上去完整、实际上充满歧义的说明书。</p></div></article><aside class=post-toc><div class=post-toc-inner><p class=post-toc-title>目录</p><nav id=TableOfContents><ul><li><a href=#skill-到底在封装什么>Skill 到底在封装什么</a></li><li><a href=#skill-的本质是经验的结构化>Skill 的本质是经验的结构化</a></li><li><a href=#只要人能通过计算机完成就有机会被封装>只要人能通过计算机完成，就有机会被封装</a></li><li><a href=#为什么不应该主要靠人直接写-skill>为什么不应该主要靠人直接写 Skill</a></li><li><a href=#更合理的方式先教会-agent再让-agent-总结>更合理的方式：先教会 Agent，再让 Agent 总结</a></li><li><a href=#skill-应该是可演化的不是一次性文档>Skill 应该是可演化的，不是一次性文档</a></li><li><a href=#为什么-skill-对-agent-特别重要>为什么 Skill 对 Agent 特别重要</a></li><li><a href=#skill-不是魔法仍然是工程>Skill 不是魔法，仍然是工程</a></li><li><a href=#对个人和团队来说这意味着什么>对个人和团队来说，这意味着什么</a></li><li><a href=#最后>最后</a></li></ul></nav></div></aside></section></main><footer class=site-footer><a class=footer-github href=https://github.com/xzl01 target=_blank rel="noopener noreferrer" aria-label=GitHub><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5A11.5 11.5.0 00.5 12.27a11.8 11.8.0 007.86 11.3c.58.11.8-.26.8-.57v-2.02c-3.2.72-3.88-1.58-3.88-1.58-.53-1.38-1.3-1.75-1.3-1.75-1.06-.75.08-.74.08-.74 1.18.09 1.79 1.25 1.79 1.25 1.05 1.86 2.75 1.32 3.42 1 .11-.78.41-1.32.74-1.62-2.55-.3-5.24-1.31-5.24-5.85.0-1.29.45-2.35 1.2-3.18-.12-.3-.52-1.52.11-3.17.0.0.98-.32 3.2 1.21a10.86 10.86.0 015.83.0c2.22-1.53 3.2-1.21 3.2-1.21.63 1.65.23 2.87.11 3.17.75.83 1.2 1.89 1.2 3.18.0 4.56-2.69 5.55-5.25 5.84.42.37.79 1.09.79 2.2V23c0 .31.21.68.8.57a11.8 11.8.0 007.85-11.3A11.5 11.5.0 0012 .5z"/></svg></a><p>&copy; 2026 HarryLoong</p><p class=footer-meta>commit local · updated 2026-03-11 10:59:47 +0800</p></footer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js></script><script src="/js/site.js?v=1773197987"></script></body></html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    
+    
+    
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Skill：把人的可执行能力封装给 AI Agent - HarryLoong&#39;s Blog</title>
+    <meta name="description" content="Skill 本质上是对一项可重复能力的封装。更理想的方式不是由人直接编写 skill，而是先教会 AI 做事，再由 AI 自己总结成 skill 并持续微调。">
+    <script>document.documentElement.classList.add('js');</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"></noscript>
+    <link rel="stylesheet" href="/css/site.css?v=1775144721">
+</head>
+<body class="inner-page">
+    <div class="bg-shape bg-shape-a" aria-hidden="true"></div>
+    <div class="bg-shape bg-shape-b" aria-hidden="true"></div>
+    <div class="solar-blob" aria-hidden="true"></div>
+
+    <header class="hero">
+        <div class="container hero-inner reveal">
+            
+            <p class="eyebrow">ARTICLE</p>
+            <h1>Agent Skill：把人的可执行能力封装给 AI Agent</h1>
+            <p class="subtitle">Skill 本质上是对一项可重复能力的封装。更理想的方式不是由人直接编写 skill，而是先教会 AI 做事，再由 AI 自己总结成 skill 并持续微调。</p>
+            
+        </div>
+    </header>
+
+    <nav class="top-nav">
+        <div class="container nav-inner">
+            <div class="nav-links" aria-label="主导航">
+                <a href="/">首页</a>
+                <a href="/blog/">文章</a>
+                <a href="/gallery/">图库</a>
+            </div>
+            <div class="theme-controls" aria-label="主题控制">
+                <select id="theme-mode-select" class="theme-select" aria-label="主题模式">
+                    <option value="auto">自动</option>
+                    <option value="manual">手动</option>
+                </select>
+                <select id="theme-palette-select" class="theme-select" aria-label="主题配色">
+                    <option value="sunrise">莫兰迪·日出</option>
+                    <option value="noon">莫兰迪·中午</option>
+                    <option value="dusk">莫兰迪·傍晚</option>
+                    <option value="midnight">莫兰迪·深夜</option>
+                    <option value="mist">莫兰迪·雾青</option>
+                    <option value="rose">莫兰迪·灰粉</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container main-wrap">
+        
+<section class="single-layout">
+    <article class="single-post">
+        <header class="post-header">
+            <p class="post-kicker">Article</p>
+            <h1 class="post-title">Agent Skill：把人的可执行能力封装给 AI Agent</h1>
+            
+            <p class="post-summary">Skill 本质上是对一项可重复能力的封装。更理想的方式不是由人直接编写 skill，而是先教会 AI 做事，再由 AI 自己总结成 skill 并持续微调。</p>
+            
+
+            <div class="post-meta">
+                <span>
+
+2026-03-06 16:10
+
+</span>
+                <span>·</span>
+                <span>2 分钟阅读</span>
+                
+                <span>·</span>
+                <span>AI Agent / 工程实践</span>
+                
+            </div>
+
+            
+            <div class="tag-list post-tags">
+                
+                <a class="tag" href="/tags/ai-agent/">AI Agent</a>
+                
+                <a class="tag" href="/tags/skill/">Skill</a>
+                
+                <a class="tag" href="/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/">自动化</a>
+                
+                <a class="tag" href="/tags/%E5%B7%A5%E4%BD%9C%E6%B5%81/">工作流</a>
+                
+            </div>
+            
+        </header>
+
+        <div class="post-divider" aria-hidden="true"></div>
+
+        <div class="post-content">
+            <p>很多人第一次接触 <code>agent skill</code> 时，会把它理解成“给 AI 增加一个插件”。</p>
+<p>这个理解不算错，但还不够准确。</p>
+<p>我更愿意把 <code>skill</code> 看成一层能力封装：它不是单纯扩展了一个功能入口，而是把一件原本需要人手动完成的事情，整理成一套 AI agent 可以稳定复用的执行方法。</p>
+<p>而且我越来越倾向于认为，<code>skill</code> 最好的来源并不是“人坐下来写一份说明书”，而是用户先把 agent 教会，再由 agent 自己把这项能力总结出来。</p>
+<h2 id="skill-到底在封装什么">Skill 到底在封装什么</h2>
+<p>所谓 <code>skill</code>，封装的并不是“某个按钮”或者“某个命令”，而是一段相对完整的能力。</p>
+<p>比如：</p>
+<ul>
+<li>如何检查一个仓库的构建是否正常</li>
+<li>如何把一批 Markdown 文档整理成博客文章</li>
+<li>如何为一个项目生成符合约定的发布说明</li>
+<li>如何在固定目录下扫描日志并提取异常信息</li>
+</ul>
+<p>这些事情的共同点是：</p>
+<ol>
+<li>有明确目标</li>
+<li>有可重复步骤</li>
+<li>有输入和输出</li>
+<li>能通过计算机完成</li>
+</ol>
+<p>一旦满足这四点，它就不再只是“某个人会做的一件事”，而是可以被工程化描述、被标准化复用、被 agent 调用的一项能力。</p>
+<h2 id="skill-的本质是经验的结构化">Skill 的本质是经验的结构化</h2>
+<p>一个人能做某件事，不代表 agent 立刻就能做。</p>
+<p>中间差的那一步，就是把人的经验从“脑子里的模糊直觉”，变成“机器可执行的结构化说明”。</p>
+<p>这一步通常包括：</p>
+<ul>
+<li>说明这项能力的目标是什么</li>
+<li>指定输入从哪里来</li>
+<li>规定执行时要遵循哪些步骤</li>
+<li>明确什么算成功，什么算失败</li>
+<li>约束边界条件和风险点</li>
+</ul>
+<p>换句话说，<code>skill</code> 不是凭空制造能力，而是把已有能力整理成一种更稳定、更可组合的形式。</p>
+<p>人会做，才有可能封装。</p>
+<p>如果连人自己都说不清“这件事到底怎么做、做到什么程度算完成、出错时怎么判断”，那它通常还不具备被封装成 skill 的条件。</p>
+<h2 id="只要人能通过计算机完成就有机会被封装">只要人能通过计算机完成，就有机会被封装</h2>
+<p>这是我觉得最重要的一点。</p>
+<p>如果一个人能够借助计算机完成一件事情，那么原则上，这件事情就有机会被封装成 <code>skill</code>，再交给 AI agent 使用。</p>
+<p>这里的关键不在于“这件事是否复杂”，而在于“它是否可以被描述清楚”。</p>
+<p>例如：</p>
+<ul>
+<li>部署一个服务</li>
+<li>检查一份配置是否符合规范</li>
+<li>批量重命名文件</li>
+<li>从代码库里抽取变更点并整理成周报</li>
+<li>根据既有风格撰写一篇技术博客</li>
+</ul>
+<p>这些事情里，有的偏工程，有的偏内容，有的偏运维，有的偏数据处理。</p>
+<p>它们领域不同，但抽象结构非常相似：输入一组上下文，按照一套规则执行，输出一个结果。</p>
+<p>而这正是 skill 最适合承载的东西。</p>
+<p>这里的关键不是“先写一个 skill 文件”，而是先确认这项能力本身是否真的存在、是否能被重复执行、是否能被 agent 学会。</p>
+<h2 id="为什么不应该主要靠人直接写-skill">为什么不应该主要靠人直接写 Skill</h2>
+<p>很多人会自然地想到：既然 skill 是一套能力描述，那就让人来写不就行了。</p>
+<p>但这件事的问题恰恰在这里。</p>
+<p>人写出来的东西，往往会带着这些问题：</p>
+<ul>
+<li>表达模糊</li>
+<li>默认前提太多</li>
+<li>步骤跳跃</li>
+<li>边界条件写不清</li>
+<li>成功标准不稳定</li>
+</ul>
+<p>一个熟练的人类工程师，在脑子里会自动补全很多上下文，所以他写下来的说明看起来已经“够用了”。但对于 agent 来说，这种说明经常是不够精确的。</p>
+<p>最典型的情况是：</p>
+<ul>
+<li>人觉得“这里改一下配置就行”</li>
+<li>agent 不知道到底要改哪个文件、改哪一行、改完之后怎么验证</li>
+</ul>
+<p>也就是说，人类写 skill 的方式，天然容易把大量隐性经验藏在字缝里。</p>
+<p>这会导致 skill 看起来像是有了，实际上执行起来依旧不稳定。</p>
+<h2 id="更合理的方式先教会-agent再让-agent-总结">更合理的方式：先教会 Agent，再让 Agent 总结</h2>
+<p>我更认同的方式是：</p>
+<ol>
+<li>用户先带着 agent 完成一件具体的事情</li>
+<li>在过程中不断纠正 agent 的理解和动作</li>
+<li>当任务完成后，让 agent 反过来总结“这件事情应该如何做”</li>
+<li>再把这份总结沉淀成 skill</li>
+</ol>
+<p>这样做有一个明显优势：</p>
+<p>这份 skill 不是凭空写出来的，而是从一次真实执行中长出来的。</p>
+<p>它记录的不是“人以为应该怎么做”，而是“agent 在真实环境里怎样才能做成”。</p>
+<p>两者差别很大。</p>
+<p>前者更像纸面流程，后者更像经过验证的工作流。</p>
+<h2 id="skill-应该是可演化的不是一次性文档">Skill 应该是可演化的，不是一次性文档</h2>
+<p>如果 skill 真的是能力封装，那么它就不应该是一次写完、永远不变的东西。</p>
+<p>它应该随着执行不断被修正。</p>
+<p>比如：</p>
+<ul>
+<li>某一步经常失败，那就应该补充前置检查</li>
+<li>某个命令在不同环境下不稳定，那就应该加入分支条件</li>
+<li>某类输入经常引起歧义，那就应该补充更明确的约束</li>
+<li>某个输出不符合预期，那就应该重写成功标准</li>
+</ul>
+<p>从这个角度看，skill 更像是一份持续迭代的执行资产。</p>
+<p>第一次只是初稿。</p>
+<p>后面每次真实调用、每次失败、每次人工纠正，都会让这份 skill 更接近“一个真正可用的能力模块”。</p>
+<p>所以更合理的链路不是：</p>
+<p><code>人写 skill -&gt; agent 使用</code></p>
+<p>而应该是：</p>
+<p><code>人教 agent 做事 -&gt; agent 总结 skill -&gt; 后续执行持续微调</code></p>
+<p>这条链路更符合 agent 的成长方式，也更符合工程现实。</p>
+<h2 id="为什么-skill-对-agent-特别重要">为什么 Skill 对 Agent 特别重要</h2>
+<p>没有 skill 的 agent，更多依赖临场推理。</p>
+<p>它可以回答问题，也可以尝试做事，但执行质量会明显依赖上下文是否完整、提示词是否精确，以及这次推理是否刚好走到了正确路径。</p>
+<p>有了 skill 之后，agent 的能力会出现一个很大的变化：从“每次重新想一遍”，变成“调用一套已经整理好的做法”。</p>
+<p>这会带来几个直接收益：</p>
+<ul>
+<li>稳定性更高</li>
+<li>输出更一致</li>
+<li>更容易复用</li>
+<li>更容易组合成更长的工作流</li>
+</ul>
+<p>本来需要一个熟练工程师反复做的事情，一旦被整理成 skill，就可能变成 agent 的基础能力模块。</p>
+<p>而当基础能力模块足够多，agent 才真正开始接近“可用的协作者”，而不是“偶尔聪明的聊天机器人”。</p>
+<h2 id="skill-不是魔法仍然是工程">Skill 不是魔法，仍然是工程</h2>
+<p>讲到这里，很容易把 skill 想得过于理想化，好像只要写一段说明，agent 就自动掌握了一项技能。</p>
+<p>实际并不是这样。</p>
+<p>好的 skill，依旧是一种工程产物。</p>
+<p>它需要反复迭代，需要处理失败场景，需要考虑权限、依赖、环境差异、输入脏数据、输出质量、人工确认节点。</p>
+<p>也就是说，封装 skill 的过程，本身就是在做一件非常标准的工程化工作：</p>
+<ul>
+<li>抽象问题</li>
+<li>固化流程</li>
+<li>降低不确定性</li>
+<li>把经验沉淀成资产</li>
+</ul>
+<p>从这个角度看，<code>skill</code> 其实很像函数、脚本、CLI 工具、操作手册和 SOP 的结合体。</p>
+<p>区别只是：它最终服务的对象，不再只是人，而是 AI agent。</p>
+<h2 id="对个人和团队来说这意味着什么">对个人和团队来说，这意味着什么</h2>
+<p>如果你接受“skill 是能力封装”这个视角，那么很多事情都会变得更清楚。</p>
+<p>对于个人来说，skill 的沉淀过程，其实是在逼自己回答一个问题：</p>
+<blockquote>
+<p>我到底会什么？我会的这件事，能不能被我讲清楚、拆清楚、交给别人或者交给 agent 去执行？</p>
+</blockquote>
+<p>对于团队来说，skill 的价值更大。</p>
+<p>很多原本附着在少数人身上的经验，例如打包发布、故障排查、文档整理、合规检查、数据导出，这些都可以逐步沉淀为可复用能力，而不是一直停留在“只有某个人会”的状态。</p>
+<p>这会让团队知识更容易继承，也会让 agent 真正开始接入生产流程。</p>
+<h2 id="最后">最后</h2>
+<p>我越来越倾向于把 AI agent 看成一种新的执行接口。</p>
+<p>而 <code>skill</code>，就是这个接口背后的能力描述层。</p>
+<p>它的价值不在于“让 AI 看起来更强”，而在于把人的能力以一种可执行、可复用、可组合的方式重新组织起来。</p>
+<p>所以我对 skill 的理解很简单：</p>
+<p>如果一个人能通过计算机干成一件事情，那么这件事情就值得尝试被封装成 skill。</p>
+<p>但这个封装动作，未必应该由人直接拿键盘去写。</p>
+<p>更好的方式，是先让用户把 agent 教会，让它在真实任务中学会边界、步骤、验证方法和失败处理，再由它自己把这些经验总结成 skill，并在后续反复执行中持续微调。</p>
+<p>这样形成的 skill，才更像真正的能力，而不是一份看上去完整、实际上充满歧义的说明书。</p>
+
+        </div>
+    </article>
+
+    
+    <aside class="post-toc">
+        <div class="post-toc-inner">
+            <p class="post-toc-title">目录</p>
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#skill-到底在封装什么">Skill 到底在封装什么</a></li>
+    <li><a href="#skill-的本质是经验的结构化">Skill 的本质是经验的结构化</a></li>
+    <li><a href="#只要人能通过计算机完成就有机会被封装">只要人能通过计算机完成，就有机会被封装</a></li>
+    <li><a href="#为什么不应该主要靠人直接写-skill">为什么不应该主要靠人直接写 Skill</a></li>
+    <li><a href="#更合理的方式先教会-agent再让-agent-总结">更合理的方式：先教会 Agent，再让 Agent 总结</a></li>
+    <li><a href="#skill-应该是可演化的不是一次性文档">Skill 应该是可演化的，不是一次性文档</a></li>
+    <li><a href="#为什么-skill-对-agent-特别重要">为什么 Skill 对 Agent 特别重要</a></li>
+    <li><a href="#skill-不是魔法仍然是工程">Skill 不是魔法，仍然是工程</a></li>
+    <li><a href="#对个人和团队来说这意味着什么">对个人和团队来说，这意味着什么</a></li>
+    <li><a href="#最后">最后</a></li>
+  </ul>
+</nav>
+        </div>
+    </aside>
+    
+</section>
+
+    </main>
+
+    <footer class="site-footer">
+        <a class="footer-github" href="https://github.com/xzl01" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 .5A11.5 11.5 0 0 0 .5 12.27a11.8 11.8 0 0 0 7.86 11.3c.58.11.8-.26.8-.57v-2.02c-3.2.72-3.88-1.58-3.88-1.58-.53-1.38-1.3-1.75-1.3-1.75-1.06-.75.08-.74.08-.74 1.18.09 1.79 1.25 1.79 1.25 1.05 1.86 2.75 1.32 3.42 1 .11-.78.41-1.32.74-1.62-2.55-.3-5.24-1.31-5.24-5.85 0-1.29.45-2.35 1.2-3.18-.12-.3-.52-1.52.11-3.17 0 0 .98-.32 3.2 1.21a10.86 10.86 0 0 1 5.83 0c2.22-1.53 3.2-1.21 3.2-1.21.63 1.65.23 2.87.11 3.17.75.83 1.2 1.89 1.2 3.18 0 4.56-2.69 5.55-5.25 5.84.42.37.79 1.09.79 2.2V23c0 .31.21.68.8.57a11.8 11.8 0 0 0 7.85-11.3A11.5 11.5 0 0 0 12 .5Z"/>
+            </svg>
+        </a>
+        <p>&copy; 2026 HarryLoong</p>
+        <p class="footer-meta">commit local · updated 2026-04-02 23:45:21 &#43;0800</p>
+    </footer>
+
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script defer src="/js/site.js?v=1775144721"></script>
+</body>
+</html>

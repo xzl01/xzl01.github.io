@@ -1,48 +1,19 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>自动化 on HarryLoong's Blog</title><link>https://xzl01.github.io/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/</link><description>Recent content in 自动化 on HarryLoong's Blog</description><generator>Hugo</generator><language>zh-cn</language><lastBuildDate>Fri, 06 Mar 2026 16:10:00 +0800</lastBuildDate><atom:link href="https://xzl01.github.io/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/index.xml" rel="self" type="application/rss+xml"/><item><title>Agent Skill：把人的可执行能力封装给 AI Agent</title><link>https://xzl01.github.io/blog/agent-skill-capability-encapsulation/</link><pubDate>Fri, 06 Mar 2026 16:10:00 +0800</pubDate><guid>https://xzl01.github.io/blog/agent-skill-capability-encapsulation/</guid><description>&lt;p&gt;很多人第一次接触 &lt;code&gt;agent skill&lt;/code&gt; 时，会把它理解成“给 AI 增加一个插件”。&lt;/p&gt;
-&lt;p&gt;这个理解不算错，但还不够准确。&lt;/p&gt;
-&lt;p&gt;我更愿意把 &lt;code&gt;skill&lt;/code&gt; 看成一层能力封装：它不是单纯扩展了一个功能入口，而是把一件原本需要人手动完成的事情，整理成一套 AI agent 可以稳定复用的执行方法。&lt;/p&gt;
-&lt;p&gt;而且我越来越倾向于认为，&lt;code&gt;skill&lt;/code&gt; 最好的来源并不是“人坐下来写一份说明书”，而是用户先把 agent 教会，再由 agent 自己把这项能力总结出来。&lt;/p&gt;
-&lt;h2 id="skill-到底在封装什么"&gt;Skill 到底在封装什么&lt;/h2&gt;
-&lt;p&gt;所谓 &lt;code&gt;skill&lt;/code&gt;，封装的并不是“某个按钮”或者“某个命令”，而是一段相对完整的能力。&lt;/p&gt;
-&lt;p&gt;比如：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;如何检查一个仓库的构建是否正常&lt;/li&gt;
-&lt;li&gt;如何把一批 Markdown 文档整理成博客文章&lt;/li&gt;
-&lt;li&gt;如何为一个项目生成符合约定的发布说明&lt;/li&gt;
-&lt;li&gt;如何在固定目录下扫描日志并提取异常信息&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;这些事情的共同点是：&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;有明确目标&lt;/li&gt;
-&lt;li&gt;有可重复步骤&lt;/li&gt;
-&lt;li&gt;有输入和输出&lt;/li&gt;
-&lt;li&gt;能通过计算机完成&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;一旦满足这四点，它就不再只是“某个人会做的一件事”，而是可以被工程化描述、被标准化复用、被 agent 调用的一项能力。&lt;/p&gt;
-&lt;h2 id="skill-的本质是经验的结构化"&gt;Skill 的本质是经验的结构化&lt;/h2&gt;
-&lt;p&gt;一个人能做某件事，不代表 agent 立刻就能做。&lt;/p&gt;
-&lt;p&gt;中间差的那一步，就是把人的经验从“脑子里的模糊直觉”，变成“机器可执行的结构化说明”。&lt;/p&gt;
-&lt;p&gt;这一步通常包括：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;说明这项能力的目标是什么&lt;/li&gt;
-&lt;li&gt;指定输入从哪里来&lt;/li&gt;
-&lt;li&gt;规定执行时要遵循哪些步骤&lt;/li&gt;
-&lt;li&gt;明确什么算成功，什么算失败&lt;/li&gt;
-&lt;li&gt;约束边界条件和风险点&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;换句话说，&lt;code&gt;skill&lt;/code&gt; 不是凭空制造能力，而是把已有能力整理成一种更稳定、更可组合的形式。&lt;/p&gt;
-&lt;p&gt;人会做，才有可能封装。&lt;/p&gt;
-&lt;p&gt;如果连人自己都说不清“这件事到底怎么做、做到什么程度算完成、出错时怎么判断”，那它通常还不具备被封装成 skill 的条件。&lt;/p&gt;
-&lt;h2 id="只要人能通过计算机完成就有机会被封装"&gt;只要人能通过计算机完成，就有机会被封装&lt;/h2&gt;
-&lt;p&gt;这是我觉得最重要的一点。&lt;/p&gt;
-&lt;p&gt;如果一个人能够借助计算机完成一件事情，那么原则上，这件事情就有机会被封装成 &lt;code&gt;skill&lt;/code&gt;，再交给 AI agent 使用。&lt;/p&gt;
-&lt;p&gt;这里的关键不在于“这件事是否复杂”，而在于“它是否可以被描述清楚”。&lt;/p&gt;
-&lt;p&gt;例如：&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;部署一个服务&lt;/li&gt;
-&lt;li&gt;检查一份配置是否符合规范&lt;/li&gt;
-&lt;li&gt;批量重命名文件&lt;/li&gt;
-&lt;li&gt;从代码库里抽取变更点并整理成周报&lt;/li&gt;
-&lt;li&gt;根据既有风格撰写一篇技术博客&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;这些事情里，有的偏工程，有的偏内容，有的偏运维，有的偏数据处理。&lt;/p&gt;</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>自动化 on HarryLoong&#39;s Blog</title>
+    <link>https://xzl01.github.io/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/</link>
+    <description>Recent content in 自动化 on HarryLoong&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Fri, 06 Mar 2026 16:10:00 +0800</lastBuildDate>
+    <atom:link href="https://xzl01.github.io/tags/%E8%87%AA%E5%8A%A8%E5%8C%96/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Agent Skill：把人的可执行能力封装给 AI Agent</title>
+      <link>https://xzl01.github.io/blog/agent-skill-capability-encapsulation/</link>
+      <pubDate>Fri, 06 Mar 2026 16:10:00 +0800</pubDate>
+      <guid>https://xzl01.github.io/blog/agent-skill-capability-encapsulation/</guid>
+      <description>很多人第一次接触 agent skill 时，会把它理解成“给 AI 增加一个插件”。&#xA;这个理解不算错，但还不够准确。&#xA;我更愿意把 skill 看成一层能力封装：它不是单纯扩展了一个功能入口，而是把一件原本需要人手动完成的事情，整理成一套 AI agent 可以稳定复用的执行方法。&#xA;而且我越来越倾向于认为，skill 最好的来源并不是“人坐下来写一份说明书”，而是用户先把 agent 教会，再由 agent 自己把这项能力总结出来。&#xA;Skill 到底在封装什么 所谓 skill，封装的并不是“某个按钮”或者“某个命令”，而是一段相对完整的能力。&#xA;比如：&#xA;如何检查一个仓库的构建是否正常 如何把一批 Markdown 文档整理成博客文章 如何为一个项目生成符合约定的发布说明 如何在固定目录下扫描日志并提取异常信息 这些事情的共同点是：&#xA;有明确目标 有可重复步骤 有输入和输出 能通过计算机完成 一旦满足这四点，它就不再只是“某个人会做的一件事”，而是可以被工程化描述、被标准化复用、被 agent 调用的一项能力。&#xA;Skill 的本质是经验的结构化 一个人能做某件事，不代表 agent 立刻就能做。&#xA;中间差的那一步，就是把人的经验从“脑子里的模糊直觉”，变成“机器可执行的结构化说明”。&#xA;这一步通常包括：&#xA;说明这项能力的目标是什么 指定输入从哪里来 规定执行时要遵循哪些步骤 明确什么算成功，什么算失败 约束边界条件和风险点 换句话说，skill 不是凭空制造能力，而是把已有能力整理成一种更稳定、更可组合的形式。&#xA;人会做，才有可能封装。&#xA;如果连人自己都说不清“这件事到底怎么做、做到什么程度算完成、出错时怎么判断”，那它通常还不具备被封装成 skill 的条件。&#xA;只要人能通过计算机完成，就有机会被封装 这是我觉得最重要的一点。&#xA;如果一个人能够借助计算机完成一件事情，那么原则上，这件事情就有机会被封装成 skill，再交给 AI agent 使用。&#xA;这里的关键不在于“这件事是否复杂”，而在于“它是否可以被描述清楚”。&#xA;例如：&#xA;部署一个服务 检查一份配置是否符合规范 批量重命名文件 从代码库里抽取变更点并整理成周报 根据既有风格撰写一篇技术博客 这些事情里，有的偏工程，有的偏内容，有的偏运维，有的偏数据处理。</description>
+    </item>
+  </channel>
+</rss>

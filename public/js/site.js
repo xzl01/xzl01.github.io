@@ -174,21 +174,8 @@
       }
     });
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        function (pos) {
-          coords = {
-            lat: pos.coords.latitude,
-            lon: pos.coords.longitude,
-          };
-          startTimer();
-        },
-        function () {
-          startTimer();
-        },
-        { enableHighAccuracy: false, timeout: 6000, maximumAge: 3600000 }
-      );
-    }
+    // Geolocation removed for privacy — using local time for theme auto-cycle instead
+    startTimer();
   }
 
   function initReveal() {

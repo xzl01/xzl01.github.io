@@ -1,61 +1,275 @@
-<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>MIME 类型与应用程序关联规范解读 - HarryLoong's Blog</title><meta name=description content="围绕 mimeapps.list 的查找顺序、默认应用规则和关联增删算法，整理 Linux 桌面环境中的 MIME 关联机制。"><script>document.documentElement.classList.add("js")</script><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet href="/css/site.css?v=1773197987"></head><body class=inner-page><div class="bg-shape bg-shape-a" aria-hidden=true></div><div class="bg-shape bg-shape-b" aria-hidden=true></div><div class=solar-blob aria-hidden=true></div><header class=hero><div class="container hero-inner reveal"><p class=eyebrow>ARTICLE</p><h1>MIME 类型与应用程序关联规范解读</h1><p class=subtitle>围绕 mimeapps.list 的查找顺序、默认应用规则和关联增删算法，整理 Linux 桌面环境中的 MIME 关联机制。</p></div></header><nav class=top-nav><div class="container nav-inner"><div class=nav-links aria-label=主导航><a href=/>首页</a>
-<a href=/blog/>文章</a>
-<a href=/gallery/>图库</a></div><div class=theme-controls aria-label=主题控制><select id=theme-mode-select class=theme-select aria-label=主题模式><option value=auto>自动</option><option value=manual>手动</option></select>
-<select id=theme-palette-select class=theme-select aria-label=主题配色><option value=sunrise>莫兰迪·日出</option><option value=noon>莫兰迪·中午</option><option value=dusk>莫兰迪·傍晚</option><option value=midnight>莫兰迪·深夜</option><option value=mist>莫兰迪·雾青</option><option value=rose>莫兰迪·灰粉</option></select></div></div></nav><main class="container main-wrap"><section class=single-layout><article class=single-post><header class=post-header><p class=post-kicker>Article</p><h1 class=post-title>MIME 类型与应用程序关联规范解读</h1><p class=post-summary>围绕 mimeapps.list 的查找顺序、默认应用规则和关联增删算法，整理 Linux 桌面环境中的 MIME 关联机制。</p><div class=post-meta><span>2026-03-06 10:00
-</span><span>·</span>
-<span>2 分钟阅读</span>
-<span>·</span>
-<span>Linux系统 / 规范标准</span></div><div class="tag-list post-tags"><a class=tag href=/tags/linux/>Linux</a>
-<a class=tag href=/tags/mime/>MIME</a>
-<a class=tag href=/tags/freedesktop/>FreeDesktop</a>
-<a class=tag href=/tags/xdg/>XDG</a></div></header><div class=post-divider aria-hidden=true></div><div class=post-content><p>这篇文章聚焦一个在桌面 Linux 中非常常见、但经常被忽略的问题：文件类型是如何和应用程序建立关联的。规范层面看，它既涉及共享 MIME 数据库，也涉及桌面条目和默认应用的解析顺序。</p><h2 id=介绍>介绍</h2><p><a href=http://freedesktop.org title=freedesktop.org>freedesktop.org</a><a href=http://www.freedesktop.org/wiki/Specifications/shared-mime-info-spec/ title="共享 MIME 数据库">共享 MIME 数据库</a>提供了一种存储有关 MIME 类型和用于确定类型的规则的静态信息的方法。</p><p><a href=http://freedesktop.org title=freedesktop.org>freedesktop.org</a><a href=http://www.freedesktop.org/wiki/Specifications/desktop-entry-spec/ title=桌面条目规范>桌面条目规范</a>允许应用程序宣布它们支持的 MIME 类型。</p><p>这套规范主要回答三个问题：默认由哪个应用打开某种文件、用户如何修改默认应用，以及系统如何增删应用与 MIME 类型之间的关联。</p><h2 id=文件名和位置>文件名和位置</h2><p>用户、系统管理员、应用程序供应商和发行版可以通过写入名为 mimeapps.list 的文件来更改应用程序和 mimetype 之间的关联。</p><p>该文件的查找顺序如下：</p><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>$XDG_CONFIG_HOME/desktop-mimeapps.list</td><td>用户覆盖，特定于桌面（适用于高级用户）</td></tr><tr><td>$XDG_CONFIG_HOME/mimeapps.list</td><td>用户覆盖（用户配置 GUI 的推荐位置）</td></tr><tr><td>$XDG_CONFIG_DIRS/desktop-mimeapps.list</td><td>系统管理员和 ISV 覆盖，特定于桌面</td></tr><tr><td>$XDG_CONFIG_DIRS/mimeapps.list</td><td>系统管理员和 ISV 覆盖</td></tr><tr><td>XDG_DATA_DIRS/applications/desktop-mimeapps.list</td><td>发行版提供的默认值，特定于桌面</td></tr><tr><td>$XDG_DATA_DIRS/applications/mimeapps.list</td><td>分发提供的默认值</td></tr></tbody></table><p>在此表中，$desktop 是当前桌面的名称之一，小写（例如，kde、gnome、xfce 等）</p><p>这是通过采用组件的 ascii 小写形式和环境变量 $XDG_CURRENT_DESKTOP 确定的，该变量是当前桌面所称的以冒号分隔的名称列表。</p><p>$desktop 变量应该依次是这些值中的每一个。</p><p>为简单起见，在本规范的其余部分中，所有上述文件都称为“mimeapps.list”。</p><p>请注意，特定于桌面的文件只能用于指定给定类型的默认应用程序。无法在这些文件中添加或删除关联。</p><p>用于确定与 mime 类型关联的所有应用程序列表和用于确定默认应用程序的算法（几乎）完全不相关，因此它们被单独呈现。</p><p>在 UOS/deepin 中，通常会同时存在用于全局设置和用户设置的两个 <code>mimeapps.list</code> 文件：</p><p><img src=/images/imported/w-ktny/image_wxM1nP52aR.png alt></p><div class=highlight><pre tabindex=0 class=chroma><code class=language-text data-lang=text><span class=line><span class=cl>[Default Applications]
-</span></span><span class=line><span class=cl>application/wps-office.et=/usr/share/applications/wps-office-et.desktop
-</span></span><span class=line><span class=cl>application/wps-office.ett=/usr/share/applications/wps-office-et.desktop
-</span></span><span class=line><span class=cl>application/wps-office.xls=/usr/share/applications/wps-office-et.desktop
-</span></span><span class=line><span class=cl>application/wps-office.xlt=/usr/share/applications/wps-office-et.desktop
-</span></span><span class=line><span class=cl>application/vnd.ms-excel=/usr/share/applications/wps-office-et.desktop
-</span></span><span class=line><span class=cl>application/msexcel=/usr/share/applications/wps-office-et.desktop
-</span></span><span class=line><span class=cl>application/wps-office.xlsx=/usr/share/applications/wps-office-et.desktop
-</span></span><span class=line><span class=cl>application/wps-office.xltx=/usr/share/applications/wps-office-et.desktop
-</span></span><span class=line><span class=cl>application/wps-office.dps=/usr/share/applications/wps-office-wpp.desktop
-</span></span><span class=line><span class=cl>application/wps-office.dpt=/usr/share/applications/wps-office-wpp.desktop
-</span></span><span class=line><span class=cl>application/wps-office.ppt=/usr/share/applications/wps-office-wpp.desktop
-</span></span><span class=line><span class=cl>application/wps-office.pot=/usr/share/applications/wps-office-wpp.desktop
-</span></span><span class=line><span class=cl>application/vnd.ms-powerpoint=/usr/share/applications/wps-office-wpp.desktop
-</span></span><span class=line><span class=cl>application/vnd.mspowerpoint=/usr/share/applications/wps-office-wpp.desktop
-</span></span><span class=line><span class=cl>application/powerpoint=/usr/share/applications/wps-office-wpp.desktop
-</span></span><span class=line><span class=cl>application/wps-office.pptx=/usr/share/applications/wps-office-wpp.desktop
-</span></span><span class=line><span class=cl>application/wps-office.potx=/usr/share/applications/wps-office-wpp.desktop
-</span></span><span class=line><span class=cl>application/wps-office.wps=/usr/share/applications/wps-office-wps.desktop
-</span></span><span class=line><span class=cl>application/wps-office.wpt=/usr/share/applications/wps-office-wps.desktop
-</span></span><span class=line><span class=cl>application/wps-office.doc=/usr/share/applications/wps-office-wps.desktop
-</span></span><span class=line><span class=cl>application/wps-office.dot=/usr/share/applications/wps-office-wps.desktop
-</span></span><span class=line><span class=cl>application/vnd.ms-word=/usr/share/applications/wps-office-wps.desktop
-</span></span><span class=line><span class=cl>application/msword=/usr/share/applications/wps-office-wps.desktop
-</span></span><span class=line><span class=cl>application/msword-template=/usr/share/applications/wps-office-wps.desktop
-</span></span><span class=line><span class=cl>application/x-deb=deepin-deb-installer.desktop
-</span></span><span class=line><span class=cl>inode/directory=/usr/share/applications/dde-file-manager.desktop
-</span></span><span class=line><span class=cl>image/bmp=/usr/share/applications/deepin-image-viewer.desktop
-</span></span><span class=line><span class=cl>image/gif=/usr/share/applications/deepin-image-viewer.desktop
-</span></span><span class=line><span class=cl>image/jpg=/usr/share/applications/deepin-image-viewer.desktop
-</span></span><span class=line><span class=cl>image/jpeg=/usr/share/applications/deepin-image-viewer.desktop
-</span></span><span class=line><span class=cl>image/png=/usr/share/applications/deepin-image-viewer.desktop
-</span></span><span class=line><span class=cl>image/pbm=/usr/share/applications/deepin-image-viewer.desktop
-</span></span><span class=line><span class=cl>image/pgm=/usr/share/applications/deepin-image-viewer.desktop
-</span></span><span class=line><span class=cl>image/ppm=/usr/share/applications/deepin-image-viewer.desktop
-</span></span><span class=line><span class=cl>image/xbm=/usr/share/applications/deepin-image-viewer.desktop
-</span></span><span class=line><span class=cl>image/xpm=/usr/share/applications/deepin-image-viewer.desktop
-</span></span><span class=line><span class=cl>image/svg=/usr/share/applications/deepin-image-viewer.desktop
-</span></span><span class=line><span class=cl>image/dds=/usr/share/applications/deepin-image-viewer.desktop
-</span></span><span class=line><span class=cl>image/icns=/usr/share/applications/deepin-image-viewer.desktop
-</span></span><span class=line><span class=cl>image/jp2=/usr/share/applications/deepin-image-viewer.desktop
-</span></span><span class=line><span class=cl>image/tga=/usr/share/applications/deepin-image-viewer.desktop
-</span></span><span class=line><span class=cl>image/tiff=/usr/share/applications/deepin-image-viewer.desktop
-</span></span><span class=line><span class=cl>image/wbmp=/usr/share/applications/deepin-image-viewer.desktop
-</span></span><span class=line><span class=cl>image/webp=/usr/share/applications/deepin-image-viewer.desktop
-</span></span></code></pre></div><h2 id=添加删除关联>添加/删除关联</h2><p>在 mimeapps.list 文件中使用以下语法在 mimetypes 和应用程序之间添加和删除关联：</p><pre tabindex=0><code class=language-纯文本 data-lang=纯文本>[添加关联]
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    
+    
+    
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIME 类型与应用程序关联规范解读 - HarryLoong&#39;s Blog</title>
+    <meta name="description" content="围绕 mimeapps.list 的查找顺序、默认应用规则和关联增删算法，整理 Linux 桌面环境中的 MIME 关联机制。">
+    <script>document.documentElement.classList.add('js');</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"></noscript>
+    <link rel="stylesheet" href="/css/site.css?v=1775144721">
+</head>
+<body class="inner-page">
+    <div class="bg-shape bg-shape-a" aria-hidden="true"></div>
+    <div class="bg-shape bg-shape-b" aria-hidden="true"></div>
+    <div class="solar-blob" aria-hidden="true"></div>
+
+    <header class="hero">
+        <div class="container hero-inner reveal">
+            
+            <p class="eyebrow">ARTICLE</p>
+            <h1>MIME 类型与应用程序关联规范解读</h1>
+            <p class="subtitle">围绕 mimeapps.list 的查找顺序、默认应用规则和关联增删算法，整理 Linux 桌面环境中的 MIME 关联机制。</p>
+            
+        </div>
+    </header>
+
+    <nav class="top-nav">
+        <div class="container nav-inner">
+            <div class="nav-links" aria-label="主导航">
+                <a href="/">首页</a>
+                <a href="/blog/">文章</a>
+                <a href="/gallery/">图库</a>
+            </div>
+            <div class="theme-controls" aria-label="主题控制">
+                <select id="theme-mode-select" class="theme-select" aria-label="主题模式">
+                    <option value="auto">自动</option>
+                    <option value="manual">手动</option>
+                </select>
+                <select id="theme-palette-select" class="theme-select" aria-label="主题配色">
+                    <option value="sunrise">莫兰迪·日出</option>
+                    <option value="noon">莫兰迪·中午</option>
+                    <option value="dusk">莫兰迪·傍晚</option>
+                    <option value="midnight">莫兰迪·深夜</option>
+                    <option value="mist">莫兰迪·雾青</option>
+                    <option value="rose">莫兰迪·灰粉</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container main-wrap">
+        
+<section class="single-layout">
+    <article class="single-post">
+        <header class="post-header">
+            <p class="post-kicker">Article</p>
+            <h1 class="post-title">MIME 类型与应用程序关联规范解读</h1>
+            
+            <p class="post-summary">围绕 mimeapps.list 的查找顺序、默认应用规则和关联增删算法，整理 Linux 桌面环境中的 MIME 关联机制。</p>
+            
+
+            <div class="post-meta">
+                <span>
+
+2026-03-06 10:00
+
+</span>
+                <span>·</span>
+                <span>2 分钟阅读</span>
+                
+                <span>·</span>
+                <span>Linux系统 / 规范标准</span>
+                
+            </div>
+
+            
+            <div class="tag-list post-tags">
+                
+                <a class="tag" href="/tags/linux/">Linux</a>
+                
+                <a class="tag" href="/tags/mime/">MIME</a>
+                
+                <a class="tag" href="/tags/freedesktop/">FreeDesktop</a>
+                
+                <a class="tag" href="/tags/xdg/">XDG</a>
+                
+            </div>
+            
+        </header>
+
+        <div class="post-divider" aria-hidden="true"></div>
+
+        <div class="post-content">
+            <p>这篇文章聚焦一个在桌面 Linux 中非常常见、但经常被忽略的问题：文件类型是如何和应用程序建立关联的。规范层面看，它既涉及共享 MIME 数据库，也涉及桌面条目和默认应用的解析顺序。</p>
+<h2 id="介绍">介绍</h2>
+<p><a href="http://freedesktop.org" title="freedesktop.org">freedesktop.org</a><a href="http://www.freedesktop.org/wiki/Specifications/shared-mime-info-spec/" title="共享 MIME 数据库">共享 MIME 数据库</a>提供了一种存储有关 MIME 类型和用于确定类型的规则的静态信息的方法。</p>
+<p><a href="http://freedesktop.org" title="freedesktop.org">freedesktop.org</a><a href="http://www.freedesktop.org/wiki/Specifications/desktop-entry-spec/" title="桌面条目规范">桌面条目规范</a>允许应用程序宣布它们支持的 MIME 类型。</p>
+<p>这套规范主要回答三个问题：默认由哪个应用打开某种文件、用户如何修改默认应用，以及系统如何增删应用与 MIME 类型之间的关联。</p>
+<h2 id="文件名和位置">文件名和位置</h2>
+<p>用户、系统管理员、应用程序供应商和发行版可以通过写入名为 mimeapps.list 的文件来更改应用程序和 mimetype 之间的关联。</p>
+<p>该文件的查找顺序如下：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$XDG_CONFIG_HOME/desktop-mimeapps.list</td>
+<td>用户覆盖，特定于桌面（适用于高级用户）</td>
+</tr>
+<tr>
+<td>$XDG_CONFIG_HOME/mimeapps.list</td>
+<td>用户覆盖（用户配置 GUI 的推荐位置）</td>
+</tr>
+<tr>
+<td>$XDG_CONFIG_DIRS/desktop-mimeapps.list</td>
+<td>系统管理员和 ISV 覆盖，特定于桌面</td>
+</tr>
+<tr>
+<td>$XDG_CONFIG_DIRS/mimeapps.list</td>
+<td>系统管理员和 ISV 覆盖</td>
+</tr>
+<tr>
+<td>XDG_DATA_DIRS/applications/desktop-mimeapps.list</td>
+<td>发行版提供的默认值，特定于桌面</td>
+</tr>
+<tr>
+<td>$XDG_DATA_DIRS/applications/mimeapps.list</td>
+<td>分发提供的默认值</td>
+</tr>
+</tbody>
+</table>
+<p>在此表中，$desktop 是当前桌面的名称之一，小写（例如，kde、gnome、xfce 等）</p>
+<p>这是通过采用组件的 ascii 小写形式和环境变量 $XDG_CURRENT_DESKTOP 确定的，该变量是当前桌面所称的以冒号分隔的名称列表。</p>
+<p>$desktop 变量应该依次是这些值中的每一个。</p>
+<p>为简单起见，在本规范的其余部分中，所有上述文件都称为“mimeapps.list”。</p>
+<p>请注意，特定于桌面的文件只能用于指定给定类型的默认应用程序。无法在这些文件中添加或删除关联。</p>
+<p>用于确定与 mime 类型关联的所有应用程序列表和用于确定默认应用程序的算法（几乎）完全不相关，因此它们被单独呈现。</p>
+<p>在 UOS/deepin 中，通常会同时存在用于全局设置和用户设置的两个 <code>mimeapps.list</code> 文件：</p>
+<p><img src="/images/imported/w-ktny/image_wxM1nP52aR.png" alt=""></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">[Default Applications]
+</span></span><span class="line"><span class="cl">application/wps-office.et=/usr/share/applications/wps-office-et.desktop
+</span></span><span class="line"><span class="cl">application/wps-office.ett=/usr/share/applications/wps-office-et.desktop
+</span></span><span class="line"><span class="cl">application/wps-office.xls=/usr/share/applications/wps-office-et.desktop
+</span></span><span class="line"><span class="cl">application/wps-office.xlt=/usr/share/applications/wps-office-et.desktop
+</span></span><span class="line"><span class="cl">application/vnd.ms-excel=/usr/share/applications/wps-office-et.desktop
+</span></span><span class="line"><span class="cl">application/msexcel=/usr/share/applications/wps-office-et.desktop
+</span></span><span class="line"><span class="cl">application/wps-office.xlsx=/usr/share/applications/wps-office-et.desktop
+</span></span><span class="line"><span class="cl">application/wps-office.xltx=/usr/share/applications/wps-office-et.desktop
+</span></span><span class="line"><span class="cl">application/wps-office.dps=/usr/share/applications/wps-office-wpp.desktop
+</span></span><span class="line"><span class="cl">application/wps-office.dpt=/usr/share/applications/wps-office-wpp.desktop
+</span></span><span class="line"><span class="cl">application/wps-office.ppt=/usr/share/applications/wps-office-wpp.desktop
+</span></span><span class="line"><span class="cl">application/wps-office.pot=/usr/share/applications/wps-office-wpp.desktop
+</span></span><span class="line"><span class="cl">application/vnd.ms-powerpoint=/usr/share/applications/wps-office-wpp.desktop
+</span></span><span class="line"><span class="cl">application/vnd.mspowerpoint=/usr/share/applications/wps-office-wpp.desktop
+</span></span><span class="line"><span class="cl">application/powerpoint=/usr/share/applications/wps-office-wpp.desktop
+</span></span><span class="line"><span class="cl">application/wps-office.pptx=/usr/share/applications/wps-office-wpp.desktop
+</span></span><span class="line"><span class="cl">application/wps-office.potx=/usr/share/applications/wps-office-wpp.desktop
+</span></span><span class="line"><span class="cl">application/wps-office.wps=/usr/share/applications/wps-office-wps.desktop
+</span></span><span class="line"><span class="cl">application/wps-office.wpt=/usr/share/applications/wps-office-wps.desktop
+</span></span><span class="line"><span class="cl">application/wps-office.doc=/usr/share/applications/wps-office-wps.desktop
+</span></span><span class="line"><span class="cl">application/wps-office.dot=/usr/share/applications/wps-office-wps.desktop
+</span></span><span class="line"><span class="cl">application/vnd.ms-word=/usr/share/applications/wps-office-wps.desktop
+</span></span><span class="line"><span class="cl">application/msword=/usr/share/applications/wps-office-wps.desktop
+</span></span><span class="line"><span class="cl">application/msword-template=/usr/share/applications/wps-office-wps.desktop
+</span></span><span class="line"><span class="cl">application/x-deb=deepin-deb-installer.desktop
+</span></span><span class="line"><span class="cl">inode/directory=/usr/share/applications/dde-file-manager.desktop
+</span></span><span class="line"><span class="cl">image/bmp=/usr/share/applications/deepin-image-viewer.desktop
+</span></span><span class="line"><span class="cl">image/gif=/usr/share/applications/deepin-image-viewer.desktop
+</span></span><span class="line"><span class="cl">image/jpg=/usr/share/applications/deepin-image-viewer.desktop
+</span></span><span class="line"><span class="cl">image/jpeg=/usr/share/applications/deepin-image-viewer.desktop
+</span></span><span class="line"><span class="cl">image/png=/usr/share/applications/deepin-image-viewer.desktop
+</span></span><span class="line"><span class="cl">image/pbm=/usr/share/applications/deepin-image-viewer.desktop
+</span></span><span class="line"><span class="cl">image/pgm=/usr/share/applications/deepin-image-viewer.desktop
+</span></span><span class="line"><span class="cl">image/ppm=/usr/share/applications/deepin-image-viewer.desktop
+</span></span><span class="line"><span class="cl">image/xbm=/usr/share/applications/deepin-image-viewer.desktop
+</span></span><span class="line"><span class="cl">image/xpm=/usr/share/applications/deepin-image-viewer.desktop
+</span></span><span class="line"><span class="cl">image/svg=/usr/share/applications/deepin-image-viewer.desktop
+</span></span><span class="line"><span class="cl">image/dds=/usr/share/applications/deepin-image-viewer.desktop
+</span></span><span class="line"><span class="cl">image/icns=/usr/share/applications/deepin-image-viewer.desktop
+</span></span><span class="line"><span class="cl">image/jp2=/usr/share/applications/deepin-image-viewer.desktop
+</span></span><span class="line"><span class="cl">image/tga=/usr/share/applications/deepin-image-viewer.desktop
+</span></span><span class="line"><span class="cl">image/tiff=/usr/share/applications/deepin-image-viewer.desktop
+</span></span><span class="line"><span class="cl">image/wbmp=/usr/share/applications/deepin-image-viewer.desktop
+</span></span><span class="line"><span class="cl">image/webp=/usr/share/applications/deepin-image-viewer.desktop
+</span></span></code></pre></div><h2 id="添加删除关联">添加/删除关联</h2>
+<p>在 mimeapps.list 文件中使用以下语法在 mimetypes 和应用程序之间添加和删除关联：</p>
+<pre tabindex="0"><code class="language-纯文本" data-lang="纯文本">[添加关联]
 mimetype1=foo1.desktop;foo2.desktop;foo3.desktop;
 mimetype2=foo4.desktop;
 [删除关联]
 mimetype1=foo5.desktop;
-</code></pre><p>[Added Associations] 和 [Removed Associations] 组只能出现在非桌面特定的文件中（即：在实际命名为“mimeapps.list”的文件中）。</p><p>[Added Associations] 组定义了应用程序与 mimetype 的附加关联，就好像 .desktop 文件首先列出了这个 mimetype。</p><p>[Removed Associations] 组删除应用程序与 mimetypes 的关联，就好像 .desktop 文件一开始没有列出此 mimetypes。</p><p>在“已添加”和“已删除”部分中为同一类型列出相同的应用程序是无效的，并且可能会产生实现定义的行为。</p><p>根据实现，给定类型的 [Added Associations] 条目中的条目顺序应该是“最优先顺序”。因此，实现应该注意保持顺序，除非在他们明确打算改变它的情况下。</p><p>关联的添加和删除仅适用于当前目录中的桌面文件，或以后的文件（按优先顺序）。这意味着从 $XDG_CONFIG_HOME、$XDG_CONFIG_DIRS 和 $XDG_DATA_HOME 中的 mimeapps.list 文件应用的添加和删除将覆盖所有现有桌面文件，但使用 /usr/share/applications/mimeapps.list 添加或删除关联，例如，如果命名应用程序的桌面文件存在于 $XDG_DATA_HOME/applications 中，则将被忽略。换句话说：添加和删除的关联可以被认为等同于从包含 mimeapps.list 的目录（可能是同一目录）的下一个优先目录中复制桌面文件并调整其 MimeType=线。如果一样。desktop 文件再次出现在优先级较高的目录中，则此修改后的 .desktop 优先级较低的文件将被忽略。如果添加或删除涉及在此优先级或较低优先级不存在的桌面文件，则添加或删除将被忽略，即使桌面文件存在于高优先级目录中。</p><p>列出（按优先顺序）与给定 mimetype 关联的应用程序的建议算法是：</p><ul><li>为结果创建一个空列表，以及一个临时空的“黑名单”</li><li>依次访问每个“mimeapps.list”文件；丢失的文件相当于一个空文件</li><li>将 mimeapps.list 中的任何“添加的关联”添加到结果列表中，不包括黑名单上的项目</li><li>将 mimeapps.list 中的任何“删除的关联”添加到黑名单</li><li>将与 mimeapps.list 位于同一目录中的任何 .desktop 文件添加到结果列表中，该文件在其 MimeType= 行中列出了给定类型，不包括已在黑名单中的任何桌面文件。对于基于 XDG_CONFIG_HOME 和 XDG_CONFIG_DIRS 的目录，（根据定义）同一目录中没有桌面文件。</li><li>将与 mimeapps.list 文件位于同一目录中的任何桌面文件的名称添加到黑名单中（对于基于 XDG_CONFIG_HOME 和 XDG_CONFIG_DIRS 的目录，该名称为无）</li><li>对每个后续目录重复最后四个步骤</li></ul><p>对从最具体到最不具体的每个 mimetype 重复上述过程。请特别注意，具有更具体的 mime 类型的应用程序“已添加”将保持该关联，即使它在更高优先级的目录中被“删除”，使用不太具体的类型。</p><h2 id=默认应用程序>默认应用程序</h2><p>通过写入文件 mimeapps.list 中的组 [Default Applications] 来指示给定 mimetype 的默认应用程序。</p><p>[默认应用程序] 组指示用于给定 mimetype 的默认应用程序。例如，这是在文件管理器中双击文件时将启动的。如果不再安装该应用程序，则尝试列表中的下一个应用程序，依此类推。</p><p>此示例确保应用程序 default1.desktop 将用于 mimetype1（如果已安装并与类型关联），否则将用于 default2.desktop（如果已安装并关联）：</p><p>[默认应用程序] mimetype1=default1.desktop;default2.desktop;</p><p>该值是以分号分隔的桌面文件 ID 列表（在桌面条目规范中定义）。</p><p>如果没有这样的条目，则检查下一个 mimeapps.list。一旦检查了所有级别，如果找不到条目，则实现应该选择与 mimetype 关联的最喜欢的 .desktop 文件，同时考虑上一节中添加和删除的关联。</p><p>确定给定 mimetype 的默认应用程序的建议算法是：</p><ul><li>在第一个 mimeapps.list 的“默认应用程序”组下获取给定 mimetype 的桌面 ID 列表</li><li>对于列表中的每个桌面 ID，尝试使用正常规则加载命名的桌面文件</li><li>如果找到有效的桌面文件，请验证它是否与类型相关联（如上一节所述）</li><li>如果找到有效关联，我们就找到了默认应用程序</li><li>如果在处理完所有列表项之后，我们还没有找到默认应用程序，则按搜索顺序继续下一个 mimeapps.list 文件并重复</li><li>如果处理完所有文件后，我们还没有找到默认应用程序，则选择支持该类型的最喜欢的应用程序（根据关联）</li></ul><p>对从最具体到最不具体的每个 mimetype 重复上述过程。请特别注意，将优先使用可以处理更具体类型的应用程序，而不是显式标记为不太具体类型的默认值的应用程序。</p><p>请注意，与添加和删除关联不同，设置为应用程序默认值的桌面 ID 可以引用在更高优先级目录中找到的同名桌面文件。</p><p>另请注意，给定类型的默认应用程序必须是与该类型关联的应用程序。这意味着实现应该确保存在这样的关联，或者在将应用程序设置为类型的默认值时显式添加一个。</p></div></article><aside class=post-toc><div class=post-toc-inner><p class=post-toc-title>目录</p><nav id=TableOfContents><ul><li><a href=#介绍>介绍</a></li><li><a href=#文件名和位置>文件名和位置</a></li><li><a href=#添加删除关联>添加/删除关联</a></li><li><a href=#默认应用程序>默认应用程序</a></li></ul></nav></div></aside></section></main><footer class=site-footer><a class=footer-github href=https://github.com/xzl01 target=_blank rel="noopener noreferrer" aria-label=GitHub><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5A11.5 11.5.0 00.5 12.27a11.8 11.8.0 007.86 11.3c.58.11.8-.26.8-.57v-2.02c-3.2.72-3.88-1.58-3.88-1.58-.53-1.38-1.3-1.75-1.3-1.75-1.06-.75.08-.74.08-.74 1.18.09 1.79 1.25 1.79 1.25 1.05 1.86 2.75 1.32 3.42 1 .11-.78.41-1.32.74-1.62-2.55-.3-5.24-1.31-5.24-5.85.0-1.29.45-2.35 1.2-3.18-.12-.3-.52-1.52.11-3.17.0.0.98-.32 3.2 1.21a10.86 10.86.0 015.83.0c2.22-1.53 3.2-1.21 3.2-1.21.63 1.65.23 2.87.11 3.17.75.83 1.2 1.89 1.2 3.18.0 4.56-2.69 5.55-5.25 5.84.42.37.79 1.09.79 2.2V23c0 .31.21.68.8.57a11.8 11.8.0 007.85-11.3A11.5 11.5.0 0012 .5z"/></svg></a><p>&copy; 2026 HarryLoong</p><p class=footer-meta>commit local · updated 2026-03-11 10:59:47 +0800</p></footer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js></script><script src="/js/site.js?v=1773197987"></script></body></html>
+</code></pre><p>[Added Associations] 和 [Removed Associations] 组只能出现在非桌面特定的文件中（即：在实际命名为“mimeapps.list”的文件中）。</p>
+<p>[Added Associations] 组定义了应用程序与 mimetype 的附加关联，就好像 .desktop 文件首先列出了这个 mimetype。</p>
+<p>[Removed Associations] 组删除应用程序与 mimetypes 的关联，就好像 .desktop 文件一开始没有列出此 mimetypes。</p>
+<p>在“已添加”和“已删除”部分中为同一类型列出相同的应用程序是无效的，并且可能会产生实现定义的行为。</p>
+<p>根据实现，给定类型的 [Added Associations] 条目中的条目顺序应该是“最优先顺序”。因此，实现应该注意保持顺序，除非在他们明确打算改变它的情况下。</p>
+<p>关联的添加和删除仅适用于当前目录中的桌面文件，或以后的文件（按优先顺序）。这意味着从 $XDG_CONFIG_HOME、$XDG_CONFIG_DIRS 和 $XDG_DATA_HOME 中的 mimeapps.list 文件应用的添加和删除将覆盖所有现有桌面文件，但使用 /usr/share/applications/mimeapps.list 添加或删除关联，例如，如果命名应用程序的桌面文件存在于 $XDG_DATA_HOME/applications 中，则将被忽略。换句话说：添加和删除的关联可以被认为等同于从包含 mimeapps.list 的目录（可能是同一目录）的下一个优先目录中复制桌面文件并调整其 MimeType=线。如果一样。desktop 文件再次出现在优先级较高的目录中，则此修改后的 .desktop 优先级较低的文件将被忽略。如果添加或删除涉及在此优先级或较低优先级不存在的桌面文件，则添加或删除将被忽略，即使桌面文件存在于高优先级目录中。</p>
+<p>列出（按优先顺序）与给定 mimetype 关联的应用程序的建议算法是：</p>
+<ul>
+<li>为结果创建一个空列表，以及一个临时空的“黑名单”</li>
+<li>依次访问每个“mimeapps.list”文件；丢失的文件相当于一个空文件</li>
+<li>将 mimeapps.list 中的任何“添加的关联”添加到结果列表中，不包括黑名单上的项目</li>
+<li>将 mimeapps.list 中的任何“删除的关联”添加到黑名单</li>
+<li>将与 mimeapps.list 位于同一目录中的任何 .desktop 文件添加到结果列表中，该文件在其 MimeType= 行中列出了给定类型，不包括已在黑名单中的任何桌面文件。对于基于 XDG_CONFIG_HOME 和 XDG_CONFIG_DIRS 的目录，（根据定义）同一目录中没有桌面文件。</li>
+<li>将与 mimeapps.list 文件位于同一目录中的任何桌面文件的名称添加到黑名单中（对于基于 XDG_CONFIG_HOME 和 XDG_CONFIG_DIRS 的目录，该名称为无）</li>
+<li>对每个后续目录重复最后四个步骤</li>
+</ul>
+<p>对从最具体到最不具体的每个 mimetype 重复上述过程。请特别注意，具有更具体的 mime 类型的应用程序“已添加”将保持该关联，即使它在更高优先级的目录中被“删除”，使用不太具体的类型。</p>
+<h2 id="默认应用程序">默认应用程序</h2>
+<p>通过写入文件 mimeapps.list 中的组 [Default Applications] 来指示给定 mimetype 的默认应用程序。</p>
+<p>[默认应用程序] 组指示用于给定 mimetype 的默认应用程序。例如，这是在文件管理器中双击文件时将启动的。如果不再安装该应用程序，则尝试列表中的下一个应用程序，依此类推。</p>
+<p>此示例确保应用程序 default1.desktop 将用于 mimetype1（如果已安装并与类型关联），否则将用于 default2.desktop（如果已安装并关联）：</p>
+<p>[默认应用程序] mimetype1=default1.desktop;default2.desktop;</p>
+<p>该值是以分号分隔的桌面文件 ID 列表（在桌面条目规范中定义）。</p>
+<p>如果没有这样的条目，则检查下一个 mimeapps.list。一旦检查了所有级别，如果找不到条目，则实现应该选择与 mimetype 关联的最喜欢的 .desktop 文件，同时考虑上一节中添加和删除的关联。</p>
+<p>确定给定 mimetype 的默认应用程序的建议算法是：</p>
+<ul>
+<li>在第一个 mimeapps.list 的“默认应用程序”组下获取给定 mimetype 的桌面 ID 列表</li>
+<li>对于列表中的每个桌面 ID，尝试使用正常规则加载命名的桌面文件</li>
+<li>如果找到有效的桌面文件，请验证它是否与类型相关联（如上一节所述）</li>
+<li>如果找到有效关联，我们就找到了默认应用程序</li>
+<li>如果在处理完所有列表项之后，我们还没有找到默认应用程序，则按搜索顺序继续下一个 mimeapps.list 文件并重复</li>
+<li>如果处理完所有文件后，我们还没有找到默认应用程序，则选择支持该类型的最喜欢的应用程序（根据关联）</li>
+</ul>
+<p>对从最具体到最不具体的每个 mimetype 重复上述过程。请特别注意，将优先使用可以处理更具体类型的应用程序，而不是显式标记为不太具体类型的默认值的应用程序。</p>
+<p>请注意，与添加和删除关联不同，设置为应用程序默认值的桌面 ID 可以引用在更高优先级目录中找到的同名桌面文件。</p>
+<p>另请注意，给定类型的默认应用程序必须是与该类型关联的应用程序。这意味着实现应该确保存在这样的关联，或者在将应用程序设置为类型的默认值时显式添加一个。</p>
+
+        </div>
+    </article>
+
+    
+    <aside class="post-toc">
+        <div class="post-toc-inner">
+            <p class="post-toc-title">目录</p>
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#介绍">介绍</a></li>
+    <li><a href="#文件名和位置">文件名和位置</a></li>
+    <li><a href="#添加删除关联">添加/删除关联</a></li>
+    <li><a href="#默认应用程序">默认应用程序</a></li>
+  </ul>
+</nav>
+        </div>
+    </aside>
+    
+</section>
+
+    </main>
+
+    <footer class="site-footer">
+        <a class="footer-github" href="https://github.com/xzl01" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 .5A11.5 11.5 0 0 0 .5 12.27a11.8 11.8 0 0 0 7.86 11.3c.58.11.8-.26.8-.57v-2.02c-3.2.72-3.88-1.58-3.88-1.58-.53-1.38-1.3-1.75-1.3-1.75-1.06-.75.08-.74.08-.74 1.18.09 1.79 1.25 1.79 1.25 1.05 1.86 2.75 1.32 3.42 1 .11-.78.41-1.32.74-1.62-2.55-.3-5.24-1.31-5.24-5.85 0-1.29.45-2.35 1.2-3.18-.12-.3-.52-1.52.11-3.17 0 0 .98-.32 3.2 1.21a10.86 10.86 0 0 1 5.83 0c2.22-1.53 3.2-1.21 3.2-1.21.63 1.65.23 2.87.11 3.17.75.83 1.2 1.89 1.2 3.18 0 4.56-2.69 5.55-5.25 5.84.42.37.79 1.09.79 2.2V23c0 .31.21.68.8.57a11.8 11.8 0 0 0 7.85-11.3A11.5 11.5 0 0 0 12 .5Z"/>
+            </svg>
+        </a>
+        <p>&copy; 2026 HarryLoong</p>
+        <p class="footer-meta">commit local · updated 2026-04-02 23:45:21 &#43;0800</p>
+    </footer>
+
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script defer src="/js/site.js?v=1775144721"></script>
+</body>
+</html>

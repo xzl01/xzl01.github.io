@@ -1,45 +1,847 @@
-<!doctype html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>Linux TLP 电源管理指南 - HarryLoong's Blog</title><meta name=description content="介绍 TLP 在 Linux 笔记本上的节能机制与配置方法，覆盖原理、关键参数和续航优化实践。"><script>document.documentElement.classList.add("js")</script><link rel=preconnect href=https://fonts.googleapis.com><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel=stylesheet><link rel=stylesheet href="/css/site.css?v=1773197987"></head><body class=inner-page><div class="bg-shape bg-shape-a" aria-hidden=true></div><div class="bg-shape bg-shape-b" aria-hidden=true></div><div class=solar-blob aria-hidden=true></div><header class=hero><div class="container hero-inner reveal"><p class=eyebrow>ARTICLE</p><h1>Linux TLP 电源管理指南</h1><p class=subtitle>介绍 TLP 在 Linux 笔记本上的节能机制与配置方法，覆盖原理、关键参数和续航优化实践。</p></div></header><nav class=top-nav><div class="container nav-inner"><div class=nav-links aria-label=主导航><a href=/>首页</a>
-<a href=/blog/>文章</a>
-<a href=/gallery/>图库</a></div><div class=theme-controls aria-label=主题控制><select id=theme-mode-select class=theme-select aria-label=主题模式><option value=auto>自动</option><option value=manual>手动</option></select>
-<select id=theme-palette-select class=theme-select aria-label=主题配色><option value=sunrise>莫兰迪·日出</option><option value=noon>莫兰迪·中午</option><option value=dusk>莫兰迪·傍晚</option><option value=midnight>莫兰迪·深夜</option><option value=mist>莫兰迪·雾青</option><option value=rose>莫兰迪·灰粉</option></select></div></div></nav><main class="container main-wrap"><section class=single-layout><article class=single-post><header class=post-header><p class=post-kicker>Article</p><h1 class=post-title>Linux TLP 电源管理指南</h1><p class=post-summary>介绍 TLP 在 Linux 笔记本上的节能机制与配置方法，覆盖原理、关键参数和续航优化实践。</p><div class=post-meta><span>2026-03-04
-</span><span>·</span>
-<span>5 分钟阅读</span>
-<span>·</span>
-<span>Linux系统 / 性能优化</span></div><div class="tag-list post-tags"><a class=tag href=/tags/linux/>Linux</a>
-<a class=tag href=/tags/tlp/>TLP</a>
-<a class=tag href=/tags/%E7%94%B5%E6%BA%90%E7%AE%A1%E7%90%86/>电源管理</a>
-<a class=tag href=/tags/%E7%BB%AD%E8%88%AA%E4%BC%98%E5%8C%96/>续航优化</a></div></header><div class=post-divider aria-hidden=true></div><div class=post-content><p>TLP 是适用于 Linux 的功能丰富的命令行实用程序，无需深入研究技术细节即可节省笔记本电脑电池电量</p><h2 id=工作原理>工作原理</h2><ul><li>TLP 基本上所做的是调整影响功耗的内核设置，内核态的配置文件存储在RAM中，所以并不具备持久性。TLP将配置存储在用户态中，在内核启动时对其进行配置</li><li>TLP 处理的大多数内核设置都作为 sysfs 节点导出到用户空间，即 /sys/ 下的文件。<code>tlp-stat</code> 的输出将显示路径。</li><li>TLP 提供两组独立的设置，称为配置文件，一组用于电池 （BAT），另一组用于交流操作。这意味着 TLP 不仅在启动时，而且在每次电源更改时都必须应用适当的配置文件（可以据此实现AC BT切换电源调度状态）</li></ul><h3 id=tlp触发事件信号>TLP触发事件（信号）</h3><ul><li>充电器插入（交流供电）：应用AC配置文件</li><li>充电器已拔下（电池供电）： 应用BAT配置文件</li><li>已插入 USB 设备：激活设备的 USB 自动挂起模式（可以在配置文件设置例外或拒绝连接）</li><li>系统启动（boot）：应用与当前电源 AC/BAT 相对应的设置配置文件。应用充电阈值并根据您的个人设置切换蓝牙、Wi-Fi 和 WWAN 设备（在默认配置中禁用）</li><li>系统关机 (power off)：保存或切换蓝牙、Wi-Fi 和 WWAN 设备状态，并根据您的个人设置禁用 USB 自动挂起（在默认配置中禁用）</li><li>系统重启： 相当于关机再启动</li><li>系统挂起到 ACPI 睡眠状态 S0ix（空闲待机）、S3（挂起到 RAM）或 S4（挂起到磁盘）：保存蓝牙、Wi-Fi 和 WWAN 设备状态，并根据您的个人设置关闭可移动光盘驱动器的电源（在默认配置中禁用）。</li><li>系统从 ACPI 睡眠状态 S0ix（空闲待机）、S3（挂起到 RAM）或 S4（挂起到磁盘）恢复： 应用与当前电源 AC/BAT 相对应的设置配置文件。恢复充电阈值以及蓝牙、Wi-Fi 和 WWAN 设备状态，具体取决于您的个人设置（在默认配置中禁用）。</li><li>LAN、Wi-Fi、WWAN 连接/断开连接或笔记本电脑插接/未插接：根据您的个人设置启用或禁用内置蓝牙、Wi-Fi 和 WWAN 设备（在默认配置中禁用）</li></ul><blockquote><p>除了上述事件之外，TLP 不会对设置进行动态或自适应更改
-特别是，TLP 绝不会因 CPU 负载、电池电量或其他原因而调整设置（如果我们需要去实现这一部分，则可以，则可以通过添加一个信号的方式来实现）</p></blockquote><h2 id=安装>安装</h2><p><code>sudo apt install tlp</code></p><h2 id=使用>使用</h2><h3 id=启动>启动</h3><p>安装后TLP将在系统启动的时候自动启动，如果你不想重启系统，可以使用<code>sudo tlp start</code>来启动tlp，也可以使用此命令来应用更改。</p><h3 id=状态>状态</h3><p><code>tlp-stat -s</code> TLP是bash脚本，所以不存于daemon进程</p><h3 id=命令行>命令行</h3><h4 id=tlp>TLP：</h4><p><code>sudo tlp bat</code> 应用电池配置文件并进入手动模式 手动模式意味着对电源的更改将被忽略，直到下一次重新启动或发出 tlp start 以恢复自动模式</p><p><code>sudo tlp ac</code>应用交流配置文件并进入手动模式</p><p><code>sudo tlp usb</code> 对所有的ubs设备应用自动挂起</p><p><code>sudo tlp bayoff</code> 关闭 MediaBay/Ultrabay 中的光驱电源</p><p><code>sudo tlp setcharge [&lt;START_CHARGE_THRESH> &lt;STOP_CHARGE_THRESH>] [BAT0|BAT1|BAT&lt;x>|CMB0|CMB1]</code> 可以设定对指定电池开始充电百分比和结束充电的百分比，以达到养护电池的目的（如果不带参数 会重置电池管理方案）（命令只能暂时更改，如果需要持久化更改 需要修改配置文件）</p><p><code>sudo tlp fullcharge [BAT0|BAT1|BAT&lt;x>|CMB0|CMB1]</code> 设定电池充满</p><p><code>tlp diskid</code> 显示已经配置驱动器的磁盘ID</p><p>以下部分为ThinkPad专属</p><p><code>sudo tlp chargeonce [BAT0|BAT1]</code> 将电池充电至停止充电阈值一次，这个阈值是使用setcharge设置的</p><p><code>sudo tlp discharge [BAT0|BAT1]</code> 让电池在交流电源下完全放电</p><p><code>sudo tlp recalibrate [BAT0|BAT1]</code>校准电池</p><h4 id=tlp-rdw>TLP-RDW</h4><p><code>sudo tlp-rdw [ enable | disable ]</code> 启用或关闭无线电管理功能</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>bluetooth <span class=o>[</span> on <span class=p>|</span> off <span class=p>|</span> toggle <span class=o>]</span>
-</span></span><span class=line><span class=cl>nfc <span class=o>[</span> on <span class=p>|</span> off <span class=p>|</span> toggle <span class=o>]</span>
-</span></span><span class=line><span class=cl>wifi <span class=o>[</span> on <span class=p>|</span> off <span class=p>|</span> toggle <span class=o>]</span>
-</span></span><span class=line><span class=cl>wwan <span class=o>[</span> on <span class=p>|</span> off <span class=p>|</span> toggle <span class=o>]</span>
-</span></span></code></pre></div><p>启用、禁用、切换或检查内置蓝牙、NFC、Wi-Fi 和 WWAN（3G/UMTS、4G/LTE 或 5G）无线电的状态，如果不带参数则为当前硬件状态（硬件需要支持rfkill）</p><h4 id=tlp-stat>TLP-STAT</h4><p><code>sudo tlp-stat</code> 查看TLP配置信息，系统信息和内核省电设置以及电池数据</p><p><code>sudo tlp-stat [-b /--battery]</code> 查看电池信息，部分电池加<code>-v</code>参数可以查看电压</p><p><code>sudo tlp-stat [-c /--config]</code>查看配置信息</p><p><code>sudo tlp-stat --cdiff</code> 查看默认配置和用户配置之间的差异</p><p><code>sudo tlp-stat [-d /--disk]</code> 查看硬盘配置信息</p><p><code>sudo tlp-stat [-e/ --pcie]</code> 查看Pcie配置信息</p><h2 id=配置>配置</h2><p>TLP最重要的就是其配置文件，可以说，TLP是否节电的关键。 TLP 使用两个根据电源自动应用的设置配置文件：</p><ul><li>以<code>_AC</code>结尾的参数在连接交流电源的时候生效</li><li>以<code>_BAT</code>结尾的参数在使用电池的时候有效</li><li>既不以<code> _AC </code>结尾也不以 <code>_BAT</code> 结尾的参数适用于这两个配置文件</li></ul><h3 id=配置文件>配置文件</h3><p>按指定顺序从以下文件中读取设置：</p><ul><li>Intrinsic defaults 固有默认值（这个配置为TLP自带，不可被更改）</li><li><code>/etc/tlp.d/*.conf</code>：插入式自定义片段，按词法（字母顺序）顺序读取，不过建议可以使用一般配置命名方法（00_xxxx.conf)</li><li><code>/etc/tlp.conf</code>：用户配置</li></ul><blockquote><p>如果多个参数相同，但在同一文件中也存在相同的参数，则最后一个匹配项优先，这也意味着，<code>/etc/tlp.conf</code> 中的参数将覆盖其他任何内容，因为它是最后读取的
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    
+    
+    
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux TLP 电源管理指南 - HarryLoong&#39;s Blog</title>
+    <meta name="description" content="介绍 TLP 在 Linux 笔记本上的节能机制与配置方法，覆盖原理、关键参数和续航优化实践。">
+    <script>document.documentElement.classList.add('js');</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"></noscript>
+    <link rel="stylesheet" href="/css/site.css?v=1775144721">
+</head>
+<body class="inner-page">
+    <div class="bg-shape bg-shape-a" aria-hidden="true"></div>
+    <div class="bg-shape bg-shape-b" aria-hidden="true"></div>
+    <div class="solar-blob" aria-hidden="true"></div>
+
+    <header class="hero">
+        <div class="container hero-inner reveal">
+            
+            <p class="eyebrow">ARTICLE</p>
+            <h1>Linux TLP 电源管理指南</h1>
+            <p class="subtitle">介绍 TLP 在 Linux 笔记本上的节能机制与配置方法，覆盖原理、关键参数和续航优化实践。</p>
+            
+        </div>
+    </header>
+
+    <nav class="top-nav">
+        <div class="container nav-inner">
+            <div class="nav-links" aria-label="主导航">
+                <a href="/">首页</a>
+                <a href="/blog/">文章</a>
+                <a href="/gallery/">图库</a>
+            </div>
+            <div class="theme-controls" aria-label="主题控制">
+                <select id="theme-mode-select" class="theme-select" aria-label="主题模式">
+                    <option value="auto">自动</option>
+                    <option value="manual">手动</option>
+                </select>
+                <select id="theme-palette-select" class="theme-select" aria-label="主题配色">
+                    <option value="sunrise">莫兰迪·日出</option>
+                    <option value="noon">莫兰迪·中午</option>
+                    <option value="dusk">莫兰迪·傍晚</option>
+                    <option value="midnight">莫兰迪·深夜</option>
+                    <option value="mist">莫兰迪·雾青</option>
+                    <option value="rose">莫兰迪·灰粉</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container main-wrap">
+        
+<section class="single-layout">
+    <article class="single-post">
+        <header class="post-header">
+            <p class="post-kicker">Article</p>
+            <h1 class="post-title">Linux TLP 电源管理指南</h1>
+            
+            <p class="post-summary">介绍 TLP 在 Linux 笔记本上的节能机制与配置方法，覆盖原理、关键参数和续航优化实践。</p>
+            
+
+            <div class="post-meta">
+                <span>
+
+2026-03-04
+
+</span>
+                <span>·</span>
+                <span>5 分钟阅读</span>
+                
+                <span>·</span>
+                <span>Linux系统 / 性能优化</span>
+                
+            </div>
+
+            
+            <div class="tag-list post-tags">
+                
+                <a class="tag" href="/tags/linux/">Linux</a>
+                
+                <a class="tag" href="/tags/tlp/">TLP</a>
+                
+                <a class="tag" href="/tags/%E7%94%B5%E6%BA%90%E7%AE%A1%E7%90%86/">电源管理</a>
+                
+                <a class="tag" href="/tags/%E7%BB%AD%E8%88%AA%E4%BC%98%E5%8C%96/">续航优化</a>
+                
+            </div>
+            
+        </header>
+
+        <div class="post-divider" aria-hidden="true"></div>
+
+        <div class="post-content">
+            <p>TLP 是适用于 Linux 的功能丰富的命令行实用程序，无需深入研究技术细节即可节省笔记本电脑电池电量</p>
+<h2 id="工作原理">工作原理</h2>
+<ul>
+<li>TLP 基本上所做的是调整影响功耗的内核设置，内核态的配置文件存储在RAM中，所以并不具备持久性。TLP将配置存储在用户态中，在内核启动时对其进行配置</li>
+<li>TLP 处理的大多数内核设置都作为 sysfs 节点导出到用户空间，即 /sys/ 下的文件。<code>tlp-stat</code> 的输出将显示路径。</li>
+<li>TLP 提供两组独立的设置，称为配置文件，一组用于电池 （BAT），另一组用于交流操作。这意味着 TLP 不仅在启动时，而且在每次电源更改时都必须应用适当的配置文件（可以据此实现AC BT切换电源调度状态）</li>
+</ul>
+<h3 id="tlp触发事件信号">TLP触发事件（信号）</h3>
+<ul>
+<li>充电器插入（交流供电）：应用AC配置文件</li>
+<li>充电器已拔下（电池供电）： 应用BAT配置文件</li>
+<li>已插入 USB 设备：激活设备的 USB 自动挂起模式（可以在配置文件设置例外或拒绝连接）</li>
+<li>系统启动（boot）：应用与当前电源 AC/BAT 相对应的设置配置文件。应用充电阈值并根据您的个人设置切换蓝牙、Wi-Fi 和 WWAN 设备（在默认配置中禁用）</li>
+<li>系统关机 (power off)：保存或切换蓝牙、Wi-Fi 和 WWAN 设备状态，并根据您的个人设置禁用 USB 自动挂起（在默认配置中禁用）</li>
+<li>系统重启： 相当于关机再启动</li>
+<li>系统挂起到 ACPI 睡眠状态 S0ix（空闲待机）、S3（挂起到 RAM）或 S4（挂起到磁盘）：保存蓝牙、Wi-Fi 和 WWAN 设备状态，并根据您的个人设置关闭可移动光盘驱动器的电源（在默认配置中禁用）。</li>
+<li>系统从 ACPI 睡眠状态 S0ix（空闲待机）、S3（挂起到 RAM）或 S4（挂起到磁盘）恢复： 应用与当前电源 AC/BAT 相对应的设置配置文件。恢复充电阈值以及蓝牙、Wi-Fi 和 WWAN 设备状态，具体取决于您的个人设置（在默认配置中禁用）。</li>
+<li>LAN、Wi-Fi、WWAN 连接/断开连接或笔记本电脑插接/未插接：根据您的个人设置启用或禁用内置蓝牙、Wi-Fi 和 WWAN 设备（在默认配置中禁用）</li>
+</ul>
+<blockquote>
+<p>除了上述事件之外，TLP 不会对设置进行动态或自适应更改
+特别是，TLP 绝不会因 CPU 负载、电池电量或其他原因而调整设置（如果我们需要去实现这一部分，则可以，则可以通过添加一个信号的方式来实现）</p>
+</blockquote>
+<h2 id="安装">安装</h2>
+<p><code>sudo apt install tlp</code></p>
+<h2 id="使用">使用</h2>
+<h3 id="启动">启动</h3>
+<p>安装后TLP将在系统启动的时候自动启动，如果你不想重启系统，可以使用<code>sudo tlp start</code>来启动tlp，也可以使用此命令来应用更改。</p>
+<h3 id="状态">状态</h3>
+<p><code>tlp-stat -s</code>  TLP是bash脚本，所以不存于daemon进程</p>
+<h3 id="命令行">命令行</h3>
+<h4 id="tlp">TLP：</h4>
+<p><code>sudo tlp bat</code> 应用电池配置文件并进入手动模式  手动模式意味着对电源的更改将被忽略，直到下一次重新启动或发出 tlp start 以恢复自动模式</p>
+<p><code>sudo tlp ac</code>应用交流配置文件并进入手动模式</p>
+<p><code>sudo tlp usb</code> 对所有的ubs设备应用自动挂起</p>
+<p><code>sudo tlp bayoff</code> 关闭 MediaBay/Ultrabay 中的光驱电源</p>
+<p><code>sudo tlp setcharge [&lt;START_CHARGE_THRESH&gt; &lt;STOP_CHARGE_THRESH&gt;] [BAT0|BAT1|BAT&lt;x&gt;|CMB0|CMB1]</code> 可以设定对指定电池开始充电百分比和结束充电的百分比，以达到养护电池的目的（如果不带参数 会重置电池管理方案）（命令只能暂时更改，如果需要持久化更改 需要修改配置文件）</p>
+<p><code>sudo tlp fullcharge [BAT0|BAT1|BAT&lt;x&gt;|CMB0|CMB1]</code> 设定电池充满</p>
+<p><code>tlp diskid</code> 显示已经配置驱动器的磁盘ID</p>
+<p>以下部分为ThinkPad专属</p>
+<p><code>sudo tlp chargeonce [BAT0|BAT1]</code> 将电池充电至停止充电阈值一次，这个阈值是使用setcharge设置的</p>
+<p><code>sudo tlp discharge [BAT0|BAT1]</code> 让电池在交流电源下完全放电</p>
+<p><code>sudo tlp recalibrate [BAT0|BAT1]</code>校准电池</p>
+<h4 id="tlp-rdw">TLP-RDW</h4>
+<p><code>sudo tlp-rdw [ enable | disable ]</code> 启用或关闭无线电管理功能</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">bluetooth <span class="o">[</span> on <span class="p">|</span> off <span class="p">|</span> toggle <span class="o">]</span>
+</span></span><span class="line"><span class="cl">nfc <span class="o">[</span> on <span class="p">|</span> off <span class="p">|</span> toggle <span class="o">]</span>
+</span></span><span class="line"><span class="cl">wifi <span class="o">[</span> on <span class="p">|</span> off <span class="p">|</span> toggle <span class="o">]</span>
+</span></span><span class="line"><span class="cl">wwan <span class="o">[</span> on <span class="p">|</span> off <span class="p">|</span> toggle <span class="o">]</span>
+</span></span></code></pre></div><p>启用、禁用、切换或检查内置蓝牙、NFC、Wi-Fi 和 WWAN（3G/UMTS、4G/LTE 或 5G）无线电的状态，如果不带参数则为当前硬件状态（硬件需要支持rfkill）</p>
+<h4 id="tlp-stat">TLP-STAT</h4>
+<p><code>sudo tlp-stat</code> 查看TLP配置信息，系统信息和内核省电设置以及电池数据</p>
+<p><code>sudo tlp-stat [-b /--battery]</code> 查看电池信息，部分电池加<code>-v</code>参数可以查看电压</p>
+<p><code>sudo tlp-stat [-c /--config]</code>查看配置信息</p>
+<p><code>sudo tlp-stat --cdiff</code> 查看默认配置和用户配置之间的差异</p>
+<p><code>sudo tlp-stat [-d /--disk]</code> 查看硬盘配置信息</p>
+<p><code>sudo tlp-stat [-e/ --pcie]</code> 查看Pcie配置信息</p>
+<h2 id="配置">配置</h2>
+<p>TLP最重要的就是其配置文件，可以说，TLP是否节电的关键。 TLP 使用两个根据电源自动应用的设置配置文件：</p>
+<ul>
+<li>以<code>_AC</code>结尾的参数在连接交流电源的时候生效</li>
+<li>以<code>_BAT</code>结尾的参数在使用电池的时候有效</li>
+<li>既不以<code> _AC </code>结尾也不以 <code>_BAT</code> 结尾的参数适用于这两个配置文件</li>
+</ul>
+<h3 id="配置文件">配置文件</h3>
+<p>按指定顺序从以下文件中读取设置：</p>
+<ul>
+<li>Intrinsic defaults 固有默认值（这个配置为TLP自带，不可被更改）</li>
+<li><code>/etc/tlp.d/*.conf</code>：插入式自定义片段，按词法（字母顺序）顺序读取，不过建议可以使用一般配置命名方法（00_xxxx.conf)</li>
+<li><code>/etc/tlp.conf</code>：用户配置</li>
+</ul>
+<blockquote>
+<p>如果多个参数相同，但在同一文件中也存在相同的参数，则最后一个匹配项优先，这也意味着，<code>/etc/tlp.conf</code> 中的参数将覆盖其他任何内容，因为它是最后读取的
 默认的<code>/etc/tlp.conf </code>中的所有参数都被禁用，删除前导 # 以激活您的更改
 /etc/tlp.d/ 目录中的配置文件由用户创建：
 * 文件名必须以 .conf 结尾，否则文件将被忽略
-* 00-template.conf 作为示例提供</p></blockquote><h3 id=参数默认值>参数默认值</h3><p>配置中有两种参数，一种是具有默认值的，会在本文档中说明，并且在<code>/etc/tlp.conf</code>中有<code>Default</code>前缀。还有一种没有默认值的。</p><h3 id=参数语法>参数语法</h3><p>配置文件由参数和注释行组成。</p><h4 id=参数行>参数行</h4><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nv>PARAMETER</span><span class=o>=</span>value
-</span></span></code></pre></div><p>如果value包含空格，则需要使用双引号</p><div class=highlight><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=nv>key</span><span class=o>=</span><span class=s2>&#34;111 1111 1111&#34;</span>
-</span></span></code></pre></div><h4 id=注释行>注释行</h4><p>以<code>#</code>开头，在1.6版本后可以在参数行后接<code>#</code>作为注释</p><h4 id=禁用功能>禁用功能</h4><ul><li>没有默认值：使用注释或者删除即可</li><li>有默认值： 赋空值即可 eg：<code>key=""</code></li></ul><h4 id=使用追加配置>使用<code>+=</code>追加配置</h4><p>和bash的环境变量一样，支持使用<code>+=</code>作为追加配置</p><blockquote><p>使用root权限编辑配置文件，在保存更改后可以使用重启，拔插ac电源或者使用<code>sudo tlp start</code>命令激活配置</p></blockquote><h3 id=配置详解>配置详解</h3><h4 id=基础操作>基础操作</h4><table><thead><tr><th>参数名称</th><th>默认参数值</th><th>描述</th></tr></thead><tbody><tr><td>TLP_ENABLE</td><td>1</td><td>设置为0可禁用TLP（需要重新启动）。未配置时的默认值：1</td></tr><tr><td>TLP_WARN_LEVEL</td><td>/</td><td>控制如何发出有关无效设置的警告：
+* 00-template.conf 作为示例提供</p>
+</blockquote>
+<h3 id="参数默认值">参数默认值</h3>
+<p>配置中有两种参数，一种是具有默认值的，会在本文档中说明，并且在<code>/etc/tlp.conf</code>中有<code>Default</code>前缀。还有一种没有默认值的。</p>
+<h3 id="参数语法">参数语法</h3>
+<p>配置文件由参数和注释行组成。</p>
+<h4 id="参数行">参数行</h4>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nv">PARAMETER</span><span class="o">=</span>value
+</span></span></code></pre></div><p>如果value包含空格，则需要使用双引号</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="nv">key</span><span class="o">=</span><span class="s2">&#34;111 1111 1111&#34;</span>
+</span></span></code></pre></div><h4 id="注释行">注释行</h4>
+<p>以<code>#</code>开头，在1.6版本后可以在参数行后接<code>#</code>作为注释</p>
+<h4 id="禁用功能">禁用功能</h4>
+<ul>
+<li>没有默认值：使用注释或者删除即可</li>
+<li>有默认值： 赋空值即可 eg：<code>key=&quot;&quot;</code></li>
+</ul>
+<h4 id="使用追加配置">使用<code>+=</code>追加配置</h4>
+<p>和bash的环境变量一样，支持使用<code>+=</code>作为追加配置</p>
+<blockquote>
+<p>使用root权限编辑配置文件，在保存更改后可以使用重启，拔插ac电源或者使用<code>sudo tlp start</code>命令激活配置</p>
+</blockquote>
+<h3 id="配置详解">配置详解</h3>
+<h4 id="基础操作">基础操作</h4>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>默认参数值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TLP_ENABLE</td>
+<td>1</td>
+<td>设置为0可禁用TLP（需要重新启动）。未配置时的默认值：1</td>
+</tr>
+<tr>
+<td>TLP_WARN_LEVEL</td>
+<td>/</td>
+<td>控制如何发出有关无效设置的警告：
 0 - 禁用
 1 - 向系统日志/日志报告后台任务（启动、恢复、电源更改）
 2 - 外壳命令向终端报告（标准）
-3 - 1和2的组合。未配置时的默认值：3</td></tr><tr><td>TLP_DEFAULT_MODE</td><td>/</td><td>定义TLP的默认操作模式（AC或BAT），以防无法检测到电源。仅涉及某些台式机和嵌入式硬件。</td></tr><tr><td>TLP_PERSISTENT_DEFAULT</td><td>0</td><td>选择如何确定操作模式：
+3 - 1和2的组合。未配置时的默认值：3</td>
+</tr>
+<tr>
+<td>TLP_DEFAULT_MODE</td>
+<td>/</td>
+<td>定义TLP的默认操作模式（AC或BAT），以防无法检测到电源。仅涉及某些台式机和嵌入式硬件。</td>
+</tr>
+<tr>
+<td>TLP_PERSISTENT_DEFAULT</td>
+<td>0</td>
+<td>选择如何确定操作模式：
 0 – 根据实际电源应用设置配置文件（默认）
-1 – 始终使用TLP_DEFAULT_MODE设置。未配置时的默认值：0</td></tr><tr><td>TLP_PS_IGNORE</td><td>/</td><td>确定工作模式时要忽略的电源等级：（用作错误检测到操作模式 AC 或 BAT 的笔记本电脑的解决方法）
+1 – 始终使用TLP_DEFAULT_MODE设置。未配置时的默认值：0</td>
+</tr>
+<tr>
+<td>TLP_PS_IGNORE</td>
+<td>/</td>
+<td>确定工作模式时要忽略的电源等级：（用作错误检测到操作模式 AC 或 BAT 的笔记本电脑的解决方法）
 AC
 BAT
-USB - 仅限版本 1.4 及更高版本。仅限版本 1.4 及更高版本：输入多个类，以空格分隔。</td></tr></tbody></table><h4 id=音频>音频</h4><table><thead><tr><th>参数名称</th><th>默认参数值</th><th>描述</th></tr></thead><tbody><tr><td>SOUND_POWER_SAVE_ON_AC/BAT</td><td>1</td><td>设置为0可禁用音频省电模式（需要重新启动）。未配置时的默认值：1（AC），1（BAT）- 版本 1.4 及更高版本，0（AC），1（BAT）- 版本 1.3。</td></tr><tr><td>SOUND_POWER_SAVE_CONTROLLER</td><td>Y</td><td>Y – 关闭控制器和声音芯片的电源
-N – 控制器保持活动状态。未配置时的默认值：Y。</td></tr></tbody></table><p>注释： <code>SOUND_POWER_SAVE_ON_AC/BAT</code> 指的是<code>SOUND_POWER_SAVE_ON_AC</code> 和 <code>SOUND_POWER_SAVE_ON_BAT</code></p><h4 id=电池保养>电池保养</h4><table><thead><tr><th>参数名称</th><th>参数值</th><th>描述</th></tr></thead><tbody><tr><td>START_CHARGE_THRESH_BAT&lt;x></td><td>75</td><td>电池充电水平低于该水平，连接充电器时将开始充电。</td></tr><tr><td>STOP_CHARGE_THRESH_BAT&lt;x></td><td>80</td><td>电池充电水平，超过该水平，充电器连接时充电将停止。</td></tr></tbody></table><p>这些参数用于设置笔记本电脑主/内部电池（BAT0）和辅助电池（BAT1）的充电阈值。启动充电阈值表示在连接充电器时，电池充电水平低于该值时将开始充电。停止充电阈值表示在充电器连接时，电池充电水平超过该值时将停止充电。这些阈值始终具有较低的可用电池容量，因此默认情况下禁用这些设置，并且必须通过删除前导 # 来显式启用这些设置。</p><h4 id=光驱>光驱</h4><table><thead><tr><th>参数名称</th><th>默认参数值</th><th>描述</th></tr></thead><tbody><tr><td>BAY_POWEROFF_ON_AC/BAT</td><td>0</td><td>控制光驱在交流电源和电池供电时是否关闭电源。
+USB - 仅限版本 1.4 及更高版本。仅限版本 1.4 及更高版本：输入多个类，以空格分隔。</td>
+</tr>
+</tbody>
+</table>
+<h4 id="音频">音频</h4>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>默认参数值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SOUND_POWER_SAVE_ON_AC/BAT</td>
+<td>1</td>
+<td>设置为0可禁用音频省电模式（需要重新启动）。未配置时的默认值：1（AC），1（BAT）- 版本 1.4 及更高版本，0（AC），1（BAT）- 版本 1.3。</td>
+</tr>
+<tr>
+<td>SOUND_POWER_SAVE_CONTROLLER</td>
+<td>Y</td>
+<td>Y – 关闭控制器和声音芯片的电源
+N – 控制器保持活动状态。未配置时的默认值：Y。</td>
+</tr>
+</tbody>
+</table>
+<p>注释： <code>SOUND_POWER_SAVE_ON_AC/BAT</code> 指的是<code>SOUND_POWER_SAVE_ON_AC</code> 和 <code>SOUND_POWER_SAVE_ON_BAT</code></p>
+<h4 id="电池保养">电池保养</h4>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>参数值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>START_CHARGE_THRESH_BAT&lt;x&gt;</td>
+<td>75</td>
+<td>电池充电水平低于该水平，连接充电器时将开始充电。</td>
+</tr>
+<tr>
+<td>STOP_CHARGE_THRESH_BAT&lt;x&gt;</td>
+<td>80</td>
+<td>电池充电水平，超过该水平，充电器连接时充电将停止。</td>
+</tr>
+</tbody>
+</table>
+<p>这些参数用于设置笔记本电脑主/内部电池（BAT0）和辅助电池（BAT1）的充电阈值。启动充电阈值表示在连接充电器时，电池充电水平低于该值时将开始充电。停止充电阈值表示在充电器连接时，电池充电水平超过该值时将停止充电。这些阈值始终具有较低的可用电池容量，因此默认情况下禁用这些设置，并且必须通过删除前导 # 来显式启用这些设置。</p>
+<h4 id="光驱">光驱</h4>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>默认参数值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BAY_POWEROFF_ON_AC/BAT</td>
+<td>0</td>
+<td>控制光驱在交流电源和电池供电时是否关闭电源。
 1：保持光驱开启状态
-0：关闭光驱电源</td></tr><tr><td>BAY_DEVICE</td><td>sr0</td><td>指定光驱设备。</td></tr></tbody></table><h4 id=硬盘>硬盘</h4><table><thead><tr><th>参数名称</th><th>默认参数值</th><th>描述</th></tr></thead><tbody><tr><td>DISK_DEVICES</td><td>&ldquo;nvme0n1 sda&rdquo;</td><td>定义参数作用的磁盘设备。多个设备用空白分隔。</td></tr><tr><td>DISK_APM_LEVEL_ON_AC/BAT</td><td>&ldquo;254 254&rdquo;（AC）
-&ldquo;128 128&rdquo; (BAT)</td><td>设置“高级电源管理级别”。可能的值介于1和255之间。
+0：关闭光驱电源</td>
+</tr>
+<tr>
+<td>BAY_DEVICE</td>
+<td>sr0</td>
+<td>指定光驱设备。</td>
+</tr>
+</tbody>
+</table>
+<h4 id="硬盘">硬盘</h4>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>默认参数值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DISK_DEVICES</td>
+<td>&ldquo;nvme0n1 sda&rdquo;</td>
+<td>定义参数作用的磁盘设备。多个设备用空白分隔。</td>
+</tr>
+<tr>
+<td>DISK_APM_LEVEL_ON_AC/BAT</td>
+<td>&ldquo;254 254&rdquo;（AC）
+&ldquo;128 128&rdquo; (BAT)</td>
+<td>设置“高级电源管理级别”。可能的值介于1和255之间。
 1 – 最大省电/最低性能 – 重要提示：此设置可能会导致磁盘驱动器磨损增加，因为读写磁头卸载过多
 128 – 省电和磨损之间的折衷（电池的 TLP 标准设置）
 192 – 防止某些 HDD 的磁头过度卸载
 254 – 最小省电/最大性能（交流电的 TLP 标准设置）
 255 – 禁用 APM（某些磁盘型号不支持）
-keep – 用于跳过特定磁盘的此设置的特殊值（同义词：<code>_</code>）</td></tr><tr><td>DISK_APM_CLASS_DENYLIST</td><td>&ldquo;usb ieee1394&rdquo;</td><td>从高级电源管理（APM）中排除磁盘类。可能的值：sata、ata、usb、ieee1394。默认为“usb ieee1394”。</td></tr><tr><td>DISK_SPINDOWN_TIMEOUT_ON_AC/BAT</td><td>&ldquo;0 0&rdquo;</td><td>磁盘空闲时主轴电机停止的超时值。有效设置：0（已禁用）、1..240（5秒到20分钟）、241..251（30分钟到5.5小时）。</td></tr><tr><td>DISK_IOSCHED</td><td>&ldquo;keep keep&rdquo;</td><td>两个参数为
+keep – 用于跳过特定磁盘的此设置的特殊值（同义词：<code>_</code>）</td>
+</tr>
+<tr>
+<td>DISK_APM_CLASS_DENYLIST</td>
+<td>&ldquo;usb ieee1394&rdquo;</td>
+<td>从高级电源管理（APM）中排除磁盘类。可能的值：sata、ata、usb、ieee1394。默认为“usb ieee1394”。</td>
+</tr>
+<tr>
+<td>DISK_SPINDOWN_TIMEOUT_ON_AC/BAT</td>
+<td>&ldquo;0 0&rdquo;</td>
+<td>磁盘空闲时主轴电机停止的超时值。有效设置：0（已禁用）、1..240（5秒到20分钟）、241..251（30分钟到5.5小时）。</td>
+</tr>
+<tr>
+<td>DISK_IOSCHED</td>
+<td>&ldquo;keep keep&rdquo;</td>
+<td>两个参数为
 多队列 （blk-mq） 调度器：<code>mq-deadline</code> 、<code>none</code>、<code>kyber</code>、<code>bfq</code>、<code>keep</code>
 单队列调度程序：<code>deadline</code>、<code>cfq</code>、<code>bfq</code>、<code>noop</code>、<code>keep</code>
-如果未配置，默认情况下所有磁盘将使用内核的默认调度程序。</td></tr><tr><td>SATA_LINKPWR_ON_AC/BAT</td><td>&ldquo;med_power_with_dipm&rdquo;</td><td>设置SATA链路的电源管理模式。可能的值包括：max_performance、medium_power、med_power_with_dipm、min_power。默认为med_power_with_dipm。</td></tr><tr><td>SATA_LINKPWR_DENYLIST</td><td>&ldquo;host1&rdquo;</td><td>从AHCI链路电源管理（ALPM）中排除SATA磁盘的主机列表。默认为空。</td></tr><tr><td>AHCI_RUNTIME_PM_ON_AC</td><td>&ldquo;on&rdquo;</td><td>控制NVMe、SATA、ATA和USB磁盘以及SATA端口的运行时电源管理。可能的值包括：auto（启用）、on（禁用）</td></tr><tr><td>AHCI_RUNTIME_PM_ON_BAT</td><td>&ldquo;auto&rdquo;</td><td>同上</td></tr><tr><td>AHCI_RUNTIME_PM_TIMEOUT</td><td>15</td><td>磁盘或端口挂起前的不活动时间（秒）。仅在激活AHCI_RUNTIME_PM_ON_AC/BAT时有效。默认为15。</td></tr></tbody></table><p>注释：DISK_IOSCHED 如果使用是NVME设备时，最好使用无IO调度程序来减少CPU开销（none和noop）</p><h4 id=文件系统>文件系统</h4><table><thead><tr><th>参数名称</th><th>默认参数值</th><th>描述</th></tr></thead><tbody><tr><td>DISK_IDLE_SECS_ON_AC/BAT</td><td>0 (AC), 2 (battery)</td><td>笔记本电脑模式等待磁盘空闲的秒数，然后再次将脏缓存块从 RAM 同步到磁盘。值大于0将激活内核笔记本电脑模式。请勿更改此设置。</td></tr><tr><td>MAX_LOST_WORK_SECS_ON_AC/BAT</td><td>15 (AC), 60 (battery)</td><td>将文件系统缓冲区中未保存的数据写入磁盘的超时时间（秒）。</td></tr></tbody></table><h4 id=图形显卡>图形显卡</h4><table><thead><tr><th>参数名称</th><th>默认参数值</th><th>描述</th></tr></thead><tbody><tr><td>INTEL_GPU_MIN_FREQ_ON_AC/BAT</td><td>0</td><td>设置 Intel GPU 的最小频率。可能的值取决于硬件。通过运行 <code>tlp-stat -g</code> 命令查看可用频率。</td></tr><tr><td>INTEL_GPU_MAX_FREQ_ON_AC/BAT</td><td>0</td><td>设置 Intel GPU 的最大频率。可能的值取决于硬件。通过运行 <code>tlp-stat -g</code>命令查看可用频率。</td></tr><tr><td>INTEL_GPU_BOOST_FREQ_ON_AC/BAT</td><td>0</td><td>设置 Intel GPU 的睿频频率。可能的值取决于硬件。通过运行 <code>tlp-stat -g</code> 命令查看可用频率。</td></tr><tr><td>RADEON_DPM_PERF_LEVEL_ON_AC/BAT</td><td>auto</td><td>控制 AMD GPU 的动态电源管理（DPM）性能级别。支持 amdgpu（仅限 TLP 版本 1.4 及更高版本）和 radeon 驱动程序。可能的值包括 auto、low、high。默认值：auto。</td></tr><tr><td>RADEON_DPM_STATE_ON_AC/BAT</td><td>performance (AC), battery (BAT)</td><td>控制 AMD GPU 的电源管理方法。可能的值包括 battery、balanced、performance。默认值：performance（AC）、battery（BAT）。</td></tr><tr><td>RADEON_POWER_PROFILE_ON_AC/BAT</td><td>default</td><td>控制 AMD GPU 的时钟。仅在旧版 ATI 硬件上受 radeon 驱动程序支持（DPM 不可用）。可能的值包括 low、mid、high、auto、default。默认值：default。</td></tr></tbody></table><p>这些参数允许用户调整 Intel GPU 和 AMD GPU 在交流电和电池模式下的性能和电源管理行为。在配置这些参数时，建议参考硬件规格和运行 <code>tlp-stat -g</code> 查看可用频率。</p><h4 id=kernel>kernel</h4><table><thead><tr><th>参数名称</th><th>默认参数值</th><th>描述</th></tr></thead><tbody><tr><td>NMI_WATCHDOG</td><td>0</td><td>激活内核 NMI 看门狗定时器。设置为 0 表示禁用，有助于节省电源。设置为 1 表示启用，对于内核调试和看门狗守护程序是相关的。</td></tr></tbody></table><p>不建议关闭watchdog 否则可能导致内核崩溃后无法自动重启和内核调试</p><h4 id=网络>网络</h4><table><thead><tr><th>参数名称</th><th>默认参数值</th><th>描述</th></tr></thead><tbody><tr><td>WIFI_PWR_ON_AC/BAT</td><td>off (AC),</td><td>设置 Wi-Fi 的电源保存模式。可能的值包括 off（禁用）和 on（启用）。默认值：off（AC）、on（BAT）。</td></tr><tr><td></td><td>on (BAT)</td><td>提示：支持已弃用的配置值 1=off/5=on，以实现向后兼容性。</td></tr><tr><td>WOL_DISABLE</td><td>Y</td><td>控制是否禁用 Wake-on-LAN（LAN 唤醒）。可能的值包括 Y（禁用）和 N（不禁用，保持 BIOS 默认）。默认值：Y。
-注意：更改为 WOL_DISABLE=N 后，需要重新启动才能使新设置生效（或在 shell 中使用 <code>sudo ethtool -s wol g</code>）。</td></tr></tbody></table><p>这些参数允许用户配置Wi-Fi的电源保存模式和控制Wake-on-LAN（LAN唤醒）功能。</p><h4 id=平台>平台</h4><table><thead><tr><th>参数名称</th><th>默认参数值</th><th>描述</th></tr></thead><tbody><tr><td>PLATFORM_PROFILE_ON_AC/BAT</td><td>performance</td><td>选择平台配置文件以控制系统的功率/性能级别、散热和风扇速度的运行特性。可能的值包括 performance、balanced、low-power。默认值：performance（AC）、low-power（BAT）。</td></tr><tr><td>MEM_SLEEP_ON_AC/BAT</td><td>s2idle</td><td>选择系统挂起模式。可能的值包括 s2idle（空闲待机）和 deep（挂起到 RAM）。注意：更改挂起模式可能导致系统不稳定和数据丢失。请使用 tlp-stat -s 检查系统上不同模式的可用性。如果不确定，请坚持使用系统默认值。</td></tr></tbody></table><p>其实如果能使用S3休眠那就更好，不过现在很多厂商并不支持S3,所以如果能用S2那就用S2吧。</p><h4 id=处理器>处理器</h4><table><thead><tr><th>参数名称</th><th>默认参数值</th><th>描述</th></tr></thead><tbody><tr><td>CPU_DRIVER_OPMODE_ON_AC/BAT</td><td>active (amd-pstate), active (intel_pstate)</td><td>选择 CPU 缩放驱动程序操作模式。配置取决于活动驱动程序：对于 amd-pstate（Active 模式），可能的值为 active 和 passive；对于 intel_pstate（Active 模式），可能的值为 active、passive 和 guided。</td></tr><tr><td>CPU_SCALING_GOVERNOR_ON_AC/BAT</td><td>powersave</td><td>选择用于自动频率缩放的 CPU 缩放调节器。配置取决于活动驱动程序。可能的值包括 performance、powersave、conservative、ondemand、userspace 和 schedutil。默认值：powersave（AC）、powersave（BAT）。</td></tr><tr><td>CPU_SCALING_MIN/MAX_FREQ_ON_AC/BAT</td><td>0, 9999999</td><td>设置可用于缩放调控器的最小/最大频率。可能的值取决于您的 CPU。请查阅<code>tlp-stat -p</code>的输出以获取可用频率。</td></tr><tr><td>CPU_ENERGY_PERF_POLICY_ON_AC/BAT</td><td>balance_performance</td><td>设置 CPU 能耗/性能策略。可能的值包括 performance、balance_performance、default、balance_power 和 power。默认值：balance_performance（AC）、balance_power（BAT）。</td></tr><tr><td>CPU_MIN/MAX_PERF_ON_AC/BAT</td><td>0, 100</td><td>定义 Intel CPU 的最小/最大 P 状态，表示为总可用处理器性能的百分比。建议仅用于限制 CPU 的功耗。可能的值在 0 到 100 之间。默认值：0 到 100（AC）、0 到 30（BAT）。</td></tr><tr><td>CPU_BOOST_ON_AC/BAT</td><td>1</td><td>配置 CPU “turbo boost”（Intel）或“turbo core”（AMD）功能。可能的值为 0（禁用）和 1（允许）。请注意，值为 1 不会激活提升，只是允许它。默认值：1（AC）、0（BAT）。</td></tr><tr><td>CPU_HWP_DYN_BOOST_ON_AC/BAT</td><td>1</td><td>配置 Intel CPU HWP 动态提升功能。可能的值为 0（禁用）和 1（启用）。要求 Intel Core i 第 6 代（“Skylake”）或更新的 CPU，在活动模式下具有 intel_pstate 扩展驱动程序。默认值：1（AC）、0（BAT）。</td></tr></tbody></table><p>这些参数允许用户配置 CPU 的性能和功耗特性，包括缩放驱动程序操作模式、调节器、频率范围、能耗/性能策略、P 状态范围、提升功能以及 HWP 动态提升功能。</p><blockquote><p>部分电脑的BIOS会干预PState 所以需要检查自己的CPU是否支持</p></blockquote><h4 id=无线设备>无线设备</h4><table><thead><tr><th>参数名称</th><th>默认参数值</th><th>描述</th></tr></thead><tbody><tr><td>RESTORE_DEVICE_STATE_ON_STARTUP</td><td>0</td><td>在启动时从上次关机中恢复无线电设备状态。可能的值为 0（禁用）和 1（启用）。默认值：0。</td></tr><tr><td>DEVICES_TO_DISABLE_ON_STARTUP</td><td>""</td><td>在启动时禁用内置无线电设备。可能的值包括 bluetooth、wifi 和 wwan，多个设备用空白分隔。</td></tr><tr><td>DEVICES_TO_ENABLE_ON_STARTUP</td><td>""</td><td>在启动时启用内置无线电设备。可能的值与上述相同，用于启用在默认情况下禁用的设备。</td></tr><tr><td>DEVICES_TO_ENABLE_ON_AC</td><td>""</td><td>插入交流电源时启用内置无线电设备。可能的值与上述相同。</td></tr><tr><td>DEVICES_TO_DISABLE_ON_BAT</td><td>""</td><td>在更改为电池电源时禁用内置无线电设备，无论其连接状态如何。可能的值与上述相同。</td></tr><tr><td>DEVICES_TO_DISABLE_ON_BAT_NOT_IN_USE</td><td>""</td><td>在更改为电池电源时禁用未连接的内置无线电设备。可能的值与上述相同。</td></tr></tbody></table><p>这些参数允许用户配置在系统启动、关闭或更改电源状态时如何处理内置的蓝牙、Wi-Fi 和 WWAN 设备。可通过设置禁用或启用这些设备，以及在何种条件下执行这些操作。</p><h4 id=无线配置向导自动化配置>无线配置向导（自动化配置）</h4><table><thead><tr><th>参数名称</th><th>参考参数值</th><th>描述</th></tr></thead><tbody><tr><td>DEVICES_TO_DISABLE_ON_LAN_CONNECT</td><td>&ldquo;wifi wwan&rdquo;</td><td>当建立 LAN 连接时，禁用蓝牙、Wi-Fi 和 WWAN 设备。多个设备用空白分隔。</td></tr><tr><td>DEVICES_TO_DISABLE_ON_WIFI_CONNECT</td><td>&ldquo;wwan&rdquo;</td><td>当建立 Wi-Fi 连接时，禁用 WWAN 设备。</td></tr><tr><td>DEVICES_TO_DISABLE_ON_WWAN_CONNECT</td><td>&ldquo;wifi&rdquo;</td><td>当建立 WWAN 连接时，禁用 Wi-Fi 设备。</td></tr><tr><td>DEVICES_TO_ENABLE_ON_LAN_DISCONNECT</td><td>&ldquo;wifi wwan&rdquo;</td><td>当断开 LAN 连接时，启用蓝牙、Wi-Fi 和 WWAN 设备。多个设备用空白分隔。</td></tr><tr><td>DEVICES_TO_ENABLE_ON_WIFI_DISCONNECT</td><td>""</td><td>当断开 Wi-Fi 连接时，启用所有设备。</td></tr><tr><td>DEVICES_TO_ENABLE_ON_WWAN_DISCONNECT</td><td>""</td><td>当断开 WWAN 连接时，启用所有设备。</td></tr><tr><td>DEVICES_TO_ENABLE_ON_DOCK</td><td>""</td><td>在对接后，启用所有设备。</td></tr><tr><td>DEVICES_TO_DISABLE_ON_DOCK</td><td>""</td><td>在对接后，禁用所有设备。</td></tr><tr><td>DEVICES_TO_ENABLE_ON_UNDOCK</td><td>&ldquo;wifi&rdquo;</td><td>在取消对接后，启用 Wi-Fi 设备。</td></tr><tr><td>DEVICES_TO_DISABLE_ON_UNDOCK</td><td>""</td><td>在取消对接后，禁用所有设备。</td></tr></tbody></table><p>这些参数允许用户配置在特定事件触发时如何处理内置的蓝牙、Wi-Fi 和 WWAN 设备。用户可以根据 LAN、Wi-Fi 或 WWAN 的连接状态、对接或取消对接等事件来启用或禁用这些设备。</p><h4 id=pcie电源配置>PCIE电源配置</h4><table><thead><tr><th>参数名称</th><th>默认参数值</th><th>描述</th></tr></thead><tbody><tr><td>RUNTIME_PM_ON_AC</td><td>on</td><td>控制 PCIe 设备的运行时电源管理。可能的值：auto（启用）或 on（禁用）。未配置时的默认值：on（AC）。</td></tr><tr><td>RUNTIME_PM_ON_BAT</td><td>auto</td><td>控制 PCIe 设备的运行时电源管理。可能的值：auto（启用）或 on（禁用）。未配置时的默认值： auto（BAT）。</td></tr><tr><td>RUNTIME_PM_DENYLIST</td><td>""</td><td>从运行时电源管理中排除列出的 PCIe 设备地址。使用 lspci 查找地址。</td></tr><tr><td>RUNTIME_PM_DRIVER_DENYLIST</td><td>&ldquo;mei_me nouveau radeon&rdquo;</td><td>从运行时电源管理中排除分配给所列驱动程序的 PCIe 设备。使用 tlp-stat -e 查找驱动程序。</td></tr><tr><td>RUNTIME_PM_ENABLE</td><td>""</td><td>为列表中的 PCI（e） 设备地址永久启用（自动）运行时 PM。这优先于所有先前的运行时 PM 设置。使用 lspci 获取地址。</td></tr><tr><td>RUNTIME_PM_DISABLE</td><td>""</td><td>为列表中的 PCI（e） 设备地址永久禁用（on）运行时 PM。与 RUNTIME_PM_ENABLE 类似，不过是禁用。使用 lspci 获取地址。</td></tr><tr><td>PCIE_ASPM_ON_AC</td><td>default</td><td>设置 PCIe ASPM 省电模式。可能的值：default（推荐）、performance（性能）、powersave（省电）和 powersupersave（PowerSuperSave，超级省电）。未配置时的默认值：default。</td></tr><tr><td>PCIE_ASPM_ON_BAT</td><td>default</td><td>设置 PCIe ASPM 省电模式。可能的值：default（推荐）、performance（性能）、powersave（省电）和 powersupersave（PowerSuperSave，超级省电）。未配置时的默认值：default。</td></tr></tbody></table><p>这些参数允许用户配置与 PCIe 设备相关的运行时电源管理和 ASPM 等功能。用户可以根据电源来源、设备地址、驱动程序等来调整这些设置，以实现更好的功耗管理。</p><h4 id=usb>USB</h4><table><thead><tr><th>参数名称</th><th>默认参数值</th><th>描述</th></tr></thead><tbody><tr><td>USB_AUTOSUSPEND</td><td>1</td><td>在启动时和插入时为 USB 设备设置自动挂起模式。可能的值：1（启用）或 0（禁用）。未配置时的默认值：1。</td></tr><tr><td>USB_DENYLIST</td><td>""</td><td>从自动挂起模式中排除 USB 设备 ID。使用 tlp-stat -u 查找 ID。多个 ID 用空格分隔。</td></tr><tr><td>USB_EXCLUDE_AUDIO</td><td>1</td><td>从自动挂起模式中排除音频设备：1（排除）或 0（不排除）。未配置时的默认值：1。</td></tr><tr><td>USB_EXCLUDE_BTUSB</td><td>0</td><td>从自动挂起模式中排除蓝牙设备：1（排除）或 0（不排除）。未配置时的默认值：0。</td></tr><tr><td>USB_EXCLUDE_PHONE</td><td>0</td><td>将智能手机从自动挂起模式中排除以启用充电：1（排除）或 0（不排除）。未配置时的默认值：0。</td></tr><tr><td>USB_EXCLUDE_PRINTER</td><td>1</td><td>从自动挂起模式中排除打印机：1（排除）或 0（不排除）。未配置时的默认值：1。</td></tr><tr><td>USB_EXCLUDE_WWAN</td><td>0</td><td>从自动挂起模式中排除内置 WWAN 设备：1（排除）或 0（不排除）。未配置时的默认值：0。</td></tr><tr><td>USB_ALLOWLIST</td><td>""</td><td>为已被上述任何设置排除的 USB 设备 ID 重新启用自动挂起模式。使用 <code>tlp-stat -u</code> 查找 ID。多个 ID 用空格分隔。</td></tr><tr><td>USB_AUTOSUSPEND_DISABLE_ON_SHUTDOWN</td><td>0</td><td>在系统关闭时禁用 USB 自动挂起模式：1（启用）或 0（禁用）。未配置时的默认值：0。</td></tr></tbody></table><h4 id=trace-mode>Trace Mode</h4><p><code>TLP_DEBUG="arg bat disk lock nm path pm ps rf run sysfs udev usb"</code></p></div></article><aside class=post-toc><div class=post-toc-inner><p class=post-toc-title>目录</p><nav id=TableOfContents><ul><li><a href=#工作原理>工作原理</a><ul><li><a href=#tlp触发事件信号>TLP触发事件（信号）</a></li></ul></li><li><a href=#安装>安装</a></li><li><a href=#使用>使用</a><ul><li><a href=#启动>启动</a></li><li><a href=#状态>状态</a></li><li><a href=#命令行>命令行</a></li></ul></li><li><a href=#配置>配置</a><ul><li><a href=#配置文件>配置文件</a></li><li><a href=#参数默认值>参数默认值</a></li><li><a href=#参数语法>参数语法</a></li><li><a href=#配置详解>配置详解</a></li></ul></li></ul></nav></div></aside></section></main><footer class=site-footer><a class=footer-github href=https://github.com/xzl01 target=_blank rel="noopener noreferrer" aria-label=GitHub><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5A11.5 11.5.0 00.5 12.27a11.8 11.8.0 007.86 11.3c.58.11.8-.26.8-.57v-2.02c-3.2.72-3.88-1.58-3.88-1.58-.53-1.38-1.3-1.75-1.3-1.75-1.06-.75.08-.74.08-.74 1.18.09 1.79 1.25 1.79 1.25 1.05 1.86 2.75 1.32 3.42 1 .11-.78.41-1.32.74-1.62-2.55-.3-5.24-1.31-5.24-5.85.0-1.29.45-2.35 1.2-3.18-.12-.3-.52-1.52.11-3.17.0.0.98-.32 3.2 1.21a10.86 10.86.0 015.83.0c2.22-1.53 3.2-1.21 3.2-1.21.63 1.65.23 2.87.11 3.17.75.83 1.2 1.89 1.2 3.18.0 4.56-2.69 5.55-5.25 5.84.42.37.79 1.09.79 2.2V23c0 .31.21.68.8.57a11.8 11.8.0 007.85-11.3A11.5 11.5.0 0012 .5z"/></svg></a><p>&copy; 2026 HarryLoong</p><p class=footer-meta>commit local · updated 2026-03-11 10:59:47 +0800</p></footer><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js></script><script src="/js/site.js?v=1773197987"></script></body></html>
+如果未配置，默认情况下所有磁盘将使用内核的默认调度程序。</td>
+</tr>
+<tr>
+<td>SATA_LINKPWR_ON_AC/BAT</td>
+<td>&ldquo;med_power_with_dipm&rdquo;</td>
+<td>设置SATA链路的电源管理模式。可能的值包括：max_performance、medium_power、med_power_with_dipm、min_power。默认为med_power_with_dipm。</td>
+</tr>
+<tr>
+<td>SATA_LINKPWR_DENYLIST</td>
+<td>&ldquo;host1&rdquo;</td>
+<td>从AHCI链路电源管理（ALPM）中排除SATA磁盘的主机列表。默认为空。</td>
+</tr>
+<tr>
+<td>AHCI_RUNTIME_PM_ON_AC</td>
+<td>&ldquo;on&rdquo;</td>
+<td>控制NVMe、SATA、ATA和USB磁盘以及SATA端口的运行时电源管理。可能的值包括：auto（启用）、on（禁用）</td>
+</tr>
+<tr>
+<td>AHCI_RUNTIME_PM_ON_BAT</td>
+<td>&ldquo;auto&rdquo;</td>
+<td>同上</td>
+</tr>
+<tr>
+<td>AHCI_RUNTIME_PM_TIMEOUT</td>
+<td>15</td>
+<td>磁盘或端口挂起前的不活动时间（秒）。仅在激活AHCI_RUNTIME_PM_ON_AC/BAT时有效。默认为15。</td>
+</tr>
+</tbody>
+</table>
+<p>注释：DISK_IOSCHED 如果使用是NVME设备时，最好使用无IO调度程序来减少CPU开销（none和noop）</p>
+<h4 id="文件系统">文件系统</h4>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>默认参数值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DISK_IDLE_SECS_ON_AC/BAT</td>
+<td>0 (AC), 2 (battery)</td>
+<td>笔记本电脑模式等待磁盘空闲的秒数，然后再次将脏缓存块从 RAM 同步到磁盘。值大于0将激活内核笔记本电脑模式。请勿更改此设置。</td>
+</tr>
+<tr>
+<td>MAX_LOST_WORK_SECS_ON_AC/BAT</td>
+<td>15 (AC), 60 (battery)</td>
+<td>将文件系统缓冲区中未保存的数据写入磁盘的超时时间（秒）。</td>
+</tr>
+</tbody>
+</table>
+<h4 id="图形显卡">图形显卡</h4>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>默认参数值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>INTEL_GPU_MIN_FREQ_ON_AC/BAT</td>
+<td>0</td>
+<td>设置 Intel GPU 的最小频率。可能的值取决于硬件。通过运行 <code>tlp-stat -g</code> 命令查看可用频率。</td>
+</tr>
+<tr>
+<td>INTEL_GPU_MAX_FREQ_ON_AC/BAT</td>
+<td>0</td>
+<td>设置 Intel GPU 的最大频率。可能的值取决于硬件。通过运行 <code>tlp-stat -g</code>命令查看可用频率。</td>
+</tr>
+<tr>
+<td>INTEL_GPU_BOOST_FREQ_ON_AC/BAT</td>
+<td>0</td>
+<td>设置 Intel GPU 的睿频频率。可能的值取决于硬件。通过运行 <code>tlp-stat -g</code> 命令查看可用频率。</td>
+</tr>
+<tr>
+<td>RADEON_DPM_PERF_LEVEL_ON_AC/BAT</td>
+<td>auto</td>
+<td>控制 AMD GPU 的动态电源管理（DPM）性能级别。支持 amdgpu（仅限 TLP 版本 1.4 及更高版本）和 radeon 驱动程序。可能的值包括 auto、low、high。默认值：auto。</td>
+</tr>
+<tr>
+<td>RADEON_DPM_STATE_ON_AC/BAT</td>
+<td>performance (AC), battery (BAT)</td>
+<td>控制 AMD GPU 的电源管理方法。可能的值包括 battery、balanced、performance。默认值：performance（AC）、battery（BAT）。</td>
+</tr>
+<tr>
+<td>RADEON_POWER_PROFILE_ON_AC/BAT</td>
+<td>default</td>
+<td>控制 AMD GPU 的时钟。仅在旧版 ATI 硬件上受 radeon 驱动程序支持（DPM 不可用）。可能的值包括 low、mid、high、auto、default。默认值：default。</td>
+</tr>
+</tbody>
+</table>
+<p>这些参数允许用户调整 Intel GPU 和 AMD GPU 在交流电和电池模式下的性能和电源管理行为。在配置这些参数时，建议参考硬件规格和运行 <code>tlp-stat -g</code> 查看可用频率。</p>
+<h4 id="kernel">kernel</h4>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>默认参数值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NMI_WATCHDOG</td>
+<td>0</td>
+<td>激活内核 NMI 看门狗定时器。设置为 0 表示禁用，有助于节省电源。设置为 1 表示启用，对于内核调试和看门狗守护程序是相关的。</td>
+</tr>
+</tbody>
+</table>
+<p>不建议关闭watchdog 否则可能导致内核崩溃后无法自动重启和内核调试</p>
+<h4 id="网络">网络</h4>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>默认参数值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WIFI_PWR_ON_AC/BAT</td>
+<td>off (AC),</td>
+<td>设置 Wi-Fi 的电源保存模式。可能的值包括 off（禁用）和 on（启用）。默认值：off（AC）、on（BAT）。</td>
+</tr>
+<tr>
+<td></td>
+<td>on (BAT)</td>
+<td>提示：支持已弃用的配置值 1=off/5=on，以实现向后兼容性。</td>
+</tr>
+<tr>
+<td>WOL_DISABLE</td>
+<td>Y</td>
+<td>控制是否禁用 Wake-on-LAN（LAN 唤醒）。可能的值包括 Y（禁用）和 N（不禁用，保持 BIOS 默认）。默认值：Y。
+注意：更改为 WOL_DISABLE=N 后，需要重新启动才能使新设置生效（或在 shell 中使用 <code>sudo ethtool -s wol g</code>）。</td>
+</tr>
+</tbody>
+</table>
+<p>这些参数允许用户配置Wi-Fi的电源保存模式和控制Wake-on-LAN（LAN唤醒）功能。</p>
+<h4 id="平台">平台</h4>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>默认参数值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PLATFORM_PROFILE_ON_AC/BAT</td>
+<td>performance</td>
+<td>选择平台配置文件以控制系统的功率/性能级别、散热和风扇速度的运行特性。可能的值包括 performance、balanced、low-power。默认值：performance（AC）、low-power（BAT）。</td>
+</tr>
+<tr>
+<td>MEM_SLEEP_ON_AC/BAT</td>
+<td>s2idle</td>
+<td>选择系统挂起模式。可能的值包括 s2idle（空闲待机）和 deep（挂起到 RAM）。注意：更改挂起模式可能导致系统不稳定和数据丢失。请使用 tlp-stat -s 检查系统上不同模式的可用性。如果不确定，请坚持使用系统默认值。</td>
+</tr>
+</tbody>
+</table>
+<p>其实如果能使用S3休眠那就更好，不过现在很多厂商并不支持S3,所以如果能用S2那就用S2吧。</p>
+<h4 id="处理器">处理器</h4>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>默认参数值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CPU_DRIVER_OPMODE_ON_AC/BAT</td>
+<td>active (amd-pstate), active (intel_pstate)</td>
+<td>选择 CPU 缩放驱动程序操作模式。配置取决于活动驱动程序：对于 amd-pstate（Active 模式），可能的值为 active 和 passive；对于 intel_pstate（Active 模式），可能的值为 active、passive 和 guided。</td>
+</tr>
+<tr>
+<td>CPU_SCALING_GOVERNOR_ON_AC/BAT</td>
+<td>powersave</td>
+<td>选择用于自动频率缩放的 CPU 缩放调节器。配置取决于活动驱动程序。可能的值包括 performance、powersave、conservative、ondemand、userspace 和 schedutil。默认值：powersave（AC）、powersave（BAT）。</td>
+</tr>
+<tr>
+<td>CPU_SCALING_MIN/MAX_FREQ_ON_AC/BAT</td>
+<td>0, 9999999</td>
+<td>设置可用于缩放调控器的最小/最大频率。可能的值取决于您的 CPU。请查阅<code>tlp-stat -p</code>的输出以获取可用频率。</td>
+</tr>
+<tr>
+<td>CPU_ENERGY_PERF_POLICY_ON_AC/BAT</td>
+<td>balance_performance</td>
+<td>设置 CPU 能耗/性能策略。可能的值包括 performance、balance_performance、default、balance_power 和 power。默认值：balance_performance（AC）、balance_power（BAT）。</td>
+</tr>
+<tr>
+<td>CPU_MIN/MAX_PERF_ON_AC/BAT</td>
+<td>0, 100</td>
+<td>定义 Intel CPU 的最小/最大 P 状态，表示为总可用处理器性能的百分比。建议仅用于限制 CPU 的功耗。可能的值在 0 到 100 之间。默认值：0 到 100（AC）、0 到 30（BAT）。</td>
+</tr>
+<tr>
+<td>CPU_BOOST_ON_AC/BAT</td>
+<td>1</td>
+<td>配置 CPU “turbo boost”（Intel）或“turbo core”（AMD）功能。可能的值为 0（禁用）和 1（允许）。请注意，值为 1 不会激活提升，只是允许它。默认值：1（AC）、0（BAT）。</td>
+</tr>
+<tr>
+<td>CPU_HWP_DYN_BOOST_ON_AC/BAT</td>
+<td>1</td>
+<td>配置 Intel CPU HWP 动态提升功能。可能的值为 0（禁用）和 1（启用）。要求 Intel Core i 第 6 代（“Skylake”）或更新的 CPU，在活动模式下具有 intel_pstate 扩展驱动程序。默认值：1（AC）、0（BAT）。</td>
+</tr>
+</tbody>
+</table>
+<p>这些参数允许用户配置 CPU 的性能和功耗特性，包括缩放驱动程序操作模式、调节器、频率范围、能耗/性能策略、P 状态范围、提升功能以及 HWP 动态提升功能。</p>
+<blockquote>
+<p>部分电脑的BIOS会干预PState 所以需要检查自己的CPU是否支持</p>
+</blockquote>
+<h4 id="无线设备">无线设备</h4>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>默认参数值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RESTORE_DEVICE_STATE_ON_STARTUP</td>
+<td>0</td>
+<td>在启动时从上次关机中恢复无线电设备状态。可能的值为 0（禁用）和 1（启用）。默认值：0。</td>
+</tr>
+<tr>
+<td>DEVICES_TO_DISABLE_ON_STARTUP</td>
+<td>&quot;&quot;</td>
+<td>在启动时禁用内置无线电设备。可能的值包括 bluetooth、wifi 和 wwan，多个设备用空白分隔。</td>
+</tr>
+<tr>
+<td>DEVICES_TO_ENABLE_ON_STARTUP</td>
+<td>&quot;&quot;</td>
+<td>在启动时启用内置无线电设备。可能的值与上述相同，用于启用在默认情况下禁用的设备。</td>
+</tr>
+<tr>
+<td>DEVICES_TO_ENABLE_ON_AC</td>
+<td>&quot;&quot;</td>
+<td>插入交流电源时启用内置无线电设备。可能的值与上述相同。</td>
+</tr>
+<tr>
+<td>DEVICES_TO_DISABLE_ON_BAT</td>
+<td>&quot;&quot;</td>
+<td>在更改为电池电源时禁用内置无线电设备，无论其连接状态如何。可能的值与上述相同。</td>
+</tr>
+<tr>
+<td>DEVICES_TO_DISABLE_ON_BAT_NOT_IN_USE</td>
+<td>&quot;&quot;</td>
+<td>在更改为电池电源时禁用未连接的内置无线电设备。可能的值与上述相同。</td>
+</tr>
+</tbody>
+</table>
+<p>这些参数允许用户配置在系统启动、关闭或更改电源状态时如何处理内置的蓝牙、Wi-Fi 和 WWAN 设备。可通过设置禁用或启用这些设备，以及在何种条件下执行这些操作。</p>
+<h4 id="无线配置向导自动化配置">无线配置向导（自动化配置）</h4>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>参考参数值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DEVICES_TO_DISABLE_ON_LAN_CONNECT</td>
+<td>&ldquo;wifi wwan&rdquo;</td>
+<td>当建立 LAN 连接时，禁用蓝牙、Wi-Fi 和 WWAN 设备。多个设备用空白分隔。</td>
+</tr>
+<tr>
+<td>DEVICES_TO_DISABLE_ON_WIFI_CONNECT</td>
+<td>&ldquo;wwan&rdquo;</td>
+<td>当建立 Wi-Fi 连接时，禁用 WWAN 设备。</td>
+</tr>
+<tr>
+<td>DEVICES_TO_DISABLE_ON_WWAN_CONNECT</td>
+<td>&ldquo;wifi&rdquo;</td>
+<td>当建立 WWAN 连接时，禁用 Wi-Fi 设备。</td>
+</tr>
+<tr>
+<td>DEVICES_TO_ENABLE_ON_LAN_DISCONNECT</td>
+<td>&ldquo;wifi wwan&rdquo;</td>
+<td>当断开 LAN 连接时，启用蓝牙、Wi-Fi 和 WWAN 设备。多个设备用空白分隔。</td>
+</tr>
+<tr>
+<td>DEVICES_TO_ENABLE_ON_WIFI_DISCONNECT</td>
+<td>&quot;&quot;</td>
+<td>当断开 Wi-Fi 连接时，启用所有设备。</td>
+</tr>
+<tr>
+<td>DEVICES_TO_ENABLE_ON_WWAN_DISCONNECT</td>
+<td>&quot;&quot;</td>
+<td>当断开 WWAN 连接时，启用所有设备。</td>
+</tr>
+<tr>
+<td>DEVICES_TO_ENABLE_ON_DOCK</td>
+<td>&quot;&quot;</td>
+<td>在对接后，启用所有设备。</td>
+</tr>
+<tr>
+<td>DEVICES_TO_DISABLE_ON_DOCK</td>
+<td>&quot;&quot;</td>
+<td>在对接后，禁用所有设备。</td>
+</tr>
+<tr>
+<td>DEVICES_TO_ENABLE_ON_UNDOCK</td>
+<td>&ldquo;wifi&rdquo;</td>
+<td>在取消对接后，启用 Wi-Fi 设备。</td>
+</tr>
+<tr>
+<td>DEVICES_TO_DISABLE_ON_UNDOCK</td>
+<td>&quot;&quot;</td>
+<td>在取消对接后，禁用所有设备。</td>
+</tr>
+</tbody>
+</table>
+<p>这些参数允许用户配置在特定事件触发时如何处理内置的蓝牙、Wi-Fi 和 WWAN 设备。用户可以根据 LAN、Wi-Fi 或 WWAN 的连接状态、对接或取消对接等事件来启用或禁用这些设备。</p>
+<h4 id="pcie电源配置">PCIE电源配置</h4>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>默认参数值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RUNTIME_PM_ON_AC</td>
+<td>on</td>
+<td>控制 PCIe 设备的运行时电源管理。可能的值：auto（启用）或 on（禁用）。未配置时的默认值：on（AC）。</td>
+</tr>
+<tr>
+<td>RUNTIME_PM_ON_BAT</td>
+<td>auto</td>
+<td>控制 PCIe 设备的运行时电源管理。可能的值：auto（启用）或 on（禁用）。未配置时的默认值： auto（BAT）。</td>
+</tr>
+<tr>
+<td>RUNTIME_PM_DENYLIST</td>
+<td>&quot;&quot;</td>
+<td>从运行时电源管理中排除列出的 PCIe 设备地址。使用 lspci 查找地址。</td>
+</tr>
+<tr>
+<td>RUNTIME_PM_DRIVER_DENYLIST</td>
+<td>&ldquo;mei_me nouveau radeon&rdquo;</td>
+<td>从运行时电源管理中排除分配给所列驱动程序的 PCIe 设备。使用 tlp-stat -e 查找驱动程序。</td>
+</tr>
+<tr>
+<td>RUNTIME_PM_ENABLE</td>
+<td>&quot;&quot;</td>
+<td>为列表中的 PCI（e） 设备地址永久启用（自动）运行时 PM。这优先于所有先前的运行时 PM 设置。使用 lspci 获取地址。</td>
+</tr>
+<tr>
+<td>RUNTIME_PM_DISABLE</td>
+<td>&quot;&quot;</td>
+<td>为列表中的 PCI（e） 设备地址永久禁用（on）运行时 PM。与 RUNTIME_PM_ENABLE 类似，不过是禁用。使用 lspci 获取地址。</td>
+</tr>
+<tr>
+<td>PCIE_ASPM_ON_AC</td>
+<td>default</td>
+<td>设置 PCIe ASPM 省电模式。可能的值：default（推荐）、performance（性能）、powersave（省电）和 powersupersave（PowerSuperSave，超级省电）。未配置时的默认值：default。</td>
+</tr>
+<tr>
+<td>PCIE_ASPM_ON_BAT</td>
+<td>default</td>
+<td>设置 PCIe ASPM 省电模式。可能的值：default（推荐）、performance（性能）、powersave（省电）和 powersupersave（PowerSuperSave，超级省电）。未配置时的默认值：default。</td>
+</tr>
+</tbody>
+</table>
+<p>这些参数允许用户配置与 PCIe 设备相关的运行时电源管理和 ASPM 等功能。用户可以根据电源来源、设备地址、驱动程序等来调整这些设置，以实现更好的功耗管理。</p>
+<h4 id="usb">USB</h4>
+<table>
+<thead>
+<tr>
+<th>参数名称</th>
+<th>默认参数值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>USB_AUTOSUSPEND</td>
+<td>1</td>
+<td>在启动时和插入时为 USB 设备设置自动挂起模式。可能的值：1（启用）或 0（禁用）。未配置时的默认值：1。</td>
+</tr>
+<tr>
+<td>USB_DENYLIST</td>
+<td>&quot;&quot;</td>
+<td>从自动挂起模式中排除 USB 设备 ID。使用 tlp-stat -u 查找 ID。多个 ID 用空格分隔。</td>
+</tr>
+<tr>
+<td>USB_EXCLUDE_AUDIO</td>
+<td>1</td>
+<td>从自动挂起模式中排除音频设备：1（排除）或 0（不排除）。未配置时的默认值：1。</td>
+</tr>
+<tr>
+<td>USB_EXCLUDE_BTUSB</td>
+<td>0</td>
+<td>从自动挂起模式中排除蓝牙设备：1（排除）或 0（不排除）。未配置时的默认值：0。</td>
+</tr>
+<tr>
+<td>USB_EXCLUDE_PHONE</td>
+<td>0</td>
+<td>将智能手机从自动挂起模式中排除以启用充电：1（排除）或 0（不排除）。未配置时的默认值：0。</td>
+</tr>
+<tr>
+<td>USB_EXCLUDE_PRINTER</td>
+<td>1</td>
+<td>从自动挂起模式中排除打印机：1（排除）或 0（不排除）。未配置时的默认值：1。</td>
+</tr>
+<tr>
+<td>USB_EXCLUDE_WWAN</td>
+<td>0</td>
+<td>从自动挂起模式中排除内置 WWAN 设备：1（排除）或 0（不排除）。未配置时的默认值：0。</td>
+</tr>
+<tr>
+<td>USB_ALLOWLIST</td>
+<td>&quot;&quot;</td>
+<td>为已被上述任何设置排除的 USB 设备 ID 重新启用自动挂起模式。使用 <code>tlp-stat -u</code> 查找 ID。多个 ID 用空格分隔。</td>
+</tr>
+<tr>
+<td>USB_AUTOSUSPEND_DISABLE_ON_SHUTDOWN</td>
+<td>0</td>
+<td>在系统关闭时禁用 USB 自动挂起模式：1（启用）或 0（禁用）。未配置时的默认值：0。</td>
+</tr>
+</tbody>
+</table>
+<h4 id="trace-mode">Trace Mode</h4>
+<p><code>TLP_DEBUG=&quot;arg bat disk lock nm path pm ps rf run sysfs udev usb&quot;</code></p>
+
+        </div>
+    </article>
+
+    
+    <aside class="post-toc">
+        <div class="post-toc-inner">
+            <p class="post-toc-title">目录</p>
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#工作原理">工作原理</a>
+      <ul>
+        <li><a href="#tlp触发事件信号">TLP触发事件（信号）</a></li>
+      </ul>
+    </li>
+    <li><a href="#安装">安装</a></li>
+    <li><a href="#使用">使用</a>
+      <ul>
+        <li><a href="#启动">启动</a></li>
+        <li><a href="#状态">状态</a></li>
+        <li><a href="#命令行">命令行</a></li>
+      </ul>
+    </li>
+    <li><a href="#配置">配置</a>
+      <ul>
+        <li><a href="#配置文件">配置文件</a></li>
+        <li><a href="#参数默认值">参数默认值</a></li>
+        <li><a href="#参数语法">参数语法</a></li>
+        <li><a href="#配置详解">配置详解</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </aside>
+    
+</section>
+
+    </main>
+
+    <footer class="site-footer">
+        <a class="footer-github" href="https://github.com/xzl01" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 .5A11.5 11.5 0 0 0 .5 12.27a11.8 11.8 0 0 0 7.86 11.3c.58.11.8-.26.8-.57v-2.02c-3.2.72-3.88-1.58-3.88-1.58-.53-1.38-1.3-1.75-1.3-1.75-1.06-.75.08-.74.08-.74 1.18.09 1.79 1.25 1.79 1.25 1.05 1.86 2.75 1.32 3.42 1 .11-.78.41-1.32.74-1.62-2.55-.3-5.24-1.31-5.24-5.85 0-1.29.45-2.35 1.2-3.18-.12-.3-.52-1.52.11-3.17 0 0 .98-.32 3.2 1.21a10.86 10.86 0 0 1 5.83 0c2.22-1.53 3.2-1.21 3.2-1.21.63 1.65.23 2.87.11 3.17.75.83 1.2 1.89 1.2 3.18 0 4.56-2.69 5.55-5.25 5.84.42.37.79 1.09.79 2.2V23c0 .31.21.68.8.57a11.8 11.8 0 0 0 7.85-11.3A11.5 11.5 0 0 0 12 .5Z"/>
+            </svg>
+        </a>
+        <p>&copy; 2026 HarryLoong</p>
+        <p class="footer-meta">commit local · updated 2026-04-02 23:45:21 &#43;0800</p>
+    </footer>
+
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script defer src="/js/site.js?v=1775144721"></script>
+</body>
+</html>
