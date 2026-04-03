@@ -2232,3 +2232,27 @@ html[data-theme="dark"] {
   --code-del-bg: #3a2420;
   --code-del-text: #c9916e;
 }
+
+/* ===== beautification: code block copy button ===== */
+pre { position: relative; }
+
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font: 12px/1.2 system-ui, sans-serif;
+  color: var(--paper);
+  background: rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 200ms ease, background 200ms ease;
+  z-index: 5;
+  user-select: none;
+}
+
+pre:hover .copy-btn { opacity: 1; }
+.copy-btn:hover { background: rgba(0, 0, 0, 0.78); }
+.copy-btn:active { transform: scale(0.95); }
