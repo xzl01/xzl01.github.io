@@ -313,3 +313,33 @@
     initTocFollow();
   });
 })();
+
+/* Scroll progress bar */
+(function () {
+  var bar = document.querySelector('.scroll-progress');
+  if (!bar) return;
+  function update() {
+    var scrollTop = window.scrollY || document.documentElement.scrollTop;
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var pct = docHeight > 0 ? (scrollTop / docHeight * 100) : 0;
+    bar.style.width = pct + '%';
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+})();
+
+/* Bottom nav active state */
+(function () {
+  var nav = document.querySelector('.site-nav-bottom');
+  if (!nav) return;
+  var links = nav.querySelectorAll('a');
+  var path = location.pathname;
+  links.forEach(function (link) {
+    var href = link.getAttribute('href');
+    if (href === '/' && (path === '/' || path === '')) {
+      link.classList.add('active');
+    } else if (href !== '/' && path.startsWith(href)) {
+      link.classList.add('active');
+    }
+  });
+})();

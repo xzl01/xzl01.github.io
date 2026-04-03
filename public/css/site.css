@@ -2256,3 +2256,166 @@ pre { position: relative; }
 pre:hover .copy-btn { opacity: 1; }
 .copy-btn:hover { background: rgba(0, 0, 0, 0.78); }
 .copy-btn:active { transform: scale(0.95); }
+
+/* ===== beautification: hero gradient title ===== */
+.home-intro h1 {
+  font-size: clamp(2.6rem, 6.5vw, 5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.06;
+  text-wrap: balance;
+  background: linear-gradient(128deg, var(--text) 40%, var(--brand) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.8rem;
+}
+
+.home-intro .subtitle,
+.home-intro p {
+  font-size: clamp(1rem, 2.2vw, 1.2rem);
+  color: var(--muted);
+  line-height: 1.72;
+  max-width: 58ch;
+}
+
+/* ===== beautification: scroll progress bar ===== */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--brand), color-mix(in srgb, var(--brand) 60%, var(--accent)));
+  width: 0%;
+  z-index: 200;
+  transition: width 50ms linear;
+  pointer-events: none;
+}
+
+/* ===== beautification: skeleton loading animation ===== */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--border) 20%, transparent) 25%,
+    color-mix(in srgb, var(--border) 40%, transparent) 50%,
+    color-mix(in srgb, var(--border) 20%, transparent) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.6s infinite linear;
+  border-radius: 6px;
+}
+
+.skeleton-text {
+  height: 1em;
+  margin-bottom: 0.5em;
+  border-radius: 4px;
+}
+
+.skeleton-title {
+  height: 1.6em;
+  width: 70%;
+  margin-bottom: 0.8em;
+  border-radius: 4px;
+}
+
+.skeleton-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ===== beautification: bottom nav active state JS ===== */
+/* (JS added inline below) */
+
+/* ===== beautification: subtle hover underline animation ===== */
+.nav-links a,
+.footer-links a {
+  position: relative;
+  text-decoration: none;
+}
+
+.nav-links a::after,
+.footer-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--brand);
+  transition: width 250ms ease;
+}
+
+.nav-links a:hover::after,
+.footer-links a:hover::after {
+  width: 100%;
+}
+
+/* ===== beautification: article image hover ===== */
+.article-content img,
+.post-content img,
+.content img {
+  border-radius: 10px;
+  transition: transform 300ms ease, box-shadow 300ms ease;
+}
+.article-content img:hover,
+.post-content img:hover,
+.content img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 12px 36px rgba(31, 41, 51, 0.14);
+}
+
+/* ===== beautification: page transition ===== */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.home-intro,
+.summary-card,
+.post-card,
+.home-card,
+.home-channel-card {
+  animation: fadeSlideIn 400ms ease both;
+}
+
+.summary-card:nth-child(2) { animation-delay: 60ms; }
+.summary-card:nth-child(3) { animation-delay: 120ms; }
+.summary-card:nth-child(4) { animation-delay: 180ms; }
+.summary-card:nth-child(5) { animation-delay: 240ms; }
+.summary-card:nth-child(6) { animation-delay: 300ms; }
+
+/* ===== beautification: blockquote styling ===== */
+blockquote {
+  border-left: 3px solid var(--brand);
+  padding: 0.6rem 1.2rem;
+  margin: 1.5rem 0;
+  background: color-mix(in srgb, var(--brand) 6%, transparent);
+  border-radius: 0 10px 10px 0;
+  font-style: italic;
+  color: var(--muted);
+}
+
+/* ===== beautification: table styling ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow-soft, 0 2px 8px rgba(0,0,0,0.06));
+}
+th {
+  background: color-mix(in srgb, var(--brand) 12%, transparent);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.7rem 1rem;
+}
+td { padding: 0.6rem 1rem; }
+tr:not(:last-child) td { border-bottom: 1px solid var(--border-soft); }
+tr:hover td { background: color-mix(in srgb, var(--brand) 4%, transparent); }
