@@ -6,6 +6,9 @@ title = "HarryLoong's Blog"
   home = ["HTML"]
   page = ["HTML"]
 
+[minify]
+  minifyOutput = true
+
 [markup]
   [markup.highlight]
     noClasses = false
