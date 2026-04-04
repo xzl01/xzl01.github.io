@@ -9,55 +9,11 @@
     }
   }
 
-  function getLocalTimeBucket() {
+  function getThemeByHour() {
     var h = new Date().getHours();
     if (h >= 6 && h < 10) return "sunrise";
     if (h >= 10 && h < 16) return "noon";
     if (h >= 16 && h < 19) return "dusk";
-    return "midnight";
-  }
-
-  function clamp(value, min, max) {
-    return Math.min(max, Math.max(min, value));
-  }
-
-  function solarPosition(date, lat, lon) {
-    var rad = Math.PI / 180;
-    var d = (date.getTime() - Date.UTC(2000, 0, 1, 12, 0, 0)) / 86400000;
-
-    var g = rad * (357.529 + 0.98560028 * d);
-    var q = rad * (280.459 + 0.98564736 * d);
-    var L = q + rad * (1.915 * Math.sin(g) + 0.02 * Math.sin(2 * g));
-
-    var e = rad * (23.439 - 0.00000036 * d);
-    var sinDec = Math.sin(e) * Math.sin(L);
-    var dec = Math.asin(sinDec);
-
-    var ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L));
-
-    var gmst = 18.697374558 + 24.06570982441908 * d;
-    var lst = ((gmst + lon / 15) % 24 + 24) % 24;
-    var ha = lst * 15 * rad - ra;
-
-    var latRad = lat * rad;
-    var elev = Math.asin(
-      Math.sin(latRad) * Math.sin(dec) +
-        Math.cos(latRad) * Math.cos(dec) * Math.cos(ha)
-    );
-    var az = Math.atan2(
-      Math.sin(ha),
-      Math.cos(ha) * Math.sin(latRad) - Math.tan(dec) * Math.cos(latRad)
-    );
-    return {
-      elevation: elev / rad,
-      azimuth: ((az / rad + 180) % 360 + 360) % 360,
-    };
-  }
-
-  function phaseFromElevation(elev) {
-    if (elev >= 42) return "noon";
-    if (elev >= 8) return "sunrise";
-    if (elev >= -8) return "dusk";
     return "midnight";
   }
 
@@ -80,39 +36,15 @@
     }
   }
 
-  function applyAutoTheme(coords) {
-    if (!coords) {
-      setTheme(getLocalTimeBucket());
-      return;
-    }
-    var pos = solarPosition(new Date(), coords.lat, coords.lon);
-    setTheme(phaseFromElevation(pos.elevation));
-  }
-
-  function updateSolarBlob(coords) {
+  function updateSolarBlob() {
     var now = new Date();
-    var x;
-    var y;
-    var opacity;
-    var size;
-
-    if (coords) {
-      var pos = solarPosition(now, coords.lat, coords.lon);
-      var elev = pos.elevation;
-      var elevNorm = clamp((elev + 12) / 78, 0, 1);
-      x = clamp((pos.azimuth / 360) * 100, 8, 92);
-      y = clamp(80 - elevNorm * 62, 18, 82);
-      opacity = clamp(0.06 + elevNorm * 0.34, 0.06, 0.4);
-      size = 180 + elevNorm * 120;
-    } else {
-      var hour = now.getHours() + now.getMinutes() / 60;
-      var progress = clamp((hour - 6) / 12, 0, 1);
-      var fakeElev = Math.sin(progress * Math.PI);
-      x = 10 + progress * 80;
-      y = 80 - fakeElev * 56;
-      opacity = 0.08 + fakeElev * 0.28;
-      size = 180 + fakeElev * 110;
-    }
+    var hour = now.getHours() + now.getMinutes() / 60;
+    var progress = Math.max(0, Math.min(1, (hour - 6) / 12));
+    var fakeElev = Math.sin(progress * Math.PI);
+    var x = 10 + progress * 80;
+    var y = 80 - fakeElev * 56;
+    var opacity = 0.08 + fakeElev * 0.28;
+    var size = 180 + fakeElev * 110;
 
     document.body.style.setProperty("--sun-x", x.toFixed(2) + "%");
     document.body.style.setProperty("--sun-y", y.toFixed(2) + "%");
@@ -129,14 +61,13 @@
 
     var mode = localStorage.getItem(STORAGE_MODE) || "auto";
     var manualTheme = localStorage.getItem(STORAGE_MANUAL) || "sunrise";
-    var coords = null;
     var timer = null;
 
     function runCycle() {
       if (mode === "auto") {
-        applyAutoTheme(coords);
+        setTheme(getThemeByHour());
       }
-      updateSolarBlob(coords);
+      updateSolarBlob();
     }
 
     function startTimer() {
@@ -144,9 +75,7 @@
       if (timer) {
         clearInterval(timer);
       }
-      timer = window.setInterval(function () {
-        runCycle();
-      }, AUTO_UPDATE_MS);
+      timer = window.setInterval(runCycle, AUTO_UPDATE_MS);
     }
 
     setMode(mode);
@@ -173,9 +102,6 @@
         runCycle();
       }
     });
-
-    // Geolocation removed for privacy — using local time for theme auto-cycle instead
-    startTimer();
   }
 
   function initReveal() {
@@ -335,11 +261,11 @@
   var links = nav.querySelectorAll('a');
   var path = location.pathname;
   links.forEach(function (link) {
-    var href = link.getAttribute('href');
+    var href = link.getAttribute("href");
     if (href === '/' && (path === '/' || path === '')) {
-      link.classList.add('active');
+      link.classList.add("active");
     } else if (href !== '/' && path.startsWith(href)) {
-      link.classList.add('active');
+      link.classList.add("active");
     }
   });
 })();
