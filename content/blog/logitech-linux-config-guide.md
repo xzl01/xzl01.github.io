@@ -106,23 +106,23 @@ devices: (
     {
         // 设备名称（必须与设备匹配）
         name: "Wireless Mouse MX Master 2S";
-        
+
         // DPI 设置
         dpi: 2000;
-        
+
         // SmartShift 滚轮模式
         smartshift: {
             on: true;
             threshold: 30;
         };
-        
+
         // HiRes 滚轮设置
         hiresscroll: {
             hires: true;
             invert: false;
             target: false;
         };
-        
+
         // 按钮映射
         buttons: (
             {

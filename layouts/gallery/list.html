@@ -22,7 +22,7 @@
 {{ $firstName := replaceRE "\\.[^.]+$" "" $first }}
 <section class="gallery-spotlight reveal">
     <a class="gallery-spotlight-media" href="/gallery/{{ $first }}" target="_blank" rel="noopener noreferrer">
-        <img src="/gallery/{{ $first }}" alt="精选作品 {{ $first }}" loading="eager" fetchpriority="high">
+        <img src="/gallery/{{ $first }}" alt="精选作品 {{ $first }}" loading="eager" fetchpriority="high" decoding="async">
     </a>
     <div class="gallery-spotlight-meta">
         <p class="gallery-kicker">Featured Shot</p>
@@ -39,7 +39,7 @@
     {{ range $idx, $item := $sorted }}
     <article class="gallery-feed-item">
         <a class="gallery-feed-thumb" href="/gallery/{{ $item }}" target="_blank" rel="noopener noreferrer">
-            <img src="/gallery/{{ $item }}" alt="摄影作品 {{ $item }}" loading="lazy">
+            <img src="/gallery/{{ $item }}" alt="摄影作品 {{ $item }}" loading="lazy" decoding="async">
         </a>
         <div class="gallery-feed-body">
             <p class="gallery-feed-index">#{{ add $idx 1 }}</p>

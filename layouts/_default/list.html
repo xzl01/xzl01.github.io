@@ -6,7 +6,7 @@
 
 {{ range .Pages.ByDate.Reverse }}
 <article class="post-card reveal">
-    <p class="post-date">{{ partial "post-time.html" . }}</p>
+    <time class="post-date" datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ partial "post-time.html" . }}</time>
     <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
     <p class="post-desc">{{ with .Description }}{{ . }}{{ else }}{{ .Summary | plainify | truncate 120 }}{{ end }}</p>
     {{ with .Params.tags }}

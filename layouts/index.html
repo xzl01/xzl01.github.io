@@ -15,25 +15,49 @@
 {{ if gt (len $galleryImages) 0 }}
     {{ $latestGallery = index (sort $galleryImages "value" "desc") 0 }}
 {{ end }}
+{{ $latestPost := false }}
+{{ if gt (len $posts) 0 }}
+    {{ $latestPost = index ($posts.ByDate.Reverse) 0 }}
+{{ end }}
 
 <section class="home-intro reveal">
-    <p class="home-label">Home</p>
-    <h2>技术写作与摄影记录，共用一套更克制的首页结构。</h2>
-    <p>博客整理长期有效的工程经验，图库保留观察与取景的节奏，两者并列，不互相附属。</p>
+    <div>
+        <p class="home-label">Notebook / Gallery</p>
+        <h2>把工程问题写清楚，也把日常观察留下来。</h2>
+        <p>这里主要收集 Linux、系统维护、开发实践和一些摄影记录。入口保持简单，重点放在可读性、检索和持续更新。</p>
+        <dl class="home-stat-strip" aria-label="站点概览">
+            <div>
+                <dt>文章</dt>
+                <dd>{{ len $posts }}</dd>
+            </div>
+            <div>
+                <dt>图库</dt>
+                <dd>{{ len $galleryImages }}</dd>
+            </div>
+            {{ with $latestPost }}
+            <div>
+                <dt>最近</dt>
+                <dd><time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ partial "post-time.html" . }}</time></dd>
+            </div>
+            {{ end }}
+        </dl>
+    </div>
+    <div class="home-intro-actions">
+        <a class="home-primary-link" href="/blog/">阅读文章</a>
+        <a class="home-secondary-link" href="/gallery/">查看图库</a>
+    </div>
 </section>
 
 <section class="home-channel-stack">
     <article class="home-channel-card reveal">
         <div class="home-channel-media home-channel-media-blog" aria-hidden="true">
-            <div class="home-channel-orb home-channel-orb-a"></div>
-            <div class="home-channel-orb home-channel-orb-b"></div>
             <div class="home-channel-grid"></div>
         </div>
         <div class="home-channel-body">
             <p class="home-label">Blog</p>
             <h3>技术博客</h3>
             <p>Linux、系统维护、工程实践与排障记录，偏长期可复用的技术内容。</p>
-            {{ with index ($posts.ByDate.Reverse) 0 }}
+            {{ with $latestPost }}
             <div class="home-channel-note">
                 <span>最近更新</span>
                 <strong>{{ .Title }}</strong>
@@ -45,12 +69,10 @@
     <article class="home-channel-card reveal">
         {{ if ne $latestGallery "" }}
         <a class="home-channel-media-link" href="/gallery/">
-            <img class="home-channel-image" src="/gallery/{{ $latestGallery }}" alt="摄影图库封面" loading="lazy">
+            <img class="home-channel-image" src="/gallery/{{ $latestGallery }}" alt="摄影图库封面" loading="lazy" decoding="async">
         </a>
         {{ else }}
         <div class="home-channel-media home-channel-media-gallery" aria-hidden="true">
-            <div class="home-channel-orb home-channel-orb-c"></div>
-            <div class="home-channel-orb home-channel-orb-d"></div>
         </div>
         {{ end }}
         <div class="home-channel-body">
@@ -78,7 +100,7 @@
                 <a href="{{ .RelPermalink }}">{{ .Title }}</a>
                 <p>{{ with .Description }}{{ . | truncate 68 }}{{ else }}{{ .Summary | plainify | truncate 68 }}{{ end }}</p>
             </div>
-            <span>{{ partial "post-time.html" . }}</span>
+            <time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ partial "post-time.html" . }}</time>
         </li>
         {{ end }}
     </ul>

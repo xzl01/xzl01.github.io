@@ -1,15 +1,17 @@
 {{ define "main" }}
+{{ $isSimplePage := .Params.simple_page }}
 <section class="single-layout">
     <article class="single-post">
         <header class="post-header">
-            <p class="post-kicker">Article</p>
+            <p class="post-kicker">{{ with .Params.eyebrow }}{{ . }}{{ else }}Article{{ end }}</p>
             <h1 class="post-title">{{ .Title }}</h1>
             {{ with .Description }}
             <p class="post-summary">{{ . }}</p>
             {{ end }}
 
+            {{ if not $isSimplePage }}
             <div class="post-meta">
-                <span>{{ partial "post-time.html" . }}</span>
+                <time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ partial "post-time.html" . }}</time>
                 <span>·</span>
                 <span>{{ .ReadingTime }} 分钟阅读</span>
                 {{ with .Params.categories }}
@@ -25,6 +27,7 @@
                 {{ end }}
             </div>
             {{ end }}
+            {{ end }}
         </header>
 
         <div class="post-divider" aria-hidden="true"></div>
@@ -34,7 +37,7 @@
         </div>
     </article>
 
-    {{ if .TableOfContents }}
+    {{ if and .TableOfContents (not .Params.hide_toc) }}
     <aside class="post-toc">
         <div class="post-toc-inner">
             <p class="post-toc-title">目录</p>

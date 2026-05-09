@@ -1,4 +1,8 @@
 /* ===== mobile bottom navigation bar ===== */
+.site-nav-bottom {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .site-nav-bottom {
     position: fixed;
@@ -15,7 +19,7 @@
     border-top: 1px solid color-mix(in srgb, var(--brand) 16%, transparent);
     box-shadow: 0 -6px 24px rgba(31, 41, 51, 0.07);
     z-index: 100;
-    padding: 0 4px;
+    padding: 0 max(4px, env(safe-area-inset-left)) env(safe-area-inset-bottom) max(4px, env(safe-area-inset-right));
   }
 
   .site-nav-bottom a {
@@ -24,7 +28,10 @@
     align-items: center;
     justify-content: center;
     gap: 3px;
-    padding: 6px 14px;
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 48px;
+    padding: 6px 4px;
     color: var(--muted);
     text-decoration: none;
     font-size: 10px;
@@ -34,9 +41,10 @@
   }
 
   .site-nav-bottom a:hover,
+  .site-nav-bottom a[aria-current="page"],
   .site-nav-bottom a.active {
     color: var(--brand);
-    transform: translateY(-2px);
+    background: color-mix(in srgb, var(--brand) 10%, transparent);
   }
 
   .site-nav-bottom a svg {
